@@ -9,3 +9,4 @@ Compatability/
 .idea/
 ParticleHats/out/
 ParticleHats/lib/fusion-bukkit.jar
+/target/

@@ -1,0 +1,27 @@
+##################################################################
+#                                                                #
+#         Here you can configure unique groups that will         #
+#              each have access to a different menu              #
+#                                                                #
+# Groups are ordered by their weight, lower weights will be      #
+# checked first                                                  #
+#                                                                #
+# Example:                                                       #
+# default:                                                       #
+#   default-menu: particles.yml                                  #
+#   weight: 0                                                    #
+# member:                                                        #
+#   default-menu: members.yml                                    #
+#   weight: 5                                                    $
+# vip:                                                           #
+#   default-menu: vip.yml                                        #
+#   weight: 10                                                   #
+#                                                                #
+# Permissions for groups follow this format:                     #
+# - particlehats.group.<group name.                              #
+#                                                                #
+##################################################################
+#
+og-pro:
+  default-menu: particle.yml
+  weight: 1

@@ -1,0 +1,212 @@
+# ##########################################################
+#                                                         #
+#                      ParticleHats                       #
+#                     by Medius_Echo                      #
+#                                                         #
+# Source Code: https://github.com/MediusEcho/ParticleHats #
+# Wiki: https://github.com/MediusEcho/ParticleHats/Wiki   #
+#                                                         #
+# ##########################################################
+#
+# Don't Change This!
+# This value gets updated automatically
+version: 2.2
+#
+# Enable automatic config updates
+config-auto-update: true
+#
+# Set the default menu that will open any time a player executes /h
+default-menu: particles.yml
+#
+# Set the language file
+# You must create your own .lang file if you want to edit messages
+lang: en_US.lang
+#
+# Loads the included menus:
+# - particles.yml
+load-included-menus: true
+#
+# Loads the included custom types:
+# - butterfly_wings_colorable.png
+# - vampire_wings.png
+load-included-custom-types: false
+#
+# Choose which worlds this plugin should ignore
+disabled-worlds: []
+#
+# Checks to see if a player has permission to use particles for the world they're in.
+check-world-permission: false
+#
+# Closes the players menu any time they equip a hat
+close-menu-on-equip: true
+#
+# Use {CURRENCY} in your item descriptions to utilize this value
+currency: &BDiamonds
+#
+# Let menus dynamically update their content (Cosmetic only)
+live-menus: true
+#
+# Set how often menus are updated (1 = fastest)
+live-menu-update-frequency: 5
+#
+# Set the maximum amount of hats a player can be wearing at once. Range is (1 - 28)
+max-hats: 28
+#
+# unequips a players oldest hat if they equip more than allowed
+unequip-overflow-hats: true
+#
+# Checks the players purchased history from older versions
+#
+# Older purchase history is not as accurate, players may be able to equip newer particles they
+# have not purchased because of this. 
+#
+# It is advised to leave this disabled, and require players to purchase their hats again
+# This value is ignored if you are using a MySQL database
+#
+check-against-legacy-purchases: false
+#
+database:
+  #
+  # Choose how the plugin saves data
+  # Supported types are [yml, mysql]
+  type: yml
+  #
+  # MySQL properties
+  username: REDACTED
+  password: REDACTED
+  hostname: localhost
+  port: 3306
+  database: ParticleHats
+  
+  # Advanced properties used when connecting to the database
+  configuration-properties: ?useSSL=true
+#
+flags:
+  #
+  # Enable Vault and use any economy plugin you want to unlock hats
+  vault: false
+  #
+  # Enable PlayerPoints economy
+  playerpoints: false
+  #
+  # Allow players to unlock hats using their experience points
+  experience: false
+  #
+  # Allow players to equip hats based on permissions
+  permission: true
+  #
+  # Use a supported vanish plugin, and hide particles any time a player vanishes
+  # Supported plugins are: SuperVanish, PremiumVanish, & VanishNoPacket
+  vanish: false
+  #
+  # Disable particle effects when a player has a potion of invisibility effect
+  essentials-vanish: true
+  #
+  # Enable TokenManager economy
+  token-manager: false
+#
+afk:
+  # Set how many seconds the plugin will wait before marking a player as AFK
+  cooldown: 60
+#
+combat:
+  # Set how many seconds the plugin will wait before marking a player as peaceful
+  cooldown: 5
+  #
+  # These combat flags allow you to specify which types of entities to check for when a player is attacking
+  #
+  # Disable a players peaceful status when they attack other players
+  check-players: true
+  #
+  # Disable a players peaceful status when they attack monsters
+  check-monsters: true
+  #
+  # Disable a players peaceful status when they attack animals
+  check-animals: true
+  #
+  # Disable a players peaceful status when they attack villagers
+  check-npc: true
+#
+menu:
+  #
+  # Hat icons will be replaced if the player does not have permission to equip them
+  lock-hats-without-permission: false
+  #
+  # Shows the hats description when it is locked
+  # This only affects the "description" property, an items "permission-description" will still appear
+  show-description-when-locked: true
+  #
+  locked-item:
+    #
+    # This item will replace the hat's normal icon
+    id: LAPIS_LAZULI
+    damage-value: 0
+    title: '&cLocked'
+  #
+  # Open a menu when the player right clicks while holding an item
+  open-menu-with-item:
+    #
+    enabled: false
+    #
+    # The default menu the player will open
+    default-menu: particles.yml
+    #
+    # Opens the players group menu instead of the default_menu
+    use-player-group: false
+    #
+    # Which item the player needs to interact with
+    id: NETHER_STAR
+    damage-value: 0
+  #
+  sound:
+    #
+    # Enable sound
+    # Default sound effect that will play when interacting with a menu
+    # If a hat has a custom sound, this sound will not be played
+    enabled: true
+    #
+    # Name of the sound you want to play
+    id: UI_BUTTON_CLICK
+    #
+    # Ranges from 0.0 to 1.0
+    volume: 1.0
+    #
+    # Ranges from 0.0 to 2.0
+    pitch: 1.0
+#
+editor:
+  #
+  # Whenever the user is asked for input, they'll be notified from the actionbar (Text that appears above the players hotbar)
+  # If this is disabled, then input will be notified via chat
+  use-actionbar: false
+  #
+  # Set how long to wait before canceling a meta edit
+  meta-time-limit: 60
+  #
+  # Restrict players from using commands while editing.
+  # When a player is editing meta properties, they'll be asked to type in chat, or by using /h meta. This will prevent them from
+  # using other plugin commands until they're done.
+  restrict-commands-while-editing: true
+  #
+  sound:
+    #
+    enabled: true
+    #
+    id: BLOCK_METAL_PLACE
+    #
+    # Ranges from 0.0 to 1.0
+    volume: 1.0
+    #
+    # Ranges from 0.0 to 2.0
+    pitch: 1.0
+    #
+    # Some menus will alter the sound to reflect the current action (eg: increasing / decreasing a value, deleting an item)
+    modifier: 0.25
+  #
+  # Includes all blacklisted sounds in the sound editor menu
+  # Blacklisted sounds are any sounds that are longer than a few seconds
+  show-blacklisted-sounds: false
+  #
+  # Includes all blacklisted potion effects in the potion editor menu
+  # Blacklisted potions are any potion that is harmful to the player
+  show-blacklisted-potions: false

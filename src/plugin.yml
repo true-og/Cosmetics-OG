@@ -1,0 +1,11 @@
+name: ParticleHats
+main: com.mediusecho.particlehats.ParticleHats
+version: 4.4.0
+api-version: 1.13
+author: MediusEcho
+softdepend: [Vault, SuperVanish, PremiumVanish, PlayerPoints, TokenManager]
+commands:
+  h:
+    description: Main command for ParticleHats
+    aliases: ph
+    
