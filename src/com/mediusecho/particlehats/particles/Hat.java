@@ -1782,7 +1782,7 @@ public class Hat {
 	public void equip (Player player)
 	{
 		if (potion != null) {
-			player.addPotionEffect(potion, true);
+			player.addPotionEffect(potion);
 		}
 	}
 	

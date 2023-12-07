@@ -739,6 +739,8 @@ public class EditorMainMenu extends AbstractStaticMenu {
 				editorItemStackMenu.open();
 			}
 			break;
+		default:
+			break;
 		}
 	}
 

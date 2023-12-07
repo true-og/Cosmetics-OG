@@ -15,6 +15,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class SpigotHelpCommand extends BukkitHelpCommand {
 
@@ -37,7 +38,7 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
 				builder.append(StringUtil.colorize("&3Usage: &8" + command.getUsage().getValue())).append("\n");
 				builder.append(StringUtil.colorize("&3Permission: &8" + command.getPermission().getPermission()));
 				
-				HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(builder.toString()).create());
+				HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(builder.toString()));
 				ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command.getUsage().getValue());
 				BaseComponent[] component = new ComponentBuilder(StringUtil.colorize("&7> &3") + command.getUsage().getValue()).event(hoverEvent).event(clickEvent).create();
 				

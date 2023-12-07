@@ -1,3 +1,7 @@
+OG-0.9.2:
+
+- Update for 1.19.4
+
 OG-0.9.1:
 
 Merged changes from upstream (ParticleHats 4.4.1):

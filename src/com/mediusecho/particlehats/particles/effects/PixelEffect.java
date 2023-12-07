@@ -231,6 +231,8 @@ public class PixelEffect extends Effect {
 					hat.getParticleData(0).getItemStackData().dropItem(world, location, hat);
 					break;
 				}
+			default:
+				break;
 			}
 		}
 	}

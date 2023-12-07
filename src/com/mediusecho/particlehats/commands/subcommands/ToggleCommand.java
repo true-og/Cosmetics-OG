@@ -8,11 +8,8 @@ import com.mediusecho.particlehats.ParticleHats;
 import com.mediusecho.particlehats.commands.Command;
 import com.mediusecho.particlehats.commands.Sender;
 import com.mediusecho.particlehats.locale.Message;
-import com.mediusecho.particlehats.particles.Hat;
 import com.mediusecho.particlehats.permission.Permission;
-import com.mediusecho.particlehats.player.EntityState;
 import com.mediusecho.particlehats.util.StringUtil;
-import org.bukkit.entity.Player;
 
 public class ToggleCommand extends Command {
 

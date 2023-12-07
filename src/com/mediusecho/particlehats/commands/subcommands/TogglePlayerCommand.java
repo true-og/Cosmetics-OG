@@ -11,9 +11,7 @@ import com.mediusecho.particlehats.ParticleHats;
 import com.mediusecho.particlehats.commands.Command;
 import com.mediusecho.particlehats.commands.Sender;
 import com.mediusecho.particlehats.locale.Message;
-import com.mediusecho.particlehats.particles.Hat;
 import com.mediusecho.particlehats.permission.Permission;
-import com.mediusecho.particlehats.player.EntityState;
 import com.mediusecho.particlehats.util.StringUtil;
 
 public class TogglePlayerCommand extends Command {
@@ -27,32 +25,32 @@ public class TogglePlayerCommand extends Command {
 			sender.sendMessage(getUsage());
 			return false;
 		}
-		
+
 		Player player = getPlayer(sender, args.get(1));
 		if (player == null)
 		{
 			sender.sendMessage(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 			return false;
 		}
-		
+
 		if (!player.isOnline())
 		{
 			sender.sendMessage(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 			return false;
 		}
-		
+
 		boolean toggleStatus = StringUtil.getToggleValue(args.get(0));
 		core.getPlayerState(player).toggleHats(!toggleStatus);
-		
+
 		if (toggleStatus) {
 			sender.sendMessage(Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
 		} else {
 			sender.sendMessage(Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public List<String> tabComplete (ParticleHats core, Sender sender, String label, ArrayList<String> args)
 	{
@@ -62,13 +60,13 @@ public class TogglePlayerCommand extends Command {
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				players.add(p.getName());
 			}
-			
+
 			if (Permission.COMMAND_SELECTORS.hasPermission(sender))
 			{
 				players.add("@p");
 				players.add("@r");
 			}
-			
+
 			return players;
 		}
 		return Arrays.asList("");
