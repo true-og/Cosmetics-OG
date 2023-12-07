@@ -1,4 +1,12 @@
-OG-1.0:
+OG-0.9.1:
+
+Merged changes from upstream (ParticleHats 4.4.1):
+
+- Added missing CHERRY_LEAVES particle.
+- Removed experimental cherry particles that were replaced by the CHERRY_LEAVES particle
+- Updated en_US.lang with missing particle description
+
+OG-0.9:
 
 - Removed unbuildable dependencies
 - Restructured project root
