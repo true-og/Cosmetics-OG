@@ -1,20 +1,45 @@
-OG-0.9.2:
+4.6.1-OG:
 
-- Update for 1.19.4
+- Back-Ported to 1.19.4.
+- Added missing CHERRY_LEAVES particle.
+- Selectively removed un-used particles.
+- Updated en_US.lang with missing particle descriptions.
+- Removed unbuildable dependencies.
+- Restructured project root.
+- Inserted custom config files.
 
-OG-0.9.1:
+4.6.0
+- Updated to 1.21
+- Added Particles:
+  - GUST
+  - SMALL_GUST
+  - GUST_EMITTER_LARGE
+  - GUST_EMITTER_SMALL
+  - TRIAL_SPAWNER_DETECTION
+  - TRIAL_SPAWNER_DETECTION_OMINOUS
+  - VAULT_CONNECTION
+  - INFESTED
+  - ITEM_COBWEB
+  - DUST_PILLAR
+  - OMINOUS_SPAWNING
+  - RAID_OMEN
+  - TRIAL_OMEN
+- Updated en_US.lang with new particle names & descriptions.
 
-Merged changes from upstream (ParticleHats 4.4.1):
+4.5.0
+- Updated for 1.20.5+
+- Added Particles:
+  - ENTITY_EFFECT, replaces SPELL_MOB in 1.20.5+, now supports color
+  - EGG_CRACK
+  - DUST_PLUME
+  - WHITE_SMOKE
+- Particle SPELL_MOB_AMBIENT now only works in versions 1.20.4 and older since it was removed in 1.20.5
+- Updated en_US.lang with new particle names & descriptions
 
+4.4.1
 - Added missing CHERRY_LEAVES particle.
 - Removed experimental cherry particles that were replaced by the CHERRY_LEAVES particle
 - Updated en_US.lang with missing particle description
-
-OG-0.9:
-
-- Removed unbuildable dependencies
-- Restructured project root
-- Inserted custom config files
 
 4.4.0
 - Added /h unset <player> <label> <true/false>
