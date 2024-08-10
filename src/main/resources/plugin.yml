@@ -1,5 +1,5 @@
-name: ParticleHats
-main: com.mediusecho.particlehats.ParticleHats
+name: Cosmetics-OG
+main: plugin.ParticleHats
 version: 4.6.1
 api-version: 1.19
 authors: [MediusEcho, NotAlexNoyle]

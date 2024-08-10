@@ -35,11 +35,6 @@ repositories {
         url = uri("https://repo.purpurmc.org/snapshots")
     }
 
-    // SuperVanish repository
-    maven {
-        url = uri("https://mavenrepo.cubekrowd.net/artifactory/repo/")
-    }
-
     // VaultAPI repository
     maven {
         url = uri("https://jitpack.io")
@@ -58,9 +53,6 @@ dependencies {
     // SLF4J
     implementation("org.slf4j:slf4j-nop:1.7.25")
 
-    // SuperVanish
-    compileOnly("de.myzelyam:SuperVanish:6.0.4")
-
     // TokenManager
     compileOnly("com.github.Realizedd:TokenManager:3.2.4") {
         exclude(group = "*", module = "*")
@@ -70,9 +62,6 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         exclude(group = "org.bukkit", module = "bukkit")
     }
-
-    // JetBrains Annotations
-    compileOnly("org.jetbrains:annotations:16.0.2")
 }
 
 tasks.withType<AbstractArchiveTask>().configureEach {
