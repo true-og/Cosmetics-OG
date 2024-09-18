@@ -10,8 +10,8 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
-group = "com.mediusecho" // Declare bundle identifier.
-version = "4.6.1" // Declare plugin version (will be in .jar).
+group = "net.trueog.cosmetics-og" // Declare bundle identifier.
+version = "1.0.1" // Declare plugin version (will be in .jar).
 val apiVersion = "1.19" // Declare minecraft server target version.
 
 tasks.named<ProcessResources>("processResources") {
@@ -43,9 +43,6 @@ repositories {
 
 dependencies {
     compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT") // Purpur API
-
-    // bStats
-    implementation("org.bstats:bstats-bukkit:2.2.1")
 
     // HikariCP
     implementation("com.zaxxer:HikariCP:3.3.1")

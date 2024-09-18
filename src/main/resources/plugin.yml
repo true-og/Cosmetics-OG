@@ -1,7 +1,7 @@
 name: Cosmetics-OG
-main: plugin.CosmeticsOG
-version: 4.6.1
-api-version: 1.19
+main: cosmeticsOG.CosmeticsOG
+version: '${version}'
+api-version: '${apiVersion}'
 authors: [MediusEcho, NotAlexNoyle]
 softdepend: [Vault, SuperVanish, PremiumVanish, VanishNoPacket, PlayerPoints, Citizens, TokenManager]
 commands:

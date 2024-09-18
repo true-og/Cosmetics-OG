@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -206,10 +204,6 @@ public class CosmeticsOG extends JavaPlugin {
 			commandManager = new CommandManager(this, "h");
 			particleManager = new ParticleManager(this);
 			hookManager = new HookManager(this);
-
-			// Enable Metrics
-			Metrics metrics = new Metrics(this, 3214);
-			metrics.addCustomChart(new SimplePie("database_type", () -> databaseType.toString().toLowerCase()));
 
 			if (SettingsManager.EDITOR_USE_ACTION_BAR.getBoolean() && supportsBaseComponent) {
 				prompt = new SpigotPrompt();
