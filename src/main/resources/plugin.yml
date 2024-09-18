@@ -1,11 +1,11 @@
 name: Cosmetics-OG
-main: plugin.ParticleHats
+main: plugin.CosmeticsOG
 version: 4.6.1
 api-version: 1.19
 authors: [MediusEcho, NotAlexNoyle]
 softdepend: [Vault, SuperVanish, PremiumVanish, VanishNoPacket, PlayerPoints, Citizens, TokenManager]
 commands:
   h:
-    description: Main command for ParticleHats
-    aliases: ph
+    description: Main command for CosmeticsOG
+    aliases: cosmetics
     
