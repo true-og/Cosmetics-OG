@@ -1,8 +1,7 @@
 plugins {
+    id("com.gradleup.shadow") version "8.3.6" // Import shadow API.
     java // Tell gradle this is a java project.
-    id("io.github.goooler.shadow") version "8.1.8"
     eclipse // Import eclipse plugin for IDE integration.
-    kotlin("jvm") version "1.9.23" // Import kotlin jvm plugin for kotlin/java integration.
 }
 
 java {
@@ -25,16 +24,17 @@ tasks.named<ProcessResources>("processResources") {
     filesMatching("plugin.yml") {
         expand(props)
     }
+    from("LICENSE") { // Bundle license into .jars.
+        into("/")
+    }
 }
 
 repositories {
     mavenCentral()
-
-    // Purpur repository
+    gradlePluginPortal()
     maven {
         url = uri("https://repo.purpurmc.org/snapshots")
     }
-
     // VaultAPI repository
     maven {
         url = uri("https://jitpack.io")
@@ -61,30 +61,24 @@ dependencies {
     }
 }
 
-tasks.withType<AbstractArchiveTask>().configureEach {
+tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .jars
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true
 }
 
 tasks.shadowJar {
     exclude("org.bstats.*") // Exclude the bStats package from being shadowed.
+    exclude("io.github.miniplaceholders.*") // Exclude the MiniPlaceholders package from being shadowed.
+    archiveClassifier.set("") // Use empty string instead of null.
     minimize()
 }
 
-tasks.jar {
+tasks.build {
     dependsOn(tasks.shadowJar)
-    archiveClassifier.set("part")
-}
-
-tasks.shadowJar {
-    archiveClassifier.set("") // Use empty string instead of null
-    from("LICENSE") {
-        into("/")
-    }
 }
 
 tasks.jar {
-    dependsOn("shadowJar")
+    archiveClassifier.set("part")
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -92,10 +86,6 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Xlint:deprecation") // Triggers deprecation warning messages.
     options.encoding = "UTF-8"
     options.isFork = true
-}
-
-kotlin {
-    jvmToolchain(17)
 }
 
 java {
