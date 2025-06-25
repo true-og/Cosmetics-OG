@@ -1,13 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -19,207 +11,210 @@ import cosmeticsOG.ui.AbstractListMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.MathUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.List;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorActionMenu extends AbstractListMenu {
 
-	private final boolean isLeftClickAction;
-	private final boolean showHiddenActions;
-	private final MenuAction selectAction;
-	private final Hat targetHat;
+    private final boolean isLeftClickAction;
+    private final boolean showHiddenActions;
+    private final MenuAction selectAction;
+    private final Hat targetHat;
 
-	private final List<ParticleAction> actions;
+    private final List<ParticleAction> actions;
 
-	public EditorActionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isLeftClickAction, boolean showHiddenActions, MenuObjectCallback callback) {
+    public EditorActionMenu(
+            CosmeticsOG core,
+            EditorMenuManager menuManager,
+            Player owner,
+            boolean isLeftClickAction,
+            boolean showHiddenActions,
+            MenuObjectCallback callback) {
 
-		super(core, menuManager, owner, false);
+        super(core, menuManager, owner, false);
 
-		this.isLeftClickAction = isLeftClickAction;
-		this.showHiddenActions = showHiddenActions;
-		this.actions = new ArrayList<ParticleAction>();
-		this.targetHat = menuManager.getBaseHat();
-		this.totalPages = MathUtil.calculatePageCount(ParticleAction.values().length, 28);
+        this.isLeftClickAction = isLeftClickAction;
+        this.showHiddenActions = showHiddenActions;
+        this.actions = new ArrayList<ParticleAction>();
+        this.targetHat = menuManager.getBaseHat();
+        this.totalPages = MathUtil.calculatePageCount(ParticleAction.values().length, 28);
 
-		this.selectAction = (event, slot) -> {
+        this.selectAction = (event, slot) -> {
+            int index = getClampedIndex(slot, 10, 2);
+            ParticleAction action = actions.get(index);
+
+            if (action == null) {
 
-			int index = getClampedIndex(slot, 10, 2);
-			ParticleAction action = actions.get(index);
+                action = ParticleAction.EQUIP;
+            }
 
-			if (action == null) {
+            callback.onSelect(action);
+
+            return MenuClickResult.NEUTRAL;
+        };
 
-				action = ParticleAction.EQUIP;
+        build();
+    }
 
-			}
+    public EditorActionMenu(
+            CosmeticsOG core,
+            EditorMenuManager menuManager,
+            Player owner,
+            boolean isLeftClickAction,
+            MenuObjectCallback callback) {
 
-			callback.onSelect(action);
+        this(core, menuManager, owner, isLeftClickAction, false, callback);
+    }
 
-			return MenuClickResult.NEUTRAL;
+    @Override
+    public void insertEmptyItem() {}
 
-		};
+    @Override
+    public void removeEmptyItem() {}
 
-		build();
+    @Override
+    protected void build() {
 
-	}
+        setAction(49, backButtonAction);
 
-	public EditorActionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isLeftClickAction, MenuObjectCallback callback) {
+        // Previous Page.
+        setAction(48, (event, slot) -> {
+            currentPage--;
+            open();
 
-		this(core, menuManager, owner, isLeftClickAction, false, callback);
+            return MenuClickResult.NEUTRAL;
+        });
 
-	}
+        // Next Page.
+        setAction(50, (event, slot) -> {
+            currentPage++;
+            open();
 
-	@Override
-	public void insertEmptyItem() {}
+            return MenuClickResult.NEUTRAL;
+        });
 
-	@Override
-	public void removeEmptyItem() {}
+        // Fill in the actions.
+        for (int i = 0; i < 28; i++) {
 
-	@Override
-	protected void build() {
+            setAction(getNormalIndex(i, 10, 2), selectAction);
+        }
 
-		setAction(49, backButtonAction);
+        // Create the pages.
+        String menuTitle = Message.EDITOR_ACTION_MENU_TITLE.getValue();
+        String[] leftClickInfo = StringUtil.parseValue(menuTitle, "1");
+        String[] rightClickInfo = StringUtil.parseValue(menuTitle, "2");
+        String leftClick = isLeftClickAction ? leftClickInfo[1] : "";
+        String rightClick = !isLeftClickAction ? rightClickInfo[1] : "";
+        for (int i = 0; i < totalPages; i++) {
 
-		// Previous Page.
-		setAction(48, (event, slot) -> {
+            String titleStr = menuTitle
+                    .replace(leftClickInfo[0], leftClick)
+                    .replace(rightClickInfo[0], rightClick)
+                    .replace("{3}", Integer.toString(i + 1))
+                    .replace("{4}", Integer.toString(totalPages));
 
-			currentPage--;
-			open();
+            // Convert the title string to a colorized TextComponent using TrueOG Utils.
+            Component title = Utils.legacySerializerAnyCase(titleStr);
 
-			return MenuClickResult.NEUTRAL;
+            // Pass the colorized title Component to createInventory.
+            Inventory menu = Bukkit.createInventory(null, 54, title);
 
-		});
+            menu.setItem(49, backButtonItem);
 
-		// Next Page.
-		setAction(50, (event, slot) -> {
+            // Next Page.
+            if ((i + 1) < totalPages) {
 
-			currentPage++;
-			open();
+                menu.setItem(
+                        50,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+            }
 
-			return MenuClickResult.NEUTRAL;
+            // Previous Page.
+            if ((i + 1) > 1) {
 
-		});
+                menu.setItem(
+                        48,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+            }
 
-		// Fill in the actions.
-		for (int i = 0; i < 28; i++) {
+            setMenu(i, menu);
+        }
 
-			setAction(getNormalIndex(i, 10, 2), selectAction);
+        // Insert the actions.
+        int index = 0;
+        int page = 0;
 
-		}
+        for (ParticleAction action : ParticleAction.values()) {
 
-		// Create the pages.
-		String menuTitle = Message.EDITOR_ACTION_MENU_TITLE.getValue();
-		String[] leftClickInfo = StringUtil.parseValue(menuTitle, "1");
-		String[] rightClickInfo = StringUtil.parseValue(menuTitle, "2");
-		String leftClick = isLeftClickAction ? leftClickInfo[1] : "";
-		String rightClick = !isLeftClickAction ? rightClickInfo[1] : "";
-		for (int i = 0; i < totalPages; i++) {
+            // Skip the mimic action if we're selecting a left click action.
+            if (action == ParticleAction.MIMIC && isLeftClickAction) {
 
-			String titleStr = menuTitle
-					.replace(leftClickInfo[0], leftClick)
-					.replace(rightClickInfo[0], rightClick)
-					.replace("{3}", Integer.toString(i + 1))
-					.replace("{4}", Integer.toString(totalPages));
+                continue;
+            }
 
-			// Convert the title string to a colorized TextComponent using TrueOG Utils.
-			Component title = Utils.legacySerializerAnyCase(titleStr);
+            if (showHiddenActions) {
 
-			// Pass the colorized title Component to createInventory.
-			Inventory menu = Bukkit.createInventory(null, 54, title);
+                if (!action.isHidden() && action != ParticleAction.DUMMY) {
 
-			menu.setItem(49, backButtonItem);
+                    continue;
+                }
 
-			// Next Page.
-			if ((i + 1) < totalPages) {
+            } else {
 
-				menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                if (action.isHidden()) {
 
-			}
+                    continue;
+                }
+            }
 
-			// Previous Page.
-			if ((i + 1) > 1) {
+            ItemStack item =
+                    ItemUtil.createItem(CompatibleMaterial.FIREWORK_STAR.getMaterial(), 1, action.getDisplayName());
+            String description = Message.EDITOR_ACTION_MENU_ACTION_DESCRIPTION.getValue();
+            String[] selectedInfo = StringUtil.parseValue(description, "2");
+            String[] selectInfo = StringUtil.parseValue(description, "3");
+            ParticleAction currentAction =
+                    isLeftClickAction ? targetHat.getLeftClickAction() : targetHat.getRightClickAction();
+            if (currentAction.equals(action)) {
 
-				menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                ItemUtil.setItemType(item, CompatibleMaterial.GUNPOWDER);
+                ItemUtil.highlightItem(item);
 
-			}
+                description =
+                        description.replace(selectedInfo[0], selectedInfo[1]).replace(selectInfo[0], "");
 
-			setMenu(i, menu);
+            } else {
 
-		}
+                description = description.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
+            }
 
+            description = description.replace("{1}", action.getDescription());
+            ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
 
-		// Insert the actions.
-		int index = 0;
-		int page = 0;
+            setItem(page, getNormalIndex(index++, 10, 2), item);
+            actions.add(action);
 
-		for (ParticleAction action : ParticleAction.values()) {
+            if (index % 28 == 0) {
 
-			// Skip the mimic action if we're selecting a left click action.
-			if (action == ParticleAction.MIMIC && isLeftClickAction) {
+                index = 0;
+                page++;
+            }
+        }
+    }
 
-				continue;
+    @Override
+    public void onClose(boolean forced) {}
 
-			}
-
-			if (showHiddenActions) {
-
-				if (! action.isHidden() && action != ParticleAction.DUMMY) {
-
-					continue;
-
-				}
-
-			}
-
-			else {
-
-				if (action.isHidden()) {
-
-					continue;
-
-				}
-
-			}
-
-			ItemStack item = ItemUtil.createItem(CompatibleMaterial.FIREWORK_STAR.getMaterial(), 1, action.getDisplayName());
-			String description = Message.EDITOR_ACTION_MENU_ACTION_DESCRIPTION.getValue();
-			String[] selectedInfo = StringUtil.parseValue(description, "2");
-			String[] selectInfo = StringUtil.parseValue(description, "3");
-			ParticleAction currentAction = isLeftClickAction ? targetHat.getLeftClickAction() : targetHat.getRightClickAction();
-			if (currentAction.equals(action)) {
-
-				ItemUtil.setItemType(item, CompatibleMaterial.GUNPOWDER);
-				ItemUtil.highlightItem(item);
-
-				description = description.replace(selectedInfo[0], selectedInfo[1]).replace(selectInfo[0], "");
-
-			} 
-
-			else {
-
-				description = description.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
-
-			}
-
-			description = description.replace("{1}", action.getDescription());
-			ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
-
-			setItem(page, getNormalIndex(index++, 10, 2), item);
-			actions.add(action);
-
-			if (index % 28 == 0) {
-
-				index = 0;
-				page++;
-
-			}
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

@@ -1,10 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -12,112 +7,99 @@ import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.properties.Group;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Displays information to the user about the Groups in the database.
 public class GroupInfoCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		List<Group> groups = core.getDatabase().getGroups(true);
-		String infoTemplate = Message.COMMAND_GROUP_INFO.getValue();
+        List<Group> groups = core.getDatabase().getGroups(true);
+        String infoTemplate = Message.COMMAND_GROUP_INFO.getValue();
 
-		if (sender.isPlayer()) {
+        if (sender.isPlayer()) {
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_GROUP_INFO_TIP.getValue());
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_GROUP_INFO_TIP.getValue());
 
-		}
-		else {
+        } else {
 
-			Utils.logToConsole(Message.COMMAND_GROUP_INFO_TIP.getValue());
+            Utils.logToConsole(Message.COMMAND_GROUP_INFO_TIP.getValue());
+        }
 
-		}
+        for (Group g : groups) {
 
-		for (Group g : groups) {
+            String info = infoTemplate
+                    .replace("{1}", g.getName())
+                    .replace("{2}", g.getDefaultMenu())
+                    .replace("{3}", Integer.toString(g.getWeight()));
 
-			String info = infoTemplate
-					.replace("{1}", g.getName())
-					.replace("{2}", g.getDefaultMenu())
-					.replace("{3}", Integer.toString(g.getWeight()));
+            if (sender.isPlayer()) {
 
-			if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, ("&f> " + info));
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, ("&f> " + info));
+            } else {
 
-			}
-			else {
+                Utils.logToConsole("> " + info);
+            }
+        }
 
-				Utils.logToConsole("> " + info);
+        return false;
+    }
 
-			}
+    @Override
+    public String getName() {
 
-		}
+        return "group info";
+    }
 
-		return false;
+    @Override
+    public String getArgumentName() {
 
-	}
+        return "info";
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public Message getUsage() {
 
-		return "group info";
+        return Message.COMMAND_GROUP_INFO_USAGE;
+    }
 
-	}
+    @Override
+    public Message getDescription() {
 
-	@Override
-	public String getArgumentName() {
+        return Message.COMMAND_GROUP_INFO_DESCRIPTION;
+    }
 
-		return "info";
+    @Override
+    public Permission getPermission() {
 
-	}
+        return Permission.COMMAND_GROUP_INFO;
+    }
 
-	@Override
-	public Message getUsage() {
+    @Override
+    public boolean hasWildcardPermission() {
 
-		return Message.COMMAND_GROUP_INFO_USAGE;
+        return true;
+    }
 
-	}
+    @Override
+    public Permission getWildcardPermission() {
 
-	@Override
-	public Message getDescription() {
+        return Permission.COMMAND_GROUP_ALL;
+    }
 
-		return Message.COMMAND_GROUP_INFO_DESCRIPTION;
+    @Override
+    public boolean showInHelp() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public Permission getPermission() {
+    @Override
+    public boolean isPlayerOnly() {
 
-		return Permission.COMMAND_GROUP_INFO;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_GROUP_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

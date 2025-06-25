@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -15,200 +9,178 @@ import cosmeticsOG.database.properties.Group;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows for GUI-based editing of Groups in the database.
 public class EditGroupCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() < 2) {
+        if (args.size() < 2) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(getUsage().getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        Database database = core.getDatabase();
 
-		}
+        int weight = -1;
 
-		Database database = core.getDatabase();
+        String groupName = args.get(0);
+        String menuName = args.get(1);
 
-		int weight = -1;
+        boolean found = false;
 
-		String groupName = args.get(0);
-		String menuName = args.get(1);
+        List<Group> groups = core.getDatabase().getGroups(false);
 
-		boolean found = false;
+        for (Group g : groups) {
 
-		List<Group> groups = core.getDatabase().getGroups(false);
+            if (g.getName().equals(groupName)) {
 
-		for (Group g : groups) {
+                found = true;
 
-			if (g.getName().equals(groupName)) {
+                break;
+            }
+        }
 
-				found = true;
+        if (!found) {
 
-				break;
+            if (sender.isPlayer()) {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
 
-		}
+            } else {
 
-		if (! found) {
+                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+            }
 
-			if (sender.isPlayer()) {
+            return false;
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+        if (!database.getMenus(false).containsKey(menuName)) {
 
-			}
-			else {
+            if (sender.isPlayer()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
-			}
+            } else {
 
-			return false;
+                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            }
 
-		}
+            return false;
+        }
 
-		if (! database.getMenus(false).containsKey(menuName)) {
+        if (args.size() >= 3) {
 
-			if (sender.isPlayer()) {
+            weight = StringUtil.toInt(args.get(2), -1);
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+        database.editGroup(groupName, menuName, weight);
 
-			}
-			else {
+        if (sender.isPlayer()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender, Message.COMMAND_EDIT_GROUP_SUCCESS.replace("{1}", groupName));
 
-			}
+        } else {
 
-			return false;
+            Utils.logToConsole(Message.COMMAND_EDIT_GROUP_SUCCESS.replace("{1}", groupName));
+        }
 
-		}
+        return false;
+    }
 
-		if (args.size() >= 3) {
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-			weight = StringUtil.toInt(args.get(2), -1);
+        switch (args.size()) {
+            case 1: {
+                List<String> groups = new ArrayList<String>();
 
-		}
+                for (Group g : core.getDatabase().getGroups(false)) {
 
-		database.editGroup(groupName, menuName, weight);
+                    groups.add(g.getName());
+                }
 
-		if (sender.isPlayer()) {
+                return groups;
+            }
+            case 2:
+                return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+            case 3:
+                return Arrays.asList("weight");
+        }
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_EDIT_GROUP_SUCCESS.replace("{1}", groupName));
+        return Arrays.asList("");
+    }
 
-		}
-		else {
+    @Override
+    public String getName() {
 
-			Utils.logToConsole(Message.COMMAND_EDIT_GROUP_SUCCESS.replace("{1}", groupName));
+        return "edit group";
+    }
 
-		}
+    @Override
+    public String getArgumentName() {
 
-		return false;
+        return "edit";
+    }
 
-	}
+    @Override
+    public Message getUsage() {
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        return Message.COMMAND_EDIT_GROUP_USAGE;
+    }
 
-		switch (args.size()) {
-		case 1: {
+    @Override
+    public Message getDescription() {
 
-			List<String> groups = new ArrayList<String>();
+        return Message.COMMAND_EDIT_GROUP_DESCRIPTION;
+    }
 
-			for (Group g : core.getDatabase().getGroups(false)) {
+    @Override
+    public Permission getPermission() {
 
-				groups.add(g.getName());
+        return Permission.COMMAND_GROUP_EDIT;
+    }
 
-			}
+    @Override
+    public boolean hasWildcardPermission() {
 
-			return groups;
+        return true;
+    }
 
-		}
-		case 2:
-			return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
-		case 3:
-			return Arrays.asList("weight");
-		}
+    @Override
+    public Permission getWildcardPermission() {
 
-		return Arrays.asList("");
+        return Permission.COMMAND_GROUP_ALL;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public String getName() {
+        return true;
+    }
 
-		return "edit group";
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public String getArgumentName () {
-
-		return "edit";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_EDIT_GROUP_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_EDIT_GROUP_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_GROUP_EDIT;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_GROUP_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

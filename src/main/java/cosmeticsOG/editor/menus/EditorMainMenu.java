@@ -1,13 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -30,902 +22,839 @@ import cosmeticsOG.ui.AbstractStaticMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.MathUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorMainMenu extends AbstractStaticMenu {
 
-	protected int particleButtonSlot = 39;
-	protected int trackingButtonSlot = 29;
-	protected int countButtonSlot = 33;
-	protected int equipButtonSlot = 52;
-	protected int scaleItemButtonSlot = 31;
+    protected int particleButtonSlot = 39;
+    protected int trackingButtonSlot = 29;
+    protected int countButtonSlot = 33;
+    protected int equipButtonSlot = 52;
+    protected int scaleItemButtonSlot = 31;
 
-	protected final EditorMenuManager editorManager;
-	protected final EditorBaseMenu editorBaseMenu;
-	protected final Hat targetHat;
-	protected final PlayerState ownerState;
+    protected final EditorMenuManager editorManager;
+    protected final EditorBaseMenu editorBaseMenu;
+    protected final Hat targetHat;
+    protected final PlayerState ownerState;
 
-	protected final ItemStack noParticleItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), Message.EDITOR_MAIN_MENU_NO_PARTICLES.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_NO_PARTICLES_DESCRIPTION.getValue()));
-	protected final ItemStack singleParticleItem = ItemUtil.createItem(Material.REDSTONE, 1, Message.EDITOR_MAIN_MENU_SET_PARTICLE.getValue());
-	protected final ItemStack multipleParticlesItem = ItemUtil.createItem(Material.BUCKET, 1, Message.EDITOR_MAIN_MENU_EDIT_PARTICLES.getValue());
+    protected final ItemStack noParticleItem = ItemUtil.createItem(
+            CompatibleMaterial.BARRIER.getMaterial(),
+            Message.EDITOR_MAIN_MENU_NO_PARTICLES.getValue(),
+            StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_NO_PARTICLES_DESCRIPTION.getValue()));
+    protected final ItemStack singleParticleItem =
+            ItemUtil.createItem(Material.REDSTONE, 1, Message.EDITOR_MAIN_MENU_SET_PARTICLE.getValue());
+    protected final ItemStack multipleParticlesItem =
+            ItemUtil.createItem(Material.BUCKET, 1, Message.EDITOR_MAIN_MENU_EDIT_PARTICLES.getValue());
 
-	protected final MenuAction setParticleAction;
-	protected final MenuAction editParticleAction;
-	protected final MenuAction noParticle4U;
+    protected final MenuAction setParticleAction;
+    protected final MenuAction editParticleAction;
+    protected final MenuAction noParticle4U;
 
-	public EditorMainMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
+    public EditorMainMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.editorManager = menuManager;
-		this.editorBaseMenu = menuManager.getEditingMenu();
-		this.targetHat = editorManager.getTargetHat();
-		this.ownerState = core.getPlayerState(owner);
-		this.inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
+        this.editorManager = menuManager;
+        this.editorBaseMenu = menuManager.getEditingMenu();
+        this.targetHat = editorManager.getTargetHat();
+        this.ownerState = core.getPlayerState(owner);
+        this.inventory = Bukkit.createInventory(
+                null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
 
-		setParticleAction = (event, slot) -> {
+        setParticleAction = (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			if (event.isLeftClick()) {
+                EditorParticleSelectionMenu editorParticleMenu =
+                        new EditorParticleSelectionMenu(core, menuManager, owner, 0, (particle) -> {
+                            ParticleEffect pe = (ParticleEffect) particle;
+                            if (pe == null) {
 
-				EditorParticleSelectionMenu editorParticleMenu = new EditorParticleSelectionMenu(core, menuManager, owner, 0, (particle) -> {
+                                return;
+                            }
 
-					ParticleEffect pe = (ParticleEffect)particle;
-					if (pe == null) {
+                            targetHat.setParticle(0, pe);
 
-						return;
+                            // Add this particle to the recents list.
+                            core.getParticleManager().addParticleToRecents(ownerID, pe);
 
-					}
+                            if (targetHat.getEffect().getParticlesSupported() == 1) {
 
-					targetHat.setParticle(0, pe);
+                                EditorLore.updateParticleDescription(getItem(particleButtonSlot), targetHat, 0);
+                            }
 
-					// Add this particle to the recents list.
-					core.getParticleManager().addParticleToRecents(ownerID, pe);
+                            menuManager.closeCurrentMenu();
+                        });
 
-					if (targetHat.getEffect().getParticlesSupported() == 1) {
+                menuManager.addMenu(editorParticleMenu);
 
-						EditorLore.updateParticleDescription(getItem(particleButtonSlot), targetHat, 0);
+                editorParticleMenu.open();
 
-					}
+            } else if (event.isRightClick()) {
 
-					menuManager.closeCurrentMenu();
+                onParticleEdit(getItem(particleButtonSlot), 0);
+            }
 
-				});
+            return MenuClickResult.NEUTRAL;
+        };
 
-				menuManager.addMenu(editorParticleMenu);
+        editParticleAction = (event, slot) -> {
+            EditorParticleMenuOverview editorParticleMenuOverview =
+                    new EditorParticleMenuOverview(core, editorManager, owner, this);
+            menuManager.addMenu(editorParticleMenuOverview);
 
-				editorParticleMenu.open();
+            editorParticleMenuOverview.open();
 
-			}
+            return MenuClickResult.NEUTRAL;
+        };
 
-			else if (event.isRightClick()) {
+        noParticle4U = (event, slot) -> {
+            CompatibleSound.ENTITY_VILLAGER_NO.play(owner, 1.0f, 1.0f);
 
-				onParticleEdit(getItem(particleButtonSlot), 0);
+            return MenuClickResult.NONE;
+        };
 
-			}
+        build();
+    }
 
-			return MenuClickResult.NEUTRAL;
+    @Override
+    protected void build() {
 
-		};
+        buildSection();
 
-		editParticleAction = (event, slot) -> {
+        // Main Menu.
+        setButton(46, mainMenuButtonItem, backButtonAction);
 
-			EditorParticleMenuOverview editorParticleMenuOverview = new EditorParticleMenuOverview(core, editorManager, owner, this);
-			menuManager.addMenu(editorParticleMenuOverview);
+        // Item Meta.
+        ItemStack metaItem = ItemUtil.createItem(
+                CompatibleMaterial.SIGN.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_META.getValue());
+        EditorLore.updateGenericDescription(metaItem, Message.EDITOR_MAIN_MENU_META_DESCRIPTION);
+        setButton(13, metaItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			editorParticleMenuOverview.open();
+                EditorMetaMenu editorMetaMenu = new EditorMetaMenu(core, editorManager, owner);
+                menuManager.addMenu(editorMetaMenu);
 
-			return MenuClickResult.NEUTRAL;
+                editorMetaMenu.open();
 
-		};
+            } else if (event.isRightClick()) {
 
-		noParticle4U = (event, slot) -> {
+                EditorDescriptionMenu editorDescriptionMenu =
+                        new EditorDescriptionMenu(core, editorManager, owner, true);
+                menuManager.addMenu(editorDescriptionMenu);
 
-			CompatibleSound.ENTITY_VILLAGER_NO.play(owner, 1.0f, 1.0f);
+                editorDescriptionMenu.open();
+            }
 
-			return MenuClickResult.NONE;
+            return MenuClickResult.NEUTRAL;
+        });
 
-		};
+        // Price.
+        ItemStack priceItem =
+                ItemUtil.createItem(Material.GOLD_NUGGET, 1, Message.EDITOR_MAIN_MENU_SET_PRICE.getValue());
+        EditorLore.updatePriceDescription(priceItem, targetHat.getPrice(), Message.EDITOR_MAIN_MENU_PRICE_DESCRIPTION);
+        setButton(15, priceItem, (event, slot) -> {
+            final int increment = (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 10 : 1);
+            final int price = targetHat.getPrice() + increment;
 
-		build();
+            targetHat.setPrice(price);
+            EditorLore.updatePriceDescription(
+                    getItem(15), targetHat.getPrice(), Message.EDITOR_MAIN_MENU_PRICE_DESCRIPTION);
 
-	}
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-	@Override
-	protected void build() {
+        // Sound.
+        ItemStack soundItem = ItemUtil.createItem(
+                CompatibleMaterial.MUSIC_DISC_STRAD.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_SOUND.getValue());
+        EditorLore.updateSoundItemDescription(soundItem, targetHat);
+        setButton(28, soundItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-		buildSection();
+                EditorSoundMenu editorSoundMenu = new EditorSoundMenu(core, editorManager, owner, (sound) -> {
+                    menuManager.closeCurrentMenu();
 
-		// Main Menu.
-		setButton(46, mainMenuButtonItem, backButtonAction);
+                    if (sound == null) {
 
-		// Item Meta.
-		ItemStack metaItem = ItemUtil.createItem(CompatibleMaterial.SIGN.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_META.getValue());
-		EditorLore.updateGenericDescription(metaItem, Message.EDITOR_MAIN_MENU_META_DESCRIPTION);
-		setButton(13, metaItem, (event, slot) -> {
+                        return;
+                    }
 
-			if (event.isLeftClick()) {
+                    Sound s = (Sound) sound;
 
-				EditorMetaMenu editorMetaMenu = new EditorMetaMenu(core, editorManager, owner);
-				menuManager.addMenu(editorMetaMenu);
+                    targetHat.setSound(s);
+                    EditorLore.updateSoundItemDescription(getItem(28), targetHat);
+                });
 
-				editorMetaMenu.open();
+                menuManager.addMenu(editorSoundMenu);
 
-			}
+                editorSoundMenu.open();
 
-			else if (event.isRightClick()) {
+            } else if (event.isShiftRightClick()) {
 
-				EditorDescriptionMenu editorDescriptionMenu = new EditorDescriptionMenu(core, editorManager, owner, true);
-				menuManager.addMenu(editorDescriptionMenu);
+                targetHat.removeSound();
+                EditorLore.updateSoundItemDescription(getItem(28), targetHat);
+            }
 
-				editorDescriptionMenu.open();
+            return MenuClickResult.NEUTRAL;
+        });
 
-			}
+        // Clone.
+        ItemStack cloneItem = ItemUtil.createItem(
+                CompatibleMaterial.PRISMARINE_SHARD.getMaterial(),
+                Message.EDITOR_MAIN_MENU_CLONE.getValue(),
+                StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_CLONE_DESCRIPTION.getValue()));
+        setButton(30, cloneItem, (event, slot) -> {
+            if (targetHat.isModified()) {
 
-			return MenuClickResult.NEUTRAL;
+                int targetSlot = editorManager.getTargetSlot();
 
-		});
+                core.getDatabase().saveHat(editorBaseMenu.getMenuInventory().getName(), targetSlot, targetHat);
 
-		// Price.
-		ItemStack priceItem = ItemUtil.createItem(Material.GOLD_NUGGET, 1, Message.EDITOR_MAIN_MENU_SET_PRICE.getValue());
-		EditorLore.updatePriceDescription(priceItem, targetHat.getPrice(), Message.EDITOR_MAIN_MENU_PRICE_DESCRIPTION);
-		setButton(15, priceItem, (event, slot) -> {
+                targetHat.clearPropertyChanges();
+            }
 
-			final int increment = (event.isLeftClick() ? 1 : -1) * (event.isShiftClick() ? 10 : 1);
-			final int price = targetHat.getPrice() + increment;
+            EditorSlotMenu editorSlotMenu = new EditorSlotMenu(core, editorManager, owner, editorBaseMenu, true);
+            menuManager.addMenu(editorSlotMenu);
 
-			targetHat.setPrice(price);
-			EditorLore.updatePriceDescription(getItem(15), targetHat.getPrice(), Message.EDITOR_MAIN_MENU_PRICE_DESCRIPTION);
+            editorSlotMenu.open();
 
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+            return MenuClickResult.NEUTRAL;
+        });
 
-		});
+        // Move.
+        ItemStack moveItem = ItemUtil.createItem(
+                CompatibleMaterial.MAP.getMaterial(),
+                Message.EDITOR_MAIN_MENU_MOVE.getValue(),
+                StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_MOVE_DESCRIPTION.getValue()));
+        setButton(32, moveItem, (event, slot) -> {
+            EditorMenuSelectionMenu editorMenuSelectionMenu =
+                    new EditorMenuSelectionMenu(core, editorManager, owner, false, (menuName) -> {
+                        if (menuName == null) {
 
-		// Sound.
-		ItemStack soundItem = ItemUtil.createItem(CompatibleMaterial.MUSIC_DISC_STRAD.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_SOUND.getValue());
-		EditorLore.updateSoundItemDescription(soundItem, targetHat);
-		setButton(28, soundItem, (event, slot) -> {
+                            return;
+                        }
 
-			if (event.isLeftClick()) {
+                        String name = (String) menuName;
+                        EditorTransferMenu editorTransferMenu =
+                                new EditorTransferMenu(core, editorManager, owner, name);
 
-				EditorSoundMenu editorSoundMenu = new EditorSoundMenu(core, editorManager, owner, (sound) -> {
+                        menuManager.addMenu(editorTransferMenu);
 
-					menuManager.closeCurrentMenu();
+                        editorTransferMenu.open();
+                    });
 
-					if (sound == null) {
+            menuManager.addMenu(editorMenuSelectionMenu);
 
-						return;
+            editorMenuSelectionMenu.open();
 
-					}
+            return MenuClickResult.NEUTRAL;
+        });
 
-					Sound s = (Sound)sound;
+        // Node.
+        ItemStack nodeItem = ItemUtil.createItem(
+                Material.ANVIL,
+                Message.EDITOR_MAIN_MENU_EDIT_NODES.getValue(),
+                StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_NODE_DESCRIPTION.getValue()));
+        setButton(34, nodeItem, (event, slot) -> {
+            EditorNodeMenuOverview editorNodeMenuOverview = new EditorNodeMenuOverview(core, editorManager, owner);
+            menuManager.addMenu(editorNodeMenuOverview);
 
-					targetHat.setSound(s);
-					EditorLore.updateSoundItemDescription(getItem(28), targetHat);
+            editorNodeMenuOverview.open();
 
-				});
+            return MenuClickResult.NEUTRAL;
+        });
 
-				menuManager.addMenu(editorSoundMenu);
+        // Slot.
+        ItemStack slotItem = ItemUtil.createItem(
+                Material.ITEM_FRAME,
+                Message.EDITOR_MAIN_MENU_SET_SLOT.getValue(),
+                StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_SLOT_DESCRIPTION.getValue()));
+        setButton(38, slotItem, (event, slot) -> {
+            EditorSlotMenu editorSlotMenu = new EditorSlotMenu(core, editorManager, owner, editorBaseMenu, false);
+            menuManager.addMenu(editorSlotMenu);
 
-				editorSoundMenu.open();
+            editorSlotMenu.open();
 
-			}
+            return MenuClickResult.NEUTRAL;
+        });
 
-			else if (event.isShiftRightClick()) {
+        // Icon.
+        ItemStack iconItem = targetHat.getItem();
+        ItemUtil.setNameAndDescription(
+                iconItem, Message.EDITOR_MAIN_MENU_SET_ICON, Message.EDITOR_MAIN_MENU_ICON_DESCRIPTION);
+        setButton(41, iconItem, (event, slot) -> {
+            EditorIconMenuOverview editorIconMenuOverview =
+                    new EditorIconMenuOverview(core, editorManager, owner, (mainItem) -> {
+                        if (mainItem == null) {
 
-				targetHat.removeSound();
-				EditorLore.updateSoundItemDescription(getItem(28), targetHat);
+                            return;
+                        }
 
-			}
+                        ItemStack item = (ItemStack) mainItem;
+                        Material material = item.getType();
 
-			return MenuClickResult.NEUTRAL;
+                        int damage = 0;
 
-		});
+                        ItemUtil.setItemType(getItem(41), material, damage);
+                    });
 
-		// Clone.
-		ItemStack cloneItem = ItemUtil.createItem(CompatibleMaterial.PRISMARINE_SHARD.getMaterial(), Message.EDITOR_MAIN_MENU_CLONE.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_CLONE_DESCRIPTION.getValue()));
-		setButton(30, cloneItem, (event, slot) -> {
+            menuManager.addMenu(editorIconMenuOverview);
 
-			if (targetHat.isModified()) {
+            editorIconMenuOverview.open();
 
-				int targetSlot = editorManager.getTargetSlot();
+            return MenuClickResult.NEUTRAL;
+        });
 
-				core.getDatabase().saveHat(editorBaseMenu.getMenuInventory().getName(), targetSlot, targetHat);
+        // Potion.
+        ItemStack potionItem = ItemUtil.createItem(Material.POTION, 1, Message.EDITOR_MAIN_MENU_SET_POTION.getValue());
+        EditorLore.updatePotionDescription(potionItem, targetHat.getPotion());
+        setButton(42, potionItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-				targetHat.clearPropertyChanges();
+                EditorPotionMenu editorPotionMenu = new EditorPotionMenu(core, editorManager, owner, () -> {
+                    EditorLore.updatePotionDescription(getItem(42), targetHat.getPotion());
+                });
 
-			}
+                menuManager.addMenu(editorPotionMenu);
 
-			EditorSlotMenu editorSlotMenu = new EditorSlotMenu(core, editorManager, owner, editorBaseMenu, true);
-			menuManager.addMenu(editorSlotMenu);
+                editorPotionMenu.open();
 
-			editorSlotMenu.open();
+            } else if (event.isShiftRightClick()) {
 
-			return MenuClickResult.NEUTRAL;
+                targetHat.removePotion();
+                EditorLore.updatePotionDescription(getItem(42), targetHat.getPotion());
+            }
 
-		});
+            return MenuClickResult.NEUTRAL;
+        });
+    }
 
-		// Move.
-		ItemStack moveItem = ItemUtil.createItem(CompatibleMaterial.MAP.getMaterial(), Message.EDITOR_MAIN_MENU_MOVE.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_MOVE_DESCRIPTION.getValue()));
-		setButton(32, moveItem, (event, slot) -> {
+    protected void buildSection() {
 
-			EditorMenuSelectionMenu editorMenuSelectionMenu = new EditorMenuSelectionMenu(core, editorManager, owner, false, (menuName) -> {
+        // Equip.
+        ItemStack equipItem = ItemUtil.createItem(
+                Material.DIAMOND_HELMET,
+                Message.EDITOR_MISC_EQUIP.getValue(),
+                StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_EQUIP_DESCRIPTION.getValue()));
+        setButton(equipButtonSlot, equipItem, (event, slot) -> {
 
-				if (menuName == null) {
+            // Stop if the player has more than the maximum allowed hats.
+            if (!ownerState.canEquip()) {
 
-					return;
+                owner.sendMessage(Message.HAT_EQUIPPED_OVERFLOW.replace(
+                        "{1}", Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
 
-				}
+                return MenuClickResult.NEGATIVE;
+            }
 
-				String name = (String) menuName;
-				EditorTransferMenu editorTransferMenu = new EditorTransferMenu(core, editorManager, owner, name);
+            Hat clone;
 
-				menuManager.addMenu(editorTransferMenu);
+            if (event.isShiftClick()) {
 
-				editorTransferMenu.open();
+                clone = targetHat.equippableClone();
 
-			});
+            } else {
 
-			menuManager.addMenu(editorMenuSelectionMenu);
+                clone = editorManager.getBaseHat().equippableClone();
+            }
 
-			editorMenuSelectionMenu.open();
+            clone.setCanBeSaved(false);
+            clone.setPermanent(false);
+            clone.setDuration(15);
+            clone.clearPropertyChanges();
 
-			return MenuClickResult.NEUTRAL;
+            core.getParticleManager().equipHat(owner, clone, false);
 
-		});
+            menuManager.closeInventory();
 
-		// Node.
-		ItemStack nodeItem = ItemUtil.createItem(Material.ANVIL, Message.EDITOR_MAIN_MENU_EDIT_NODES.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_NODE_DESCRIPTION.getValue()));
-		setButton(34, nodeItem, (event, slot) -> {
+            return MenuClickResult.NEUTRAL;
+        });
 
-			EditorNodeMenuOverview editorNodeMenuOverview = new EditorNodeMenuOverview(core, editorManager, owner);
-			menuManager.addMenu(editorNodeMenuOverview);
+        // Type.
+        ItemStack typeItem = ItemUtil.createItem(
+                CompatibleMaterial.CYAN_DYE.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_TYPE.getValue());
+        EditorLore.updateTypeDescription(typeItem, targetHat);
+        setButton(10, typeItem, (event, slot) -> {
+            if (!event.isShiftClick()) {
 
-			editorNodeMenuOverview.open();
+                EditorTypeMenu editorTypeMenu = new EditorTypeMenu(core, editorManager, owner, (obj) -> {
+                    ParticleType type = targetHat.getType();
 
-			return MenuClickResult.NEUTRAL;
+                    // Reset animation if new type doesn't support it.
+                    if (!type.supportsAnimation() && targetHat.getAnimation() == ParticleAnimation.ANIMATED) {
 
-		});
+                        targetHat.setAnimation(ParticleAnimation.STATIC);
+                    }
 
-		// Slot.
-		ItemStack slotItem = ItemUtil.createItem(Material.ITEM_FRAME, Message.EDITOR_MAIN_MENU_SET_SLOT.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_SLOT_DESCRIPTION.getValue()));
-		setButton(38, slotItem, (event, slot) -> {
+                    EditorLore.updateTrackingDescription(getItem(trackingButtonSlot), targetHat);
+                    EditorLore.updateTypeDescription(getItem(10), targetHat);
 
-			EditorSlotMenu editorSlotMenu = new EditorSlotMenu(core, editorManager, owner, editorBaseMenu, false);
-			menuManager.addMenu(editorSlotMenu);
+                    setButton(particleButtonSlot, getParticleItem(), getParticleAction());
 
-			editorSlotMenu.open();
+                    if (targetHat.getEffect().getParticlesSupported() == 1) {
 
-			return MenuClickResult.NEUTRAL;
+                        EditorLore.updateParticleDescription(getItem(particleButtonSlot), targetHat, 0);
 
-		});
+                    } else {
 
-		// Icon.
-		ItemStack iconItem = targetHat.getItem();
-		ItemUtil.setNameAndDescription(iconItem, Message.EDITOR_MAIN_MENU_SET_ICON, Message.EDITOR_MAIN_MENU_ICON_DESCRIPTION);
-		setButton(41, iconItem, (event, slot) -> {
+                        if (targetHat.getParticleData(0).hasPropertyChanges()) {
 
-			EditorIconMenuOverview editorIconMenuOverview = new EditorIconMenuOverview(core, editorManager, owner, (mainItem) -> {
+                            core.getDatabase()
+                                    .saveParticleData(
+                                            editorBaseMenu.getMenuInventory().getName(), targetHat, 0);
+                        }
+                    }
+                });
 
-				if (mainItem == null) {
+                menuManager.addMenu(editorTypeMenu);
 
-					return;
+                editorTypeMenu.open();
 
-				}
+            } else {
 
-				ItemStack item = (ItemStack) mainItem;
-				Material material = item.getType();
+                int id = targetHat.getAnimation().getID();
+                ParticleAnimation animation =
+                        ParticleAnimation.fromID(MathUtil.wrap(id + 1, ParticleAnimation.values().length, 0));
 
-				int damage = 0;
+                targetHat.setAnimation(animation);
 
-				ItemUtil.setItemType(getItem(41), material, damage);
+                EditorLore.updateTypeDescription(getItem(10), targetHat);
+            }
 
-			});
+            return MenuClickResult.NEUTRAL;
+        });
 
-			menuManager.addMenu(editorIconMenuOverview);
+        // Location.
+        ItemStack locationItem =
+                ItemUtil.createItem(Material.CLAY_BALL, 1, Message.EDITOR_MAIN_MENU_SET_LOCATION.getValue());
+        EditorLore.updateLocationDescription(
+                locationItem, targetHat.getLocation(), Message.EDITOR_MAIN_MENU_LOCATION_DESCRIPTION);
+        setButton(11, locationItem, (event, slot) -> {
+            final int increment = event.isLeftClick() ? 1 : -1;
+            final int locationID =
+                    MathUtil.wrap(targetHat.getLocation().getID() + increment, ParticleLocation.values().length, 0);
+            final ParticleLocation location = ParticleLocation.fromId(locationID);
 
-			editorIconMenuOverview.open();
+            targetHat.setLocation(location);
 
-			return MenuClickResult.NEUTRAL;
+            EditorLore.updateLocationDescription(getItem(11), location, Message.EDITOR_MAIN_MENU_LOCATION_DESCRIPTION);
 
-		});
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-		// Potion.
-		ItemStack potionItem = ItemUtil.createItem(Material.POTION, 1, Message.EDITOR_MAIN_MENU_SET_POTION.getValue());
-		EditorLore.updatePotionDescription(potionItem, targetHat.getPotion());
-		setButton(42, potionItem, (event, slot) -> {
+        // Speed.
+        ItemStack speedItem = ItemUtil.createItem(Material.SUGAR, 1, Message.EDITOR_MAIN_MENU_SET_SPEED.getValue());
 
-			if (event.isLeftClick()) {
+        // Temporary tweak until 5.0.
+        if (core.getDatabaseType() == DatabaseType.YAML) {
 
-				EditorPotionMenu editorPotionMenu = new EditorPotionMenu(core, editorManager, owner, () -> {
+            EditorLore.updateDoubleDescription(
+                    speedItem, targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
+            setButton(16, speedItem, (event, slot) -> {
+                final double normalClick = event.isLeftClick() ? 0.1D : -0.1D;
+                final double shiftClick = event.isShiftClick() ? 10D : 1D;
+                final double modifier = normalClick * shiftClick;
+                final double speed = event.isMiddleClick() ? 0D : targetHat.getSpeed() + modifier;
 
-					EditorLore.updatePotionDescription(getItem(42), targetHat.getPotion());
+                targetHat.setSpeed(speed);
 
-				});
+                EditorLore.updateDoubleDescription(
+                        getItem(16), targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
 
-				menuManager.addMenu(editorPotionMenu);
+                return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+            });
 
-				editorPotionMenu.open();
+        }
 
-			}
+        // MariaDB.
+        else {
 
-			else if (event.isShiftRightClick()) {
+            EditorLore.updateIntegerDescription(
+                    speedItem, (int) targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
+            setButton(16, speedItem, (event, slot) -> {
+                final int increment = event.isLeftClick() ? 1 : -1;
+                final int speed = (int) targetHat.getSpeed() + increment;
 
-				targetHat.removePotion();
-				EditorLore.updatePotionDescription(getItem(42), targetHat.getPotion());
+                targetHat.setSpeed(speed);
 
-			}
+                EditorLore.updateIntegerDescription(
+                        getItem(16), (int) targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
 
-			return MenuClickResult.NEUTRAL;
+                return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+            });
+        }
 
-		});
+        // Action.
+        ItemStack actionItem = ItemUtil.createItem(
+                CompatibleMaterial.GUNPOWDER.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_ACTION.getValue());
+        EditorLore.updateGenericActionDescription(actionItem, targetHat);
+        setButton(19, actionItem, (event, slot) -> {
+            EditorActionMenuOverview editorActionMenuOverview =
+                    new EditorActionMenuOverview(core, editorManager, owner, () -> {
+                        EditorLore.updateGenericActionDescription(getItem(19), editorManager.getBaseHat());
+                    });
 
-	}
+            menuManager.addMenu(editorActionMenuOverview);
 
-	protected void buildSection () {
+            editorActionMenuOverview.open();
 
-		// Equip.
-		ItemStack equipItem = ItemUtil.createItem(Material.DIAMOND_HELMET, Message.EDITOR_MISC_EQUIP.getValue(), StringUtil.parseDescription(Message.EDITOR_MAIN_MENU_EQUIP_DESCRIPTION.getValue()));
-		setButton(equipButtonSlot, equipItem, (event, slot) -> {
+            return MenuClickResult.NEUTRAL;
+        });
 
-			// Stop if the player has more than the maximum allowed hats.
-			if (! ownerState.canEquip()) {
+        // Mode.
+        ItemStack modeItem = ItemUtil.createItem(
+                CompatibleMaterial.ROSE_RED.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_MODE.getValue());
+        EditorLore.updateModeDescription(modeItem, targetHat.getMode(), Message.EDITOR_MAIN_MENU_MODE_DESCRIPTION);
+        setButton(20, modeItem, (event, slot) -> {
+            List<ParticleMode> modes = ParticleMode.getSupportedModes();
 
-				owner.sendMessage(Message.HAT_EQUIPPED_OVERFLOW.replace("{1}", Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
+            final int increment = event.isLeftClick() ? 1 : -1;
+            final int size = modes.size();
+            final int index = MathUtil.wrap(modes.indexOf(targetHat.getMode()) + increment, size, 0);
+            final ParticleMode mode = modes.get(index);
 
-				return MenuClickResult.NEGATIVE;
+            targetHat.setMode(mode);
 
-			}
+            EditorLore.updateModeDescription(getItem(20), mode, Message.EDITOR_MAIN_MENU_MODE_DESCRIPTION);
 
-			Hat clone;
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-			if (event.isShiftClick()) {
+        // Frequency.
+        ItemStack frequencyItem = ItemUtil.createItem(
+                CompatibleMaterial.COMPARATOR.getMaterial(),
+                1,
+                Message.EDITOR_MAIN_MENU_SET_UPDATE_FREQUENCY.getValue());
+        EditorLore.updateFrequencyDescription(
+                frequencyItem, targetHat.getUpdateFrequency(), Message.EDITOR_MAIN_MENU_UPDATE_FREQUENCY_DESCRIPTION);
+        setButton(22, frequencyItem, (event, slot) -> {
+            final int increment = event.isLeftClick() ? 1 : -1;
+            int frequency = targetHat.getUpdateFrequency() + increment;
+            if (event.isMiddleClick()) {
 
-				clone = targetHat.equippableClone();
+                frequency = 2;
+            }
 
-			}
-			else {
+            targetHat.setUpdateFrequency(frequency);
 
-				clone = editorManager.getBaseHat().equippableClone();
+            EditorLore.updateFrequencyDescription(
+                    getItem(22), targetHat.getUpdateFrequency(), Message.EDITOR_MAIN_MENU_UPDATE_FREQUENCY_DESCRIPTION);
 
-			}
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-			clone.setCanBeSaved(false);
-			clone.setPermanent(false);
-			clone.setDuration(15);
-			clone.clearPropertyChanges();
+        // Angle.
+        ItemStack angleItem =
+                ItemUtil.createItem(Material.SLIME_BALL, 1, Message.EDITOR_MAIN_MENU_SET_ANGLE.getValue());
+        EditorLore.updateVectorDescription(
+                angleItem, targetHat.getAngle(), Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
+        setButton(24, angleItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			core.getParticleManager().equipHat(owner, clone, false);
+                EditorAngleMenu editorAngleMenu = new EditorAngleMenu(core, editorManager, owner, () -> {
+                    EditorLore.updateVectorDescription(
+                            getItem(24),
+                            editorManager.getTargetHat().getAngle(),
+                            Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
+                });
 
-			menuManager.closeInventory();
+                menuManager.addMenu(editorAngleMenu);
 
-			return MenuClickResult.NEUTRAL;
+                editorAngleMenu.open();
 
-		});
+            } else if (event.isShiftRightClick()) {
 
-		// Type.
-		ItemStack typeItem = ItemUtil.createItem(CompatibleMaterial.CYAN_DYE.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_TYPE.getValue());
-		EditorLore.updateTypeDescription(typeItem, targetHat);
-		setButton(10, typeItem, (event, slot) -> {
+                targetHat.setAngle(0, 0, 0);
 
-			if (! event.isShiftClick()) {
+                EditorLore.updateVectorDescription(
+                        getItem(24),
+                        editorManager.getTargetHat().getAngle(),
+                        Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
+            }
 
-				EditorTypeMenu editorTypeMenu = new EditorTypeMenu(core, editorManager, owner, (obj) -> {
+            return MenuClickResult.NEUTRAL;
+        });
 
-					ParticleType type = targetHat.getType();
+        // Offset.
+        ItemStack offsetItem = ItemUtil.createItem(
+                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_OFFSET.getValue());
+        EditorLore.updateOffsetDescription(offsetItem, targetHat);
+        setButton(25, offsetItem, (event, slot) -> {
+            EditorOffsetMenu editorOffsetMenu = new EditorOffsetMenu(core, editorManager, owner, () -> {
+                EditorLore.updateOffsetDescription(getItem(25), editorManager.getTargetHat());
+            });
 
-					// Reset animation if new type doesn't support it.
-					if (! type.supportsAnimation() && targetHat.getAnimation() == ParticleAnimation.ANIMATED) {
+            menuManager.addMenu(editorOffsetMenu);
 
-						targetHat.setAnimation(ParticleAnimation.STATIC);
+            editorOffsetMenu.open();
 
-					}
+            return MenuClickResult.NEUTRAL;
+        });
 
-					EditorLore.updateTrackingDescription(getItem(trackingButtonSlot), targetHat);
-					EditorLore.updateTypeDescription(getItem(10), targetHat);
+        // Tracking.
+        ItemStack trackingItem =
+                ItemUtil.createItem(Material.COMPASS, 1, Message.EDITOR_MAIN_MENU_SET_TRACKING_METHOD.getValue());
+        EditorLore.updateTrackingDescription(trackingItem, targetHat);
+        setButton(trackingButtonSlot, trackingItem, (event, slot) -> {
+            List<ParticleTracking> methods = targetHat.getEffect().getSupportedTrackingMethods();
 
-					setButton(particleButtonSlot, getParticleItem(), getParticleAction());
+            final int increment = event.isLeftClick() ? 1 : -1;
+            final int size = methods.size();
+            final int index = MathUtil.wrap(methods.indexOf(targetHat.getTrackingMethod()) + increment, size, 0);
 
-					if (targetHat.getEffect().getParticlesSupported() == 1) {
+            targetHat.setTrackingMethod(methods.get(index));
 
-						EditorLore.updateParticleDescription(getItem(particleButtonSlot), targetHat, 0);
+            EditorLore.updateTrackingDescription(getItem(trackingButtonSlot), targetHat);
 
-					}
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-					else {
+        // Count.
+        ItemStack countItem = ItemUtil.createItem(
+                CompatibleMaterial.WHEAT_SEEDS.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_COUNT.getValue());
+        EditorLore.updateIntegerDescription(
+                countItem, targetHat.getCount(), Message.EDITOR_MAIN_MENU_COUNT_DESCRIPTION);
+        setButton(countButtonSlot, countItem, (event, slot) -> {
+            final int increment = event.isLeftClick() ? 1 : -1;
+            final int count = targetHat.getCount() + increment;
 
-						if (targetHat.getParticleData(0).hasPropertyChanges()) {
+            targetHat.setCount(count);
 
-							core.getDatabase().saveParticleData(editorBaseMenu.getMenuInventory().getName(), targetHat, 0);
+            EditorLore.updateIntegerDescription(
+                    getItem(countButtonSlot), targetHat.getCount(), Message.EDITOR_MAIN_MENU_COUNT_DESCRIPTION);
 
-						}
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-					}
+        // Particle.
+        ItemStack particleItem = getParticleItem();
+        if (targetHat.getEffect().getParticlesSupported() == 1) {
 
-				});
+            EditorLore.updateParticleDescription(particleItem, targetHat, 0);
+        }
 
-				menuManager.addMenu(editorTypeMenu);
+        setButton(particleButtonSlot, getParticleItem(), getParticleAction());
 
-				editorTypeMenu.open();
+        // Scale.
+        ItemStack scaleItem = ItemUtil.createItem(
+                CompatibleMaterial.PUFFERFISH.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_SCALE.getValue());
+        EditorLore.updateDoubleDescription(scaleItem, targetHat.getScale(), Message.EDITOR_MAIN_MENU_SCALE_DESCRIPTION);
+        setButton(scaleItemButtonSlot, scaleItem, (event, slot) -> {
+            double normalClick = event.isLeftClick() ? 0.1f : -0.1f;
+            double shiftClick = event.isShiftClick() ? 10 : 1;
+            double modifier = normalClick * shiftClick;
+            boolean isMiddleClick = event.isMiddleClick();
 
-			}
+            double scale = isMiddleClick ? 1 : targetHat.getScale() + modifier;
+            targetHat.setScale(scale);
 
-			else {
+            EditorLore.updateDoubleDescription(
+                    getItem(scaleItemButtonSlot), targetHat.getScale(), Message.EDITOR_MAIN_MENU_SCALE_DESCRIPTION);
 
-				int id = targetHat.getAnimation().getID();
-				ParticleAnimation animation = ParticleAnimation.fromID(MathUtil.wrap(id + 1, ParticleAnimation.values().length, 0));
+            if (isMiddleClick) {
 
-				targetHat.setAnimation(animation);
+                return MenuClickResult.NEUTRAL;
+            } else {
 
-				EditorLore.updateTypeDescription(getItem(10), targetHat);
+                return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+            }
+        });
+    }
 
-			}
+    @Override
+    public void onClose(boolean forced) {
 
-			return MenuClickResult.NEUTRAL;
+        Database database = core.getDatabase();
 
-		});
+        if (targetHat.getType().getParticlesSupported() == 1) {
 
-		// Location.
-		ItemStack locationItem = ItemUtil.createItem(Material.CLAY_BALL, 1, Message.EDITOR_MAIN_MENU_SET_LOCATION.getValue());
-		EditorLore.updateLocationDescription(locationItem, targetHat.getLocation(), Message.EDITOR_MAIN_MENU_LOCATION_DESCRIPTION);
-		setButton(11, locationItem, (event, slot) -> {
+            if (targetHat.getParticleData(0).hasPropertyChanges()) {
 
-			final int increment = event.isLeftClick() ? 1 : -1;
-			final int locationID = MathUtil.wrap(targetHat.getLocation().getID() + increment, ParticleLocation.values().length, 0);
-			final ParticleLocation location = ParticleLocation.fromId(locationID);
+                database.saveParticleData(editorManager.getMenuName(), targetHat, 0);
+            }
+        }
 
-			targetHat.setLocation(location);
+        if (!forced) {
 
-			EditorLore.updateLocationDescription(getItem(11), location, Message.EDITOR_MAIN_MENU_LOCATION_DESCRIPTION);
+            Hat hat = editorManager.getBaseHat();
+            if (hat == null) {
 
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+                return;
+            }
 
-		});
+            String name = editorManager.getMenuName();
 
-		// Speed.
-		ItemStack speedItem = ItemUtil.createItem(Material.SUGAR, 1, Message.EDITOR_MAIN_MENU_SET_SPEED.getValue());
+            if (hat.isModified()) {
 
-		// Temporary tweak until 5.0.
-		if (core.getDatabaseType() == DatabaseType.YAML) {
+                int targetSlot = editorManager.getTargetSlot();
 
-			EditorLore.updateDoubleDescription(speedItem, targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
-			setButton(16, speedItem, (event, slot) -> {
+                database.saveHat(name, targetSlot, hat);
 
-				final double normalClick    = event.isLeftClick() ? 0.1D : -0.1D;
-				final double shiftClick     = event.isShiftClick() ? 10D : 1D;
-				final double modifier       = normalClick * shiftClick;
-				final double speed = event.isMiddleClick() ? 0D : targetHat.getSpeed() + modifier;
+                hat.clearPropertyChanges();
+            }
 
-				targetHat.setSpeed(speed);
+            if (hat.getNodeCount() > 0) {
 
-				EditorLore.updateDoubleDescription(getItem(16), targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
+                for (Hat node : hat.getNodes()) {
 
-				return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+                    if (node.isModified()) {
 
-			});
+                        database.saveNode(name, node.getIndex(), node);
 
-		}
+                        node.clearPropertyChanges();
+                    }
+                }
+            }
+        }
+    }
 
-		// MariaDB.
-		else {
+    @Override
+    public void onTick(int ticks) {}
 
-			EditorLore.updateIntegerDescription(speedItem, (int) targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
-			setButton(16, speedItem, (event, slot) -> {
+    /**
+     * Returns an appropriate item for the current ParticleType
+     * @return
+     */
+    private ItemStack getParticleItem() {
 
-				final int increment = event.isLeftClick() ? 1 : -1;
-				final int speed = (int) targetHat.getSpeed() + increment;
+        Hat hat = editorManager.getTargetHat();
+        int particlesSupported = hat.getEffect().getParticlesSupported();
 
-				targetHat.setSpeed(speed);
+        if (particlesSupported == 0) {
 
-				EditorLore.updateIntegerDescription(getItem(16), (int) targetHat.getSpeed(), Message.EDITOR_MAIN_MENU_SPEED_DESCRIPTION);
+            return noParticleItem;
+        }
 
-				return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        if (particlesSupported == 1) {
 
-			});
+            return singleParticleItem;
+        }
 
-		}
+        return multipleParticlesItem;
+    }
 
-		// Action.
-		ItemStack actionItem = ItemUtil.createItem(CompatibleMaterial.GUNPOWDER.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_ACTION.getValue());
-		EditorLore.updateGenericActionDescription(actionItem, targetHat);
-		setButton(19, actionItem, (event, slot) -> {
+    /**
+     * Returns an appropriate EditorAction for the current ParticleType
+     * @return
+     */
+    private MenuAction getParticleAction() {
 
-			EditorActionMenuOverview editorActionMenuOverview = new EditorActionMenuOverview(core, editorManager, owner, () -> {
+        Hat hat = editorManager.getTargetHat();
+        int particlesSupported = hat.getEffect().getParticlesSupported();
 
-				EditorLore.updateGenericActionDescription(getItem(19), editorManager.getBaseHat());
+        if (particlesSupported == 0) {
 
-			});
+            return noParticle4U;
+        }
 
-			menuManager.addMenu(editorActionMenuOverview);
+        if (particlesSupported == 1) {
 
-			editorActionMenuOverview.open();
+            return setParticleAction;
+        }
 
-			return MenuClickResult.NEUTRAL;
+        return editParticleAction;
+    }
 
-		});
+    public void onParticleEdit(ItemStack item, int particleIndex) {
 
-		// Mode.
-		ItemStack modeItem = ItemUtil.createItem(CompatibleMaterial.ROSE_RED.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_MODE.getValue());
-		EditorLore.updateModeDescription(modeItem, targetHat.getMode(), Message.EDITOR_MAIN_MENU_MODE_DESCRIPTION);
-		setButton(20, modeItem, (event, slot) -> {
+        ParticleEffect pe = targetHat.getParticle(particleIndex);
+        switch (pe.getProperty()) {
+            case NO_DATA:
+                break;
+            case COLOR:
+            case COLOR_TRANSITION:
+            case DUST_OPTIONS:
+                {
+                    EditorColorMenu editorColorMenu =
+                            new EditorColorMenu(core, editorManager, owner, particleIndex, () -> {
+                                EditorLore.updateParticleDescription(item, targetHat, particleIndex);
+                            });
 
-			List<ParticleMode> modes = ParticleMode.getSupportedModes();
+                    menuManager.addMenu(editorColorMenu);
 
-			final int increment = event.isLeftClick() ? 1 : -1;
-			final int size = modes.size();
-			final int index = MathUtil.wrap(modes.indexOf(targetHat.getMode()) + increment, size, 0);
-			final ParticleMode mode = modes.get(index);
+                    editorColorMenu.open();
+                }
+                break;
+            case BLOCK_DATA:
+                {
+                    Message menuTitle = Message.EDITOR_ICON_MENU_BLOCK_TITLE;
+                    Message blockTitle = Message.EDITOR_ICON_MENU_BLOCK_INFO;
+                    Message blockDescription = Message.EDITOR_ICON_MENU_BLOCK_DESCRIPTION;
 
-			targetHat.setMode(mode);
+                    EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(
+                            core, editorManager, owner, menuTitle, blockTitle, blockDescription, (clickedItem) -> {
+                                menuManager.closeCurrentMenu();
 
-			EditorLore.updateModeDescription(getItem(20), mode, Message.EDITOR_MAIN_MENU_MODE_DESCRIPTION);
+                                if (clickedItem == null) {
 
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+                                    return;
+                                }
 
-		});
+                                ItemStack i = (ItemStack) clickedItem;
+                                if (!i.getType().isBlock()) {
 
-		// Frequency.
-		ItemStack frequencyItem = ItemUtil.createItem(CompatibleMaterial.COMPARATOR.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_UPDATE_FREQUENCY.getValue());
-		EditorLore.updateFrequencyDescription(frequencyItem, targetHat.getUpdateFrequency(), Message.EDITOR_MAIN_MENU_UPDATE_FREQUENCY_DESCRIPTION);
-		setButton(22, frequencyItem, (event, slot) -> {
+                                    return;
+                                }
 
-			final int increment = event.isLeftClick() ? 1 : -1;
-			int frequency = targetHat.getUpdateFrequency() + increment;
-			if (event.isMiddleClick()) {
+                                targetHat.setParticleBlock(particleIndex, i);
 
-				frequency = 2;
-			}
+                                EditorLore.updateParticleDescription(item, targetHat, particleIndex);
+                            });
 
-			targetHat.setUpdateFrequency(frequency);
+                    menuManager.addMenu(editorItemMenu);
 
-			EditorLore.updateFrequencyDescription(getItem(22), targetHat.getUpdateFrequency(), Message.EDITOR_MAIN_MENU_UPDATE_FREQUENCY_DESCRIPTION);
+                    editorItemMenu.open();
+                }
+                break;
+            case ITEM_DATA:
+                {
+                    Message menuTitle = Message.EDITOR_ICON_MENU_ITEM_TITLE;
+                    Message itemTitle = Message.EDITOR_ICON_MENU_ITEM_INFO;
+                    Message itemDescription = Message.EDITOR_ICON_MENU_ITEM_DESCRIPTION;
 
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+                    EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(
+                            core, editorManager, owner, menuTitle, itemTitle, itemDescription, (clickedItem) -> {
+                                menuManager.closeCurrentMenu();
 
-		});
+                                if (clickedItem == null) {
 
-		// Angle.
-		ItemStack angleItem = ItemUtil.createItem(Material.SLIME_BALL, 1, Message.EDITOR_MAIN_MENU_SET_ANGLE.getValue());
-		EditorLore.updateVectorDescription(angleItem, targetHat.getAngle(), Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
-		setButton(24, angleItem, (event, slot) -> {
+                                    return;
+                                }
 
-			if (event.isLeftClick()) {
+                                ItemStack i = (ItemStack) clickedItem;
+                                if (i.getType().isBlock()) {
 
-				EditorAngleMenu editorAngleMenu = new EditorAngleMenu(core, editorManager, owner, () -> {
+                                    return;
+                                }
 
-					EditorLore.updateVectorDescription(getItem(24), editorManager.getTargetHat().getAngle(), Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
+                                targetHat.setParticleItem(particleIndex, i);
 
-				});
+                                EditorLore.updateParticleDescription(item, targetHat, particleIndex);
+                            });
 
-				menuManager.addMenu(editorAngleMenu);
+                    menuManager.addMenu(editorItemMenu);
 
-				editorAngleMenu.open();
+                    editorItemMenu.open();
+                }
+                break;
+            case ITEMSTACK_DATA:
+                {
+                    EditorItemStackMenu editorItemStackMenu =
+                            new EditorItemStackMenu(core, editorManager, owner, particleIndex, () -> {
+                                EditorLore.updateParticleDescription(item, targetHat, particleIndex);
+                            });
 
-			}
+                    menuManager.addMenu(editorItemStackMenu);
 
-			else if (event.isShiftRightClick()) {
-
-				targetHat.setAngle(0, 0, 0);
-
-				EditorLore.updateVectorDescription(getItem(24), editorManager.getTargetHat().getAngle(), Message.EDITOR_MAIN_MENU_VECTOR_DESCRIPTION);
-
-			}
-
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-		// Offset.
-		ItemStack offsetItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_OFFSET.getValue());
-		EditorLore.updateOffsetDescription(offsetItem, targetHat);
-		setButton(25, offsetItem, (event, slot) -> {
-
-			EditorOffsetMenu editorOffsetMenu = new EditorOffsetMenu(core, editorManager, owner, () -> {
-
-				EditorLore.updateOffsetDescription(getItem(25), editorManager.getTargetHat());
-
-			});
-
-			menuManager.addMenu(editorOffsetMenu);
-
-			editorOffsetMenu.open();
-
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-		// Tracking.
-		ItemStack trackingItem = ItemUtil.createItem(Material.COMPASS, 1, Message.EDITOR_MAIN_MENU_SET_TRACKING_METHOD.getValue()); 
-		EditorLore.updateTrackingDescription(trackingItem, targetHat);
-		setButton(trackingButtonSlot, trackingItem, (event, slot) -> {
-
-			List<ParticleTracking> methods = targetHat.getEffect().getSupportedTrackingMethods();
-
-			final int increment = event.isLeftClick() ? 1 : -1;
-			final int size = methods.size();
-			final int index = MathUtil.wrap(methods.indexOf(targetHat.getTrackingMethod()) + increment, size, 0);
-
-			targetHat.setTrackingMethod(methods.get(index));
-
-			EditorLore.updateTrackingDescription(getItem(trackingButtonSlot), targetHat);
-
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
-
-		});
-
-		// Count.
-		ItemStack countItem = ItemUtil.createItem(CompatibleMaterial.WHEAT_SEEDS.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_COUNT.getValue());
-		EditorLore.updateIntegerDescription(countItem, targetHat.getCount(), Message.EDITOR_MAIN_MENU_COUNT_DESCRIPTION);
-		setButton(countButtonSlot, countItem, (event, slot) -> {
-
-			final int increment = event.isLeftClick() ? 1 : -1;
-			final int count = targetHat.getCount() + increment;
-
-			targetHat.setCount(count);
-
-			EditorLore.updateIntegerDescription(getItem(countButtonSlot), targetHat.getCount(), Message.EDITOR_MAIN_MENU_COUNT_DESCRIPTION);
-
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
-
-		});
-
-		// Particle.
-		ItemStack particleItem = getParticleItem();
-		if (targetHat.getEffect().getParticlesSupported() == 1) {
-
-			EditorLore.updateParticleDescription(particleItem, targetHat, 0);
-
-		}
-
-		setButton(particleButtonSlot, getParticleItem(), getParticleAction());
-
-		// Scale.
-		ItemStack scaleItem = ItemUtil.createItem(CompatibleMaterial.PUFFERFISH.getMaterial(), 1, Message.EDITOR_MAIN_MENU_SET_SCALE.getValue());
-		EditorLore.updateDoubleDescription(scaleItem, targetHat.getScale(), Message.EDITOR_MAIN_MENU_SCALE_DESCRIPTION);
-		setButton(scaleItemButtonSlot, scaleItem, (event, slot) -> {
-
-			double normalClick    = event.isLeftClick() ? 0.1f : -0.1f;
-			double shiftClick     = event.isShiftClick() ? 10 : 1;
-			double modifier       = normalClick * shiftClick;
-			boolean isMiddleClick = event.isMiddleClick();
-
-			double scale = isMiddleClick ? 1 : targetHat.getScale() + modifier;
-			targetHat.setScale(scale);
-
-			EditorLore.updateDoubleDescription(getItem(scaleItemButtonSlot), targetHat.getScale(), Message.EDITOR_MAIN_MENU_SCALE_DESCRIPTION);
-
-			if (isMiddleClick) {
-
-				return MenuClickResult.NEUTRAL;
-			}
-			else {
-
-				return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
-
-			}
-
-		});
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {
-
-		Database database = core.getDatabase();
-
-		if (targetHat.getType().getParticlesSupported() == 1) {
-
-			if (targetHat.getParticleData(0).hasPropertyChanges()) {
-
-				database.saveParticleData(editorManager.getMenuName(), targetHat, 0);
-
-			}
-
-		}
-
-		if (! forced) {
-
-			Hat hat = editorManager.getBaseHat();
-			if (hat == null) {
-
-				return;
-
-			}
-
-			String name = editorManager.getMenuName();
-
-			if (hat.isModified()) {
-
-				int targetSlot = editorManager.getTargetSlot();
-
-				database.saveHat(name, targetSlot, hat);
-
-				hat.clearPropertyChanges();
-
-			}
-
-			if (hat.getNodeCount() > 0) {
-
-				for (Hat node : hat.getNodes()) {
-
-					if (node.isModified()) {
-
-						database.saveNode(name, node.getIndex(), node);
-
-						node.clearPropertyChanges();
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-	@Override
-	public void onTick(int ticks) {}
-
-	/**
-	 * Returns an appropriate item for the current ParticleType
-	 * @return
-	 */
-	private ItemStack getParticleItem () {
-
-		Hat hat = editorManager.getTargetHat();
-		int particlesSupported = hat.getEffect().getParticlesSupported();
-
-		if (particlesSupported == 0) {
-
-			return noParticleItem;
-
-		}
-
-		if (particlesSupported == 1) {
-
-			return singleParticleItem;
-
-		}
-
-		return multipleParticlesItem;
-
-	}
-
-	/**
-	 * Returns an appropriate EditorAction for the current ParticleType
-	 * @return
-	 */
-	private MenuAction getParticleAction () {
-
-		Hat hat = editorManager.getTargetHat();
-		int particlesSupported = hat.getEffect().getParticlesSupported();
-
-		if (particlesSupported == 0) {
-
-			return noParticle4U;
-
-		}
-
-		if (particlesSupported == 1) {
-
-			return setParticleAction;
-
-		}
-
-		return editParticleAction;
-
-	}
-
-	public void onParticleEdit (ItemStack item, int particleIndex) {
-
-		ParticleEffect pe = targetHat.getParticle(particleIndex);
-		switch (pe.getProperty()) {
-		case NO_DATA:
-			break;
-		case COLOR:
-		case COLOR_TRANSITION:
-		case DUST_OPTIONS: {
-
-			EditorColorMenu editorColorMenu = new EditorColorMenu(core, editorManager, owner, particleIndex, () -> {
-
-				EditorLore.updateParticleDescription(item, targetHat, particleIndex);
-
-			});
-
-			menuManager.addMenu(editorColorMenu);
-
-			editorColorMenu.open();
-
-		}
-		break;
-		case BLOCK_DATA: {
-
-			Message menuTitle = Message.EDITOR_ICON_MENU_BLOCK_TITLE;
-			Message blockTitle = Message.EDITOR_ICON_MENU_BLOCK_INFO;
-			Message blockDescription = Message.EDITOR_ICON_MENU_BLOCK_DESCRIPTION;
-
-			EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(core, editorManager, owner, menuTitle, blockTitle, blockDescription, (clickedItem) -> {
-
-				menuManager.closeCurrentMenu();
-
-				if (clickedItem == null) {
-
-					return;
-
-				}
-
-				ItemStack i = (ItemStack)clickedItem;
-				if (! i.getType().isBlock()) {
-
-					return;
-
-				}
-
-				targetHat.setParticleBlock(particleIndex, i);
-
-				EditorLore.updateParticleDescription(item, targetHat, particleIndex);
-
-			});
-
-			menuManager.addMenu(editorItemMenu);
-
-			editorItemMenu.open();
-
-		}
-		break;
-		case ITEM_DATA: {
-
-			Message menuTitle = Message.EDITOR_ICON_MENU_ITEM_TITLE;
-			Message itemTitle = Message.EDITOR_ICON_MENU_ITEM_INFO;
-			Message itemDescription = Message.EDITOR_ICON_MENU_ITEM_DESCRIPTION;
-
-			EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(core, editorManager, owner, menuTitle, itemTitle, itemDescription, (clickedItem) -> {
-
-				menuManager.closeCurrentMenu();
-
-				if (clickedItem == null) {
-
-					return;
-
-				}
-
-				ItemStack i = (ItemStack) clickedItem;
-				if (i.getType().isBlock()) {
-
-					return;
-
-				}
-
-				targetHat.setParticleItem(particleIndex, i);
-
-				EditorLore.updateParticleDescription(item, targetHat, particleIndex);
-
-			});
-
-			menuManager.addMenu(editorItemMenu);
-
-			editorItemMenu.open();
-
-		}
-		break;
-		case ITEMSTACK_DATA: {
-
-			EditorItemStackMenu editorItemStackMenu = new EditorItemStackMenu(core, editorManager, owner, particleIndex, () -> {
-
-				EditorLore.updateParticleDescription(item, targetHat, particleIndex);
-
-			});
-
-			menuManager.addMenu(editorItemStackMenu);
-
-			editorItemStackMenu.open();
-
-		}
-		break;
-		default:
-
-			break;
-
-		}
-
-	}
-
+                    editorItemStackMenu.open();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Sender;
@@ -13,115 +7,105 @@ import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.editor.MetaState;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.player.PlayerState;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows a player to modify or set metadata related to an open editor in the game.
 public class MetaCommand extends EditCommand {
 
-	public MetaCommand(final CosmeticsOG core) {
+    public MetaCommand(final CosmeticsOG core) {
 
-		super(core);
+        super(core);
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (sender.isPlayer()) {
 
-		if (sender.isPlayer()) {
+            Player player = sender.getPlayer();
+            PlayerState playerState = core.getPlayerState(player);
+            if (!playerState.hasEditorOpen()) {
 
-			Player player = sender.getPlayer();
-			PlayerState playerState = core.getPlayerState(player);
-			if (! playerState.hasEditorOpen()) {
+                Utils.cosmeticsOGPlaceholderMessage(player, Message.META_ERROR.getValue());
 
-				Utils.cosmeticsOGPlaceholderMessage(player, Message.META_ERROR.getValue());
+                return false;
+            }
 
-				return false;
+            if (args.size() == 0) {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage(
+                        player,
+                        Message.COMMAND_META_USAGE.replace(
+                                "{1}", playerState.getMetaState().getSuggestion()));
 
-			if (args.size() == 0) {
+                return false;
+            }
 
-				Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_META_USAGE.replace("{1}", playerState.getMetaState().getSuggestion()));
+            EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
+            MetaState metaState = playerState.getMetaState();
 
-				return false;
+            if (args.size() == 1 && args.get(0).equalsIgnoreCase("cancel")) {
 
-			}
+                editorManager.reopen();
 
-			EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
-			MetaState metaState = playerState.getMetaState();
+            } else {
 
-			if (args.size() == 1 && args.get(0).equalsIgnoreCase("cancel")) {
+                metaState.onMetaSet(editorManager, player, args);
+            }
 
-				editorManager.reopen();
+        } else {
 
-			}
-			else {
+            Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+        }
 
-				metaState.onMetaSet(editorManager, player, args);
+        return true;
+    }
 
-			}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		}
-		else {
+        if (sender.isPlayer()) {
 
-			Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+            PlayerState playerState = core.getPlayerState(sender.getPlayer());
 
-		}
+            if (args.size() == 1) {
 
-		return true;
+                return Arrays.asList(playerState.getMetaState().getSuggestion(), "cancel");
 
-	}
+            } else {
 
-	@Override
-	public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+                return Arrays.asList(playerState.getMetaState().getSuggestion());
+            }
+        }
 
-		if (sender.isPlayer()) {
+        return Arrays.asList("");
+    }
 
-			PlayerState playerState = core.getPlayerState(sender.getPlayer());
+    @Override
+    public String getName() {
 
-			if (args.size() == 1) {
+        return "meta";
+    }
 
-				return Arrays.asList(playerState.getMetaState().getSuggestion(), "cancel");
+    @Override
+    public String getArgumentName() {
 
-			}
-			else {
+        return "meta";
+    }
 
-				return Arrays.asList(playerState.getMetaState().getSuggestion());
+    @Override
+    public Message getUsage() {
 
-			}
+        return Message.COMMAND_META_USAGE;
+    }
 
-		}
+    @Override
+    public Message getDescription() {
 
-		return Arrays.asList("");
-
-	}
-
-	@Override
-	public String getName() {
-
-		return "meta";
-
-	}
-
-	@Override
-	public String getArgumentName() {
-
-		return "meta";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_META_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_META_DESCRIPTION;
-
-	}
-
+        return Message.COMMAND_META_DESCRIPTION;
+    }
 }

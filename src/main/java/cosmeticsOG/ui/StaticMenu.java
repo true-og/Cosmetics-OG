@@ -1,17 +1,5 @@
 package cosmeticsOG.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.locale.Message;
@@ -23,276 +11,257 @@ import cosmeticsOG.particles.properties.ParticleAction;
 import cosmeticsOG.player.PlayerState;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class StaticMenu extends AbstractStaticMenu {
 
-	private final MenuInventory menuInventory;
-	private final PlayerState ownerState;
+    private final MenuInventory menuInventory;
+    private final PlayerState ownerState;
 
-	private final MenuAction hatAction;
+    private final MenuAction hatAction;
 
-	public StaticMenu(CosmeticsOG core, MenuManager menuManager, Player owner, MenuInventory menuInventory) {
+    public StaticMenu(CosmeticsOG core, MenuManager menuManager, Player owner, MenuInventory menuInventory) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.menuInventory = menuInventory;
-		this.ownerState = core.getPlayerState(owner);
-		this.inventory = Bukkit.createInventory(null, menuInventory.getSize(), menuInventory.getDisplayTitle());
+        this.menuInventory = menuInventory;
+        this.ownerState = core.getPlayerState(owner);
+        this.inventory = Bukkit.createInventory(null, menuInventory.getSize(), menuInventory.getDisplayTitle());
 
-		hatAction = (event, slot) -> {
+        hatAction = (event, slot) -> {
+            Hat hat = menuInventory.getHat(slot);
+            MenuClickResult result = MenuClickResult.NEUTRAL;
+            if (hat == null) {
 
-			Hat hat = menuInventory.getHat(slot);
-			MenuClickResult result = MenuClickResult.NEUTRAL;
-			if (hat == null) {
+                return MenuClickResult.NONE;
+            }
 
-				return MenuClickResult.NONE;
+            if (!hat.isLoaded()) {
 
-			}
+                core.getDatabase().loadHat(getName(), slot, hat);
+            }
 
-			if (! hat.isLoaded()) {
+            if (hat.playSound(owner)) {
 
-				core.getDatabase().loadHat(getName(), slot, hat);
+                result = MenuClickResult.NONE;
+            }
 
-			}
+            if (event.isLeftClick()) {
 
-			if (hat.playSound(owner)) {
+                hat.getLeftClickAction().onClick(owner, hat, slot, inventory, hat.getLeftClickArgument());
 
-				result = MenuClickResult.NONE;
+            } else if (event.isRightClick()) {
 
-			}
+                ParticleAction action = hat.getRightClickAction();
+                if (action == ParticleAction.MIMIC) {
 
-			if (event.isLeftClick()) {
+                    hat.getLeftClickAction().onClick(owner, hat, slot, inventory, hat.getLeftClickArgument());
 
-				hat.getLeftClickAction().onClick(owner, hat, slot, inventory, hat.getLeftClickArgument());
+                } else {
 
-			}
-			else if (event.isRightClick()) {
+                    action.onClick(owner, hat, slot, inventory, hat.getRightClickArgument());
+                }
+            }
 
-				ParticleAction action = hat.getRightClickAction();
-				if (action == ParticleAction.MIMIC) {
+            return result;
+        };
 
-					hat.getLeftClickAction().onClick(owner, hat, slot, inventory, hat.getLeftClickArgument());
+        build();
+    }
 
-				}
-				else {
+    //	@Override
+    //	public void open ()
+    //	{
+    //		menuManager.isOpeningMenu(this);
+    //		menuInventory.open(owner);
+    //	}
 
-					action.onClick(owner, hat, slot, inventory, hat.getRightClickArgument());
+    @Override
+    protected void build() {
 
-				}
+        Material lockedMaterial = SettingsManager.MENU_LOCKED_ITEM.getMaterial();
+        int lockedMaterialDurability = SettingsManager.MENU_LOCKED_ITEM_DAMAGE.getInt();
+        TextComponent lockedTitle = Utils.legacySerializerAnyCase(SettingsManager.MENU_LOCKED_ITEM_TITLE.getString());
 
-			}
+        List<Hat> equippedHats = core.getPlayerState(owner).getActiveHats();
+        for (int i = 0; i < inventory.getSize(); i++) {
 
-			return result;
+            ItemStack item = menuInventory.getItem(i);
+            Hat hat = menuInventory.getHat(i);
+            if (item == null || hat == null) {
 
-		};
+                continue;
+            }
 
-		build();
+            // Check for PURCHASE_ITEM action.
+            if (hat.getLeftClickAction() == ParticleAction.PURCHASE_ITEM) {
 
-	}
+                Hat pendingPurchase = ownerState.getPendingPurchase();
+                if (pendingPurchase != null) {
 
-	//	@Override
-	//	public void open () 
-	//	{
-		//		menuManager.isOpeningMenu(this);
-	//		menuInventory.open(owner);
-	//	}
+                    inventory.setItem(i, pendingPurchase.getMenuItem());
+                }
 
-	@Override
-	protected void build() {
+                continue;
+            }
 
-		Material lockedMaterial = SettingsManager.MENU_LOCKED_ITEM.getMaterial();
-		int lockedMaterialDurability = SettingsManager.MENU_LOCKED_ITEM_DAMAGE.getInt();
-		TextComponent lockedTitle = Utils.legacySerializerAnyCase(SettingsManager.MENU_LOCKED_ITEM_TITLE.getString());
+            // Highlight equipped hats.
+            if (equippedHats.contains(hat)) {
 
-		List<Hat> equippedHats = core.getPlayerState(owner).getActiveHats();
-		for (int i = 0; i < inventory.getSize(); i++) {
+                ItemUtil.highlightItem(item);
 
-			ItemStack item = menuInventory.getItem(i);
-			Hat hat = menuInventory.getHat(i);
-			if (item == null || hat == null) {
+                ItemMeta itemMeta = item.getItemMeta();
+                List<Component> lore = itemMeta.lore();
+                if (lore == null) {
 
-				continue;
+                    lore = new ArrayList<Component>();
+                }
 
-			}
+                String equippedLore = Message.HAT_EQUIPPED_DESCRIPTION.getValue();
+                String[] lineInfo = StringUtil.parseValue(equippedLore, "1");
+                if (lore.size() > 0) {
 
-			// Check for PURCHASE_ITEM action.
-			if (hat.getLeftClickAction() == ParticleAction.PURCHASE_ITEM) {
+                    equippedLore = equippedLore.replace(lineInfo[0], lineInfo[1]);
 
-				Hat pendingPurchase = ownerState.getPendingPurchase();
-				if (pendingPurchase != null) {
+                } else {
 
-					inventory.setItem(i, pendingPurchase.getMenuItem());
+                    equippedLore = equippedLore.replace(lineInfo[0], "");
+                }
 
-				}
+                lore.addAll(StringUtil.parseDescription(equippedLore));
+                itemMeta.lore(lore);
+                item.setItemMeta(itemMeta);
 
-				continue;
+            }
 
-			}
+            // Lock hats that aren't equipped if possible.
+            else if (hat.canBeLocked() && hat.isLocked()) {
 
-			// Highlight equipped hats.
-			if (equippedHats.contains(hat)) {
+                if (SettingsManager.MENU_LOCK_HATS_WITHOUT_PERMISSION.getBoolean()) {
 
-				ItemUtil.highlightItem(item);
+                    ItemUtil.setItemType(item, lockedMaterial, lockedMaterialDurability);
+                    ItemUtil.setItemName(item, lockedTitle.content());
+                }
+            }
 
-				ItemMeta itemMeta = item.getItemMeta();
-				List<Component> lore = itemMeta.lore();
-				if (lore == null) {
+            inventory.setItem(i, item);
+        }
 
-					lore = new ArrayList<Component>();
+        for (int i = 0; i < inventory.getSize(); i++) {
 
-				}
+            setAction(i, hatAction);
+        }
+    }
 
-				String equippedLore = Message.HAT_EQUIPPED_DESCRIPTION.getValue();
-				String[] lineInfo = StringUtil.parseValue(equippedLore, "1");
-				if (lore.size() > 0) {
+    @Override
+    public void onClose(boolean forced) {}
 
-					equippedLore = equippedLore.replace(lineInfo[0], lineInfo[1]);
+    @Override
+    public void onTick(int ticks) {
 
-				}
-				else {
+        for (Entry<Integer, Hat> set : menuInventory.getHats().entrySet()) {
 
-					equippedLore = equippedLore.replace(lineInfo[0], "");
+            int slot = set.getKey();
+            Hat hat = set.getValue();
+            if (hat == null || hat.isLocked()) {
 
-				}
+                continue;
+            }
 
-				lore.addAll(StringUtil.parseDescription(equippedLore));
-				itemMeta.lore(lore);
-				item.setItemMeta(itemMeta);
+            IconData iconData = hat.getIconData();
+            if (iconData.isLive()) {
 
-			}
+                ItemStackTemplate itemTemplate = iconData.getNextItem(ticks);
+                ItemUtil.setItemType(inventory.getItem(slot), itemTemplate.getMaterial(), itemTemplate.getDurability());
+            }
+        }
+    }
 
-			// Lock hats that aren't equipped if possible.
-			else if (hat.canBeLocked() && hat.isLocked()) {
+    @Override
+    public String getName() {
 
-				if (SettingsManager.MENU_LOCK_HATS_WITHOUT_PERMISSION.getBoolean()) {
+        return menuInventory.getName();
+    }
 
-					ItemUtil.setItemType(item, lockedMaterial, lockedMaterialDurability);
-					ItemUtil.setItemName(item, lockedTitle.content());
+    /**
+     * Get all hats in this menu
+     * @return
+     */
+    public Map<Integer, Hat> getHats() {
 
-				}
+        return menuInventory.getHats();
+    }
 
-			}
+    public void equipHat(Hat hat) {
 
-			inventory.setItem(i, item);
+        ItemStack item = menuInventory.getItem(hat.getSlot());
+        ItemUtil.highlightItem(item);
 
-		}
+        ItemMeta itemMeta = item.getItemMeta();
 
-		for (int i = 0; i < inventory.getSize(); i++) {
+        // Assuming hat.getCachedDescription() returns a List<String>.
+        List<String> cachedDescription = hat.getCachedDescription();
+        List<Component> lore = new ArrayList<>();
 
-			setAction(i, hatAction);
+        // Convert each String in cachedDescription to a TextComponent and add to lore.
+        for (String line : cachedDescription) {
 
-		}
+            lore.add(Component.text(line));
+        }
 
-	}
+        TextComponent equippedLore = Utils.legacySerializerAnyCase(Message.HAT_EQUIPPED_DESCRIPTION.getValue());
 
-	@Override
-	public void onClose(boolean forced) {}
+        String[] lineInfo = StringUtil.parseValue(equippedLore.content(), "1");
 
-	@Override
-	public void onTick(int ticks) {
+        // Replace content based on existing lore size.
+        String updatedLoreContent = lore.size() > 0
+                ? equippedLore.content().replace(lineInfo[0], lineInfo[1])
+                : equippedLore.content().replace(lineInfo[0], "");
 
-		for (Entry<Integer, Hat> set : menuInventory.getHats().entrySet()) {
+        // Update the TextComponent with the new content.
+        equippedLore = equippedLore.content(updatedLoreContent);
 
-			int slot = set.getKey();
-			Hat hat = set.getValue();
-			if (hat == null || hat.isLocked()) {
+        // Add the updated TextComponent to the lore.
+        lore.add(equippedLore);
 
-				continue;
+        // Set the lore as a List of Components in the ItemMeta.
+        itemMeta.lore(lore);
 
-			}
+        // Apply the updated ItemMeta back to the ItemStack.
+        item.setItemMeta(itemMeta);
 
-			IconData iconData = hat.getIconData();
-			if (iconData.isLive()) {
+        // Update the inventory with the modified item.
+        inventory.setItem(hat.getSlot(), item);
+    }
 
-				ItemStackTemplate itemTemplate = iconData.getNextItem(ticks);
-				ItemUtil.setItemType(inventory.getItem(slot), itemTemplate.getMaterial(), itemTemplate.getDurability());
+    public void unequipHat(Hat hat) {
 
-			}
+        // Get the ItemStack from the menu inventory.
+        ItemStack item = menuInventory.getItem(hat.getSlot());
+        ItemUtil.stripHighlight(item);
 
-		}
+        // Convert List<String> from hat.getCachedDescription() to List<Component>.
+        List<Component> descriptionComponents = hat.getCachedDescription().stream()
+                // Convert each String to a Component.
+                .map(Component::text)
+                // Add the output to the list.
+                .collect(Collectors.toList());
 
-	}
+        // Set the ItemStack's description using a List<Component>.
+        ItemUtil.setItemDescription(item, descriptionComponents);
 
-	@Override
-	public String getName () {
-
-		return menuInventory.getName();
-
-	}
-
-	/**
-	 * Get all hats in this menu
-	 * @return
-	 */
-	public Map<Integer, Hat> getHats () {
-
-		return menuInventory.getHats();
-
-	}
-
-	public void equipHat(Hat hat) {
-
-		ItemStack item = menuInventory.getItem(hat.getSlot());
-		ItemUtil.highlightItem(item);
-
-		ItemMeta itemMeta = item.getItemMeta();
-
-		// Assuming hat.getCachedDescription() returns a List<String>.
-		List<String> cachedDescription = hat.getCachedDescription();
-		List<Component> lore = new ArrayList<>();
-
-		// Convert each String in cachedDescription to a TextComponent and add to lore.
-		for (String line : cachedDescription) {
-
-			lore.add(Component.text(line));
-
-		}
-
-		TextComponent equippedLore = Utils.legacySerializerAnyCase(Message.HAT_EQUIPPED_DESCRIPTION.getValue());
-
-		String[] lineInfo = StringUtil.parseValue(equippedLore.content(), "1");
-
-		// Replace content based on existing lore size.
-		String updatedLoreContent = lore.size() > 0 ? equippedLore.content().replace(lineInfo[0], lineInfo[1]) : equippedLore.content().replace(lineInfo[0], "");
-
-		// Update the TextComponent with the new content.
-		equippedLore = equippedLore.content(updatedLoreContent);
-
-		// Add the updated TextComponent to the lore.
-		lore.add(equippedLore);
-
-		// Set the lore as a List of Components in the ItemMeta.
-		itemMeta.lore(lore);
-
-		// Apply the updated ItemMeta back to the ItemStack.
-		item.setItemMeta(itemMeta);
-
-		// Update the inventory with the modified item.
-		inventory.setItem(hat.getSlot(), item);
-
-	}
-
-	public void unequipHat(Hat hat) {
-
-		// Get the ItemStack from the menu inventory.
-		ItemStack item = menuInventory.getItem(hat.getSlot());
-		ItemUtil.stripHighlight(item);
-
-		// Convert List<String> from hat.getCachedDescription() to List<Component>.
-		List<Component> descriptionComponents = hat.getCachedDescription().stream()
-				// Convert each String to a Component.
-				.map(Component::text)
-				// Add the output to the list.
-				.collect(Collectors.toList());
-
-		// Set the ItemStack's description using a List<Component>.
-		ItemUtil.setItemDescription(item, descriptionComponents);
-
-		// Update the inventory with the modified ItemStack.
-		inventory.setItem(hat.getSlot(), item);
-
-	}
-
+        // Update the inventory with the modified ItemStack.
+        inventory.setItem(hat.getSlot(), item);
+    }
 }

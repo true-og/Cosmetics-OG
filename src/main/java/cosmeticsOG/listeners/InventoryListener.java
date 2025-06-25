@@ -1,5 +1,7 @@
 package cosmeticsOG.listeners;
 
+import cosmeticsOG.CosmeticsOG;
+import cosmeticsOG.player.PlayerState;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,72 +11,62 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
-import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.player.PlayerState;
-
 public class InventoryListener implements Listener {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	public InventoryListener (final CosmeticsOG core)
-	{
-		this.core = core;
-		core.getServer().getPluginManager().registerEvents(this, core);
-	}
+    public InventoryListener(final CosmeticsOG core) {
+        this.core = core;
+        core.getServer().getPluginManager().registerEvents(this, core);
+    }
 
-	@EventHandler
-	public void onInventoryClick (InventoryClickEvent event)
-	{
-		if (!(event.getWhoClicked() instanceof Player)) {
-			return;
-		}
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
 
-		ItemStack item = event.getCurrentItem();
-		if (item != null && item.getType() != Material.AIR)
-		{
-			Player player = (Player)event.getWhoClicked();
-			PlayerState playerState = core.getPlayerState(player);
+        ItemStack item = event.getCurrentItem();
+        if (item != null && item.getType() != Material.AIR) {
+            Player player = (Player) event.getWhoClicked();
+            PlayerState playerState = core.getPlayerState(player);
 
-			if (playerState.hasMenuManager())
-			{
-				boolean inMenu = event.getRawSlot() < event.getInventory().getSize();
-				playerState.getMenuManager().onClick(event, inMenu);
-			}
-		}
-	}
+            if (playerState.hasMenuManager()) {
+                boolean inMenu = event.getRawSlot() < event.getInventory().getSize();
+                playerState.getMenuManager().onClick(event, inMenu);
+            }
+        }
+    }
 
-	@EventHandler
-	public void onInventoryClose (InventoryCloseEvent event)
-	{
-		if (!(event.getPlayer() instanceof Player)) {
-			return;
-		}
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) {
+            return;
+        }
 
-		Player player = (Player)event.getPlayer();
-		if (player.hasMetadata("NPC")) {
-			return;
-		}
+        Player player = (Player) event.getPlayer();
+        if (player.hasMetadata("NPC")) {
+            return;
+        }
 
-		PlayerState playerState = core.getPlayerState(player);
+        PlayerState playerState = core.getPlayerState(player);
 
-		if (playerState.hasMenuManager()) {
-			playerState.getMenuManager().onInventoryClose(event);
-		}
-	}
+        if (playerState.hasMenuManager()) {
+            playerState.getMenuManager().onInventoryClose(event);
+        }
+    }
 
-	@EventHandler
-	public void onInventoryOpen (InventoryOpenEvent event)
-	{
-		if (!(event.getPlayer() instanceof Player)) {
-			return;
-		}
+    @EventHandler
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (!(event.getPlayer() instanceof Player)) {
+            return;
+        }
 
-		Player player = (Player)event.getPlayer();
-		PlayerState playerState = core.getPlayerState(player);
+        Player player = (Player) event.getPlayer();
+        PlayerState playerState = core.getPlayerState(player);
 
-		if (playerState.hasMenuManager()) {
-			playerState.getMenuManager().onInventoryOpen(event);
-		}
-	}
-
+        if (playerState.hasMenuManager()) {
+            playerState.getMenuManager().onInventoryOpen(event);
+        }
+    }
 }

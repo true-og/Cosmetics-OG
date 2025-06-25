@@ -1,135 +1,115 @@
 package cosmeticsOG.managers;
 
-import org.bukkit.plugin.PluginManager;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.hooks.CurrencyHook;
 import cosmeticsOG.hooks.VanishHook;
 import cosmeticsOG.hooks.economy.TokenManagerHook;
 import cosmeticsOG.hooks.economy.VaultHook;
+import org.bukkit.plugin.PluginManager;
 
 public class HookManager {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	private CurrencyHook currencyHook;
-	private VanishHook vanishHook;
+    private CurrencyHook currencyHook;
+    private VanishHook vanishHook;
 
-	public HookManager (final CosmeticsOG core) {
+    public HookManager(final CosmeticsOG core) {
 
-		this.core = core;
+        this.core = core;
 
-		loadHooks();
+        loadHooks();
+    }
 
-	}
+    public void onReload() {
 
-	public void onReload () {
+        loadHooks();
+    }
 
-		loadHooks();
+    /**
+     * Get this plugin's CurrencyHook
+     * @return
+     */
+    public CurrencyHook getCurrencyHook() {
 
-	}
+        return currencyHook;
+    }
 
-	/**
-	 * Get this plugin's CurrencyHook
-	 * @return
-	 */
-	public CurrencyHook getCurrencyHook () {
+    /**
+     * Get this plugin's VanishHook
+     * @return
+     */
+    public VanishHook getVanishHook() {
 
-		return currencyHook;
+        return vanishHook;
+    }
 
-	}
+    private void loadHooks() {
 
-	/**
-	 * Get this plugin's VanishHook
-	 * @return
-	 */
-	public VanishHook getVanishHook () {
+        PluginManager pluginManager = core.getServer().getPluginManager();
 
-		return vanishHook;
+        // Vault Hook.
+        if (SettingsManager.FLAG_VAULT.getBoolean()) {
 
-	}
+            if (currencyHook != null && currencyHook instanceof VaultHook) {
 
-	private void loadHooks () {
+                return;
+            }
 
-		PluginManager pluginManager = core.getServer().getPluginManager();
+            if (pluginManager.isPluginEnabled("Vault")) {
 
-		// Vault Hook.
-		if (SettingsManager.FLAG_VAULT.getBoolean()) {
+                currencyHook = new VaultHook(core);
 
-			if (currencyHook != null && currencyHook instanceof VaultHook) {
+                Utils.logToConsole("Hooking into Vault...");
 
-				return;
+            } else {
 
-			}
+                Utils.logToConsole("WARNING: Could not find Vault, disabling economy support!");
 
-			if (pluginManager.isPluginEnabled("Vault")) {
+                SettingsManager.FLAG_VAULT.addOverride(false);
 
-				currencyHook = new VaultHook(core);
+                currencyHook = null;
+            }
 
-				Utils.logToConsole("Hooking into Vault...");
+        }
 
-			}
+        // TokenManager Hook.
+        else if (SettingsManager.FLAG_TOKEN_MANAGER.getBoolean()) {
 
-			else {
+            if (currencyHook != null && currencyHook instanceof TokenManagerHook) {
 
-				Utils.logToConsole("WARNING: Could not find Vault, disabling economy support!");
+                return;
+            }
 
-				SettingsManager.FLAG_VAULT.addOverride(false);
+            if (pluginManager.isPluginEnabled("TokenManager")) {
 
-				currencyHook = null;
+                currencyHook = new TokenManagerHook();
 
-			}
+                Utils.logToConsole("Hooking into TokenManager...");
 
-		}
+            } else {
 
-		// TokenManager Hook.
-		else if (SettingsManager.FLAG_TOKEN_MANAGER.getBoolean()) {
+                Utils.logToConsole("WARNING: Could not find TokenManager, disabling economy support!");
 
-			if (currencyHook != null && currencyHook instanceof TokenManagerHook) {
+                SettingsManager.FLAG_TOKEN_MANAGER.addOverride(false);
 
-				return;
+                currencyHook = null;
+            }
+        }
 
-			}
+        // Vanish Hooks.
+        if (vanishHook == null && SettingsManager.FLAG_VANISH.getBoolean()) {
 
-			if (pluginManager.isPluginEnabled("TokenManager")) {
+            // TODO: TrueOG vanish hook.
 
-				currencyHook = new TokenManagerHook();
+        } else {
 
-				Utils.logToConsole("Hooking into TokenManager...");
+            if (vanishHook != null && !SettingsManager.FLAG_VANISH.getBoolean()) {
 
-			}
-
-			else {
-
-				Utils.logToConsole("WARNING: Could not find TokenManager, disabling economy support!");
-
-				SettingsManager.FLAG_TOKEN_MANAGER.addOverride(false);
-
-				currencyHook = null;
-
-			}
-
-		}
-
-		// Vanish Hooks.
-		if (vanishHook == null && SettingsManager.FLAG_VANISH.getBoolean()) {
-
-			// TODO: TrueOG vanish hook.
-
-		}
-
-		else {
-
-			if (vanishHook != null && !SettingsManager.FLAG_VANISH.getBoolean()) {
-
-				vanishHook.unregister();
-				vanishHook = null;
-
-			}
-
-		}
-
-	}
-
+                vanishHook.unregister();
+                vanishHook = null;
+            }
+        }
+    }
 }

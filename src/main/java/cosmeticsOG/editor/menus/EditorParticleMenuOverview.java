@@ -1,14 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.database.Database;
@@ -19,140 +10,132 @@ import cosmeticsOG.particles.Hat;
 import cosmeticsOG.particles.ParticleEffect;
 import cosmeticsOG.ui.AbstractStaticMenu;
 import cosmeticsOG.util.ItemUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorParticleMenuOverview extends AbstractStaticMenu {
 
-	private final EditorMenuManager editorManager;
-	private final EditorMainMenu editorMainMenu;
-	private final Hat targetHat;
+    private final EditorMenuManager editorManager;
+    private final EditorMainMenu editorMainMenu;
+    private final Hat targetHat;
 
-	private Map<Integer, ParticleEffect> particles;
-	private Map<Integer, Boolean > modifiedParticles;
+    private Map<Integer, ParticleEffect> particles;
+    private Map<Integer, Boolean> modifiedParticles;
 
-	public EditorParticleMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner, EditorMainMenu editorMainMenu) {
+    public EditorParticleMenuOverview(
+            CosmeticsOG core, EditorMenuManager menuManager, Player owner, EditorMainMenu editorMainMenu) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.editorManager = menuManager;
-		this.editorMainMenu = editorMainMenu;
-		this.targetHat = menuManager.getTargetHat();
-		this.particles = new HashMap<Integer, ParticleEffect>();
-		this.modifiedParticles = new HashMap<Integer, Boolean>();	
-		this.inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_OVERVIEW_MENU_TITLE.getValue()));
+        this.editorManager = menuManager;
+        this.editorMainMenu = editorMainMenu;
+        this.targetHat = menuManager.getTargetHat();
+        this.particles = new HashMap<Integer, ParticleEffect>();
+        this.modifiedParticles = new HashMap<Integer, Boolean>();
+        this.inventory = Bukkit.createInventory(
+                null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_OVERVIEW_MENU_TITLE.getValue()));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    protected void build() {
 
-	@Override
-	protected void build() {
+        setButton(49, backButtonItem, backButtonAction);
 
-		setButton(49, backButtonItem, backButtonAction);
+        MenuAction editAction = (event, slot) -> {
+            int particleIndex = getClampedIndex(slot, 10, 2);
+            if (event.isLeftClick()) {
 
-		MenuAction editAction = (event, slot) -> {
+                EditorParticleSelectionMenu editorParticleSelectionMenu =
+                        new EditorParticleSelectionMenu(core, editorManager, owner, particleIndex, (particle) -> {
+                            menuManager.closeCurrentMenu();
 
-			int particleIndex = getClampedIndex(slot, 10, 2);
-			if (event.isLeftClick()) {
+                            if (particle == null) {
 
-				EditorParticleSelectionMenu editorParticleSelectionMenu = new EditorParticleSelectionMenu(core, editorManager, owner, particleIndex, (particle) -> {
+                                return;
+                            }
 
-					menuManager.closeCurrentMenu();
+                            ParticleEffect pe = (ParticleEffect) particle;
+                            targetHat.setParticle(particleIndex, pe);
 
-					if (particle == null) {
+                            // Add this particle to the recents list.
+                            core.getParticleManager().addParticleToRecents(ownerID, pe);
 
-						return;
+                            ItemStack item = getItem(slot);
+                            ItemStack itemStack = pe.getItem();
+                            Material material = itemStack.getType();
+                            int damage = 0;
 
-					}
+                            ItemUtil.setItemType(item, material, damage);
 
-					ParticleEffect pe = (ParticleEffect)particle;
-					targetHat.setParticle(particleIndex, pe);
+                            EditorLore.updateParticleDescription(item, targetHat, particleIndex);
 
-					// Add this particle to the recents list.
-					core.getParticleManager().addParticleToRecents(ownerID, pe);
+                            modifiedParticles.put(particleIndex, true);
+                        });
 
-					ItemStack item = getItem(slot);
-					ItemStack itemStack = pe.getItem();
-					Material material = itemStack.getType();
-					int damage = 0;
+                menuManager.addMenu(editorParticleSelectionMenu);
 
-					ItemUtil.setItemType(item, material, damage);
+                editorParticleSelectionMenu.open();
 
-					EditorLore.updateParticleDescription(item, targetHat, particleIndex);	
+            } else if (event.isRightClick()) {
 
-					modifiedParticles.put(particleIndex, true);
+                editorMainMenu.onParticleEdit(getItem(slot), particleIndex);
+            }
 
-				});
+            return MenuClickResult.NEUTRAL;
+        };
 
-				menuManager.addMenu(editorParticleSelectionMenu);
+        for (int i = 0; i < 28; i++) {
 
-				editorParticleSelectionMenu.open();
+            setAction(getNormalIndex(i, 10, 2), editAction);
+        }
 
-			}
+        String itemTitle = Message.EDITOR_PARTICLE_OVERVIEW_PARTICLE_NAME.getValue();
+        int particlesSupported = targetHat.getType().getParticlesSupported();
+        for (int i = 0; i < particlesSupported; i++) {
 
-			else if (event.isRightClick()) {
+            ParticleEffect particle = targetHat.getParticle(i);
+            ItemStack item = particle.getItem().clone();
 
-				editorMainMenu.onParticleEdit(getItem(slot), particleIndex);
+            ItemUtil.setItemName(item, itemTitle.replace("{1}", Integer.toString(i + 1)));
 
-			}
+            particles.put(i, particle);
+            modifiedParticles.put(i, false);
 
-			return MenuClickResult.NEUTRAL;
+            EditorLore.updateParticleDescription(item, targetHat, i);
 
-		};
+            setItem(getNormalIndex(i, 10, 2), item);
+        }
+    }
 
-		for (int i = 0; i < 28; i++) {
+    @Override
+    public void onClose(boolean forced) {
 
-			setAction(getNormalIndex(i, 10, 2), editAction);
+        Database database = core.getDatabase();
+        String menuName = editorManager.getMenuName();
+        for (Entry<Integer, Boolean> entry : modifiedParticles.entrySet()) {
 
-		}
+            if (entry.getValue()) {
 
-		String itemTitle = Message.EDITOR_PARTICLE_OVERVIEW_PARTICLE_NAME.getValue();
-		int particlesSupported = targetHat.getType().getParticlesSupported();
-		for (int i = 0; i < particlesSupported; i++) {
+                database.saveParticleData(menuName, targetHat, entry.getKey());
+            }
+        }
 
-			ParticleEffect particle = targetHat.getParticle(i);
-			ItemStack item = particle.getItem().clone();
+        for (int i = 0; i < targetHat.getType().getParticlesSupported(); i++) {
 
-			ItemUtil.setItemName(item, itemTitle.replace("{1}", Integer.toString(i + 1)));
+            if (targetHat.getParticleData(i).hasPropertyChanges()) {
 
-			particles.put(i, particle);
-			modifiedParticles.put(i, false);
+                database.saveParticleData(menuName, targetHat, i);
+            }
+        }
+    }
 
-			EditorLore.updateParticleDescription(item, targetHat, i);
-
-			setItem(getNormalIndex(i, 10, 2), item);
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {
-
-		Database database = core.getDatabase();
-		String menuName = editorManager.getMenuName();
-		for (Entry<Integer, Boolean> entry : modifiedParticles.entrySet()) {
-
-			if (entry.getValue()) {
-
-				database.saveParticleData(menuName, targetHat, entry.getKey());
-
-			}
-
-		}
-
-		for (int i = 0; i < targetHat.getType().getParticlesSupported(); i++) {
-
-			if (targetHat.getParticleData(i).hasPropertyChanges()) {
-
-				database.saveParticleData(menuName, targetHat, i);
-
-			}
-
-		}
-
-	}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

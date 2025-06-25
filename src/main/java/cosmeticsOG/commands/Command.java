@@ -1,5 +1,9 @@
 package cosmeticsOG.commands;
 
+import cosmeticsOG.CosmeticsOG;
+import cosmeticsOG.Utils;
+import cosmeticsOG.locale.Message;
+import cosmeticsOG.permission.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -16,340 +19,311 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
-import cosmeticsOG.locale.Message;
-import cosmeticsOG.permission.Permission;
-
 public abstract class Command {
 
-	/**
-	 * Determine if we can include this command in the help menu
-	 */
-	protected boolean visible = true;
+    /**
+     * Determine if we can include this command in the help menu
+     */
+    protected boolean visible = true;
 
-	/**
-	 * Keep track of which sub commands belong to this command
-	 */
-	protected Map<String, Command> subCommands;
+    /**
+     * Keep track of which sub commands belong to this command
+     */
+    protected Map<String, Command> subCommands;
 
-	public Command ()
-	{		
-		subCommands = new LinkedHashMap<String, Command>();
-	}
+    public Command() {
+        subCommands = new LinkedHashMap<String, Command>();
+    }
 
-	/**
-	 * Generic command execute method
-	 * @param plugin
-	 * @param sender
-	 * @param label
-	 * @param args
-	 * @return
-	 */
-	public abstract boolean execute (CosmeticsOG core, Sender sender, String label, ArrayList<String> args);
+    /**
+     * Generic command execute method
+     * @param plugin
+     * @param sender
+     * @param label
+     * @param args
+     * @return
+     */
+    public abstract boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args);
 
-	/**
-	 * Handles this commands onCommand
-	 * Checks permission before passing command along
-	 * @param core
-	 * @param sender
-	 * @param label
-	 * @param args
-	 * @return
-	 */
-	public boolean onCommand (CosmeticsOG core, Sender sender, String label, ArrayList<String> args)
-	{
-		if (! sender.isPlayer() && isPlayerOnly())
-		{
-			Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
-			return false;
-		}
+    /**
+     * Handles this commands onCommand
+     * Checks permission before passing command along
+     * @param core
+     * @param sender
+     * @param label
+     * @param args
+     * @return
+     */
+    public boolean onCommand(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (!sender.isPlayer() && isPlayerOnly()) {
+            Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+            return false;
+        }
 
-		String argument = "";
-		if (args.size() >= 1) {
-			argument = args.get(0);
-		}
+        String argument = "";
+        if (args.size() >= 1) {
+            argument = args.get(0);
+        }
 
-		if (! hasPermission(sender, argument)) {
+        if (!hasPermission(sender, argument)) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        return execute(core, sender, label, args);
+    }
 
-		}
+    /**
+     * Generic tab complete method
+     * @param plugin
+     * @param sender
+     * @param label
+     * @param args
+     * @return
+     */
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (hasPermission(sender)) {
+            if (args.size() == 1) {
+                List<String> arguments = new ArrayList<String>();
+                for (Entry<String, Command> entry : subCommands.entrySet()) {
+                    if (entry.getValue().hasPermission(sender)) {
+                        arguments.add(entry.getKey());
+                    }
+                }
+                return arguments;
+            } else {
+                String cmd = args.get(0);
+                if (subCommands.containsKey(cmd)) {
+                    args.remove(0);
+                    return subCommands.get(cmd).onTabComplete(core, sender, label, args);
+                }
+            }
+        }
+        return Arrays.asList("");
+    }
 
-		return execute(core, sender, label, args);
-	}
+    public List<String> onTabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (hasPermission(sender)) {
+            return tabComplete(core, sender, label, args);
+        }
+        return Arrays.asList("");
+    }
 
-	/**
-	 * Generic tab complete method
-	 * @param plugin
-	 * @param sender
-	 * @param label
-	 * @param args
-	 * @return
-	 */
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args)
-	{	
-		if (hasPermission(sender))
-		{
-			if (args.size() == 1)
-			{
-				List<String> arguments = new ArrayList<String>();
-				for (Entry<String, Command> entry : subCommands.entrySet())
-				{
-					if (entry.getValue().hasPermission(sender)) {
-						arguments.add(entry.getKey());
-					}
-				}
-				return arguments;
-			}
+    /**
+     * Return this commands name
+     * @return
+     */
+    public abstract String getName();
 
-			else
-			{
-				String cmd = args.get(0);				
-				if (subCommands.containsKey(cmd))
-				{
-					args.remove(0);
-					return subCommands.get(cmd).onTabComplete(core, sender, label, args);
-				}
-			}
-		}
-		return Arrays.asList("");
-	}
+    /**
+     * Returns the argument name this command starts off with
+     * @return
+     */
+    public abstract String getArgumentName();
 
-	public List<String> onTabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args)
-	{
-		if (hasPermission(sender)) {
-			return tabComplete(core, sender, label, args);
-		}
-		return Arrays.asList("");
-	}
+    /**
+     * Returns this commands arguments
+     * @return
+     */
+    public abstract Message getUsage();
 
-	/**
-	 * Return this commands name
-	 * @return
-	 */
-	public abstract String getName ();
+    /**
+     * Returns a brief description of what this command does
+     * @return
+     */
+    public abstract Message getDescription();
 
-	/**
-	 * Returns the argument name this command starts off with
-	 * @return
-	 */
-	public abstract String getArgumentName ();
+    /**
+     * Returns this commands permission
+     * @return
+     */
+    public abstract Permission getPermission();
 
-	/**
-	 * Returns this commands arguments
-	 * @return
-	 */
-	public abstract Message getUsage ();
+    /**
+     * Returns true if this command will appear in the help menu
+     * @return
+     */
+    public abstract boolean showInHelp();
 
-	/**
-	 * Returns a brief description of what this command does
-	 * @return
-	 */
-	public abstract Message getDescription ();
+    /**
+     * Checks to see if consoles can run this command
+     * @return
+     */
+    public abstract boolean isPlayerOnly();
 
-	/**
-	 * Returns this commands permission
-	 * @return
-	 */
-	public abstract Permission getPermission ();
+    /**
+     * Checks to see if this command has a permission value
+     * @return
+     */
+    public boolean hasPermission() {
+        return true;
+    }
 
-	/**
-	 * Returns true if this command will appear in the help menu
-	 * @return
-	 */
-	public abstract boolean showInHelp ();
+    /**
+     * Checks to see if this command has a wild card permission
+     * @return
+     */
+    public boolean hasWildcardPermission() {
+        return false;
+    }
 
-	/**
-	 * Checks to see if consoles can run this command
-	 * @return
-	 */
-	public abstract boolean isPlayerOnly();
+    /**
+     * Returns this command's wild card permission
+     * @return
+     */
+    public Permission getWildcardPermission() {
+        return Permission.NONE;
+    }
 
-	/**
-	 * Checks to see if this command has a permission value
-	 * @return
-	 */
-	public boolean hasPermission () {
-		return true;
-	}
+    /**
+     * Registers a sub-command under this command
+     * @param command
+     */
+    public void register(Command command) {
+        subCommands.put(command.getArgumentName(), command);
+    }
 
-	/**
-	 * Checks to see if this command has a wild card permission
-	 * @return
-	 */
-	public boolean hasWildcardPermission () {
-		return false;
-	}
+    /**
+     * Returns a map of all sub-commands registered under this command
+     * @return
+     */
+    public Map<String, Command> getSubCommands() {
+        final Map<String, Command> commands = new LinkedHashMap<String, Command>(subCommands);
+        return commands;
+    }
 
-	/**
-	 * Returns this command's wild card permission
-	 * @return
-	 */
-	public Permission getWildcardPermission () {
-		return Permission.NONE;
-	}
+    /**
+     * Recursively adds all sub-commands under this command to the Map
+     * @param commands
+     */
+    public void getSubCommands(LinkedHashMap<String, Command> commands) {
+        for (Entry<String, Command> entry : subCommands.entrySet()) {
+            Command cmd = entry.getValue();
 
-	/**
-	 * Registers a sub-command under this command
-	 * @param command
-	 */
-	public void register (Command command) {
-		subCommands.put(command.getArgumentName(), command);
-	}
+            if (cmd.showInHelp()) {
+                commands.put(cmd.getName(), cmd);
+            }
 
-	/**
-	 * Returns a map of all sub-commands registered under this command
-	 * @return
-	 */
-	public Map<String, Command> getSubCommands ()
-	{
-		final Map<String, Command> commands = new LinkedHashMap<String, Command>(subCommands);
-		return commands;
-	}
+            cmd.getSubCommands(commands);
+        }
+    }
 
-	/**
-	 * Recursively adds all sub-commands under this command to the Map
-	 * @param commands
-	 */
-	public void getSubCommands (LinkedHashMap<String, Command> commands)
-	{
-		for (Entry<String, Command> entry : subCommands.entrySet())
-		{
-			Command cmd = entry.getValue();
+    /**
+     * Checks to see if the player has permission to execute this command
+     * @param sender
+     * @return
+     */
+    public boolean hasPermission(Sender sender) {
+        return hasPermission(sender, "");
+    }
 
-			if (cmd.showInHelp()) {
-				commands.put(cmd.getName(), cmd);
-			}
+    /**
+     * Checks to see if the player has permission to execute this command
+     * @param sender
+     * @param arg
+     * @return
+     */
+    public boolean hasPermission(Sender sender, String arg) {
+        if (!sender.isPlayer()) {
+            return true;
+        }
 
-			cmd.getSubCommands(commands);
-		}
-	}
+        // If this command doesn't have a permission of its own, then
+        // we'll check the sub commands
+        if (!hasPermission()) {
+            for (Command command : subCommands.values()) {
+                if (command.hasPermission(sender)) {
+                    return true;
+                }
+            }
+        }
 
-	/**
-	 * Checks to see if the player has permission to execute this command
-	 * @param sender
-	 * @return
-	 */
-	public boolean hasPermission (Sender sender) {
-		return hasPermission(sender, "");
-	}
+        // /h wild card check
+        if (Permission.COMMAND_ALL.hasPermission(sender)) {
+            return true;
+        }
 
-	/**
-	 * Checks to see if the player has permission to execute this command
-	 * @param sender
-	 * @param arg
-	 * @return
-	 */
-	public boolean hasPermission (Sender sender, String arg)
-	{
-		if (!sender.isPlayer()) {
-			return true;
-		}
+        // Specific command wild card check
+        if (hasWildcardPermission()) {
+            if (getWildcardPermission().hasPermission(sender)) {
+                return true;
+            }
+        }
 
-		// If this command doesn't have a permission of its own, then
-		// we'll check the sub commands
-		if (!hasPermission())
-		{
-			for (Command command : subCommands.values()) {
-				if (command.hasPermission(sender)) {
-					return true;
-				}
-			}
-		}
+        // Regular permission check
+        if (getPermission().hasPermission(sender)) {
+            return true;
+        }
 
-		// /h wild card check
-		if (Permission.COMMAND_ALL.hasPermission(sender)) {
-			return true;
-		}
+        return false;
+    }
 
-		// Specific command wild card check
-		if (hasWildcardPermission())
-		{
-			if (getWildcardPermission().hasPermission(sender)) {
-				return true;
-			}
-		}
+    public Player getPlayer(Sender sender, String selector) {
+        CommandSender commandSender = sender.getCommandSender();
+        if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
+            switch (selector) {
+                case "@p":
+                    {
+                        Location location = null;
+                        if (sender.isPlayer()) {
+                            location = sender.getPlayer().getLocation();
+                        } else if (commandSender instanceof BlockCommandSender) {
+                            location = ((BlockCommandSender) commandSender)
+                                    .getBlock()
+                                    .getLocation();
+                        }
 
-		// Regular permission check
-		if (getPermission().hasPermission(sender)) {
-			return true;
-		}
+                        if (location != null) {
+                            return getNearestPlayer(location);
+                        }
+                    }
+                    break;
 
-		return false;
-	}
+                case "@r":
+                    {
+                        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+                        Optional<? extends Player> player = players.stream()
+                                .skip((int) (players.size() * Math.random()))
+                                .findFirst();
 
-	public Player getPlayer (Sender sender, String selector)
-	{
-		CommandSender commandSender = sender.getCommandSender();
-		if (Permission.COMMAND_SELECTORS.hasPermission(sender))
-		{
-			switch (selector)
-			{
-			case "@p":
-			{
-				Location location = null;
-				if (sender.isPlayer()) {
-					location = sender.getPlayer().getLocation();
-				} else if (commandSender instanceof BlockCommandSender) {
-					location = ((BlockCommandSender)commandSender).getBlock().getLocation();
-				}
+                        if (player.isPresent()) {
+                            return player.get();
+                        }
+                    }
+                    break;
+            }
+        }
 
-				if (location != null) {
-					return getNearestPlayer(location);
-				}
-			}
-			break;
+        return Bukkit.getPlayer(selector);
+    }
 
-			case "@r":
-			{
-				Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-				Optional<? extends Player> player = players.stream().skip((int) (players.size() * Math.random())).findFirst();
+    private Player getNearestPlayer(Location location) {
+        double maxDistance = 100;
+        Player targetPlayer = null;
+        Collection<? extends Entity> nearbyEntities = location.getWorld().getNearbyEntities(location, 25, 25, 25);
 
-				if (player.isPresent()) {
-					return player.get();
-				}
-			}
-			break;
-			}
-		}
+        for (Entity e : nearbyEntities) {
+            if (!(e instanceof Player)) {
+                continue;
+            }
 
-		return Bukkit.getPlayer(selector);
-	}
+            Player player = (Player) e;
+            double distance = player.getLocation().distanceSquared(location);
+            if (distance < maxDistance) {
+                targetPlayer = player;
+                maxDistance = distance;
+            }
+        }
 
-	private Player getNearestPlayer (Location location)
-	{
-		double maxDistance = 100;
-		Player targetPlayer = null;
-		Collection<? extends Entity> nearbyEntities = location.getWorld().getNearbyEntities(location, 25, 25, 25);
-
-		for (Entity e : nearbyEntities)
-		{
-			if (!(e instanceof Player)) {
-				continue;
-			}
-
-			Player player = (Player)e;
-			double distance = player.getLocation().distanceSquared(location);
-			if (distance < maxDistance)
-			{
-				targetPlayer = player;
-				maxDistance = distance;
-			}
-		}
-
-		return targetPlayer;
-	}
-
+        return targetPlayer;
+    }
 }

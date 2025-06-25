@@ -1,14 +1,5 @@
 package cosmeticsOG.listeners;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -17,7 +8,14 @@ import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.player.PlayerState;
 import cosmeticsOG.ui.MenuManager;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import java.util.Arrays;
+import java.util.List;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 /**
  * Listens for a player editing meta properties through the menu editor
@@ -26,76 +24,67 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
  */
 public class ChatListener implements Listener {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	public ChatListener (final CosmeticsOG core) {
+    public ChatListener(final CosmeticsOG core) {
 
-		this.core = core;	
+        this.core = core;
 
-		core.getServer().getPluginManager().registerEvents(this, core);
+        core.getServer().getPluginManager().registerEvents(this, core);
+    }
 
-	}
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerChat(AsyncChatEvent event) {
 
-	@EventHandler (priority = EventPriority.HIGHEST)
-	public void onPlayerChat(AsyncChatEvent event) {
+        if (SettingsManager.EDITOR_USE_ACTION_BAR.getBoolean()) {
 
-		if (SettingsManager.EDITOR_USE_ACTION_BAR.getBoolean())	{
+            Player player = event.getPlayer();
+            PlayerState playerState = core.getPlayerState(player);
 
-			Player player = event.getPlayer();
-			PlayerState playerState = core.getPlayerState(player);
+            if (playerState.hasMenuManager()) {
 
-			if (playerState.hasMenuManager()) {
+                MetaState metaState = playerState.getMetaState();
+                if (metaState.equals(MetaState.NONE)) {
 
-				MetaState metaState = playerState.getMetaState();
-				if (metaState.equals(MetaState.NONE)) {
+                    return;
+                }
 
-					return;
+                MenuManager menuManager = playerState.getMenuManager();
+                if (!(menuManager instanceof EditorMenuManager)) {
 
-				}
+                    return;
+                }
 
-				MenuManager menuManager = playerState.getMenuManager();
-				if (! (menuManager instanceof EditorMenuManager)) {
+                EditorMenuManager editorManager = (EditorMenuManager) menuManager;
 
-					return;
+                event.setCancelled(true);
 
-				}
+                Bukkit.getScheduler().scheduleSyncDelayedTask(CosmeticsOG.instance, () -> {
 
-				EditorMenuManager editorManager = (EditorMenuManager) menuManager;
+                    // Convert the Component to a plain string
+                    String messageString =
+                            PlainTextComponentSerializer.plainText().serialize(event.message());
 
-				event.setCancelled(true);
+                    if (Utils.stripColors(messageString).equals("cancel")) {
 
-				Bukkit.getScheduler().scheduleSyncDelayedTask(CosmeticsOG.instance, () -> {
+                        editorManager.reopen();
 
-					// Convert the Component to a plain string
-					String messageString = PlainTextComponentSerializer.plainText().serialize(event.message());
+                        return;
+                    }
 
-					if (Utils.stripColors(messageString).equals("cancel")) {
+                    List<String> arguments = Arrays.asList(messageString.split(" "));
 
-						editorManager.reopen();
+                    metaState.onMetaSet(editorManager, player, arguments);
+                });
+            }
+        }
+    }
 
-						return;
+    /**
+     * Unregisters this AsyncPlayerChatEvent Listener
+     */
+    public void unregister() {
 
-					}
-
-					List<String> arguments = Arrays.asList(messageString.split(" "));
-
-					metaState.onMetaSet(editorManager, player, arguments);
-
-				});
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Unregisters this AsyncPlayerChatEvent Listener
-	 */
-	public void unregister () {
-
-		AsyncChatEvent.getHandlerList().unregister(this);
-
-	}
-
+        AsyncChatEvent.getHandlerList().unregister(this);
+    }
 }

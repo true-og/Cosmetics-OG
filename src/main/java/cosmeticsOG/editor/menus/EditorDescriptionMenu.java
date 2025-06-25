@@ -1,12 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -20,305 +13,286 @@ import cosmeticsOG.particles.Hat;
 import cosmeticsOG.ui.AbstractListMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorDescriptionMenu extends AbstractListMenu {
 
-	private final EditorMenuManager editorManager;
-	private final boolean isEditingDescription;
-	private final Hat targetHat;
+    private final EditorMenuManager editorManager;
+    private final boolean isEditingDescription;
+    private final Hat targetHat;
 
-	private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_EMPTY.getValue());
+    private final ItemStack emptyItem = ItemUtil.createItem(
+            CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_EMPTY.getValue());
 
-	private final String lineTitle = Message.EDITOR_DESCIPRION_LINE_TITLE.getValue();
-	private final String lineDescription = Message.EDITOR_DESCRIPTION_MENU_LINE_DESCRIPTION.getValue();
-	private final String[] descriptionInfo = StringUtil.parseValue(lineDescription, "1");
+    private final String lineTitle = Message.EDITOR_DESCIPRION_LINE_TITLE.getValue();
+    private final String lineDescription = Message.EDITOR_DESCRIPTION_MENU_LINE_DESCRIPTION.getValue();
+    private final String[] descriptionInfo = StringUtil.parseValue(lineDescription, "1");
 
-	private int editingLine = -1;
-	private boolean isModified = false;
+    private int editingLine = -1;
+    private boolean isModified = false;
 
-	public EditorDescriptionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isEditingDescription) {
+    public EditorDescriptionMenu(
+            CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isEditingDescription) {
 
-		super(core, menuManager, owner, true);
+        super(core, menuManager, owner, true);
 
-		this.editorManager = menuManager;
-		this.isEditingDescription = isEditingDescription;
-		this.targetHat = menuManager.getBaseHat();
-		this.totalPages = 1;
+        this.editorManager = menuManager;
+        this.isEditingDescription = isEditingDescription;
+        this.targetHat = menuManager.getBaseHat();
+        this.totalPages = 1;
 
-		setMenu(0, Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
+        setMenu(
+                0,
+                Bukkit.createInventory(
+                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    public void insertEmptyItem() {
 
-	@Override
-	public void insertEmptyItem() {
+        setButton(0, 22, emptyItem, emptyAction);
+    }
 
-		setButton(0, 22, emptyItem, emptyAction);
+    @Override
+    public void removeEmptyItem() {
 
-	}
+        setButton(0, 22, null, emptyAction);
+    }
 
-	@Override
-	public void removeEmptyItem() {
+    @Override
+    public void open() {
 
-		setButton(0, 22, null, emptyAction);
+        if (editingLine != -1) {
 
-	}
+            List<String> description = getDescription();
+            String line = description.get(editingLine);
+            ItemStack item = getItem(0, getNormalIndex(editingLine, 10, 2));
 
-	@Override
-	public void open () {
+            setLineDescription(item, line);
 
-		if (editingLine != -1) {
+            editingLine = -1;
 
-			List<String> description = getDescription();
-			String line = description.get(editingLine);
-			ItemStack item = getItem(0, getNormalIndex(editingLine, 10, 2));
+            EditorLore.updatePreviewDecription(getItem(0, 49), description, targetHat);
+        }
 
-			setLineDescription(item, line);
+        super.open();
+    }
 
-			editingLine = -1;
+    @Override
+    protected void build() {
 
-			EditorLore.updatePreviewDecription(getItem(0, 49), description, targetHat);
+        setButton(0, 46, backButtonItem, backButtonAction);
 
-		}
+        ItemStack previewItem = ItemUtil.createItem(
+                CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_PREVIEW.getValue());
+        EditorLore.updatePreviewDecription(previewItem, getDescription(), targetHat);
+        setButton(0, 49, previewItem, (event, slot) -> {
+            if (event.isShiftRightClick()) {
 
-		super.open();
+                getDescription().clear();
 
-	}
+                for (int i = 0; i <= 27; i++) {
 
-	@Override
-	protected void build() {
+                    setItem(0, getNormalIndex(i, 10, 2), null);
+                }
 
-		setButton(0, 46, backButtonItem, backButtonAction);
+                setEmpty(true);
 
-		ItemStack previewItem = ItemUtil.createItem(CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_PREVIEW.getValue());
-		EditorLore.updatePreviewDecription(previewItem, getDescription(), targetHat);
-		setButton(0, 49, previewItem, (event, slot) -> {
+                EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
 
-			if (event.isShiftRightClick()) {
+                isModified = true;
 
-				getDescription().clear();
+                return MenuClickResult.NEGATIVE;
+            }
 
-				for (int i = 0; i <= 27; i++) {
+            return MenuClickResult.NONE;
+        });
 
-					setItem(0, getNormalIndex(i, 10, 2), null);
+        // Add Line.
+        ItemStack addItem = ItemUtil.createItem(
+                CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_ADD_LINE.getValue());
+        setButton(0, 52, addItem, (event, slot) -> {
+            List<String> description = getDescription();
+            int size = description.size();
+            if (size <= 27) {
 
-				}
+                ItemStack item =
+                        ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(size + 1)));
 
-				setEmpty(true);
+                description.add("");
+                EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
 
-				EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
+                setLineDescription(item, "");
+                setItem(0, getNormalIndex(size, 10, 2), item);
+            }
 
-				isModified = true;
+            setEmpty(false);
+            isModified = true;
 
-				return MenuClickResult.NEGATIVE;
+            return MenuClickResult.NEUTRAL;
+        });
 
-			}
+        final MenuAction editAction = (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			return MenuClickResult.NONE;
+                if (event.isShiftClick()) {
 
-		});
+                    onInsert(slot);
 
-		// Add Line.
-		ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_ADD_LINE.getValue());
-		setButton(0, 52, addItem, (event, slot) -> {
+                    return MenuClickResult.NEUTRAL;
+                }
 
-			List<String> description = getDescription();
-			int size = description.size();
-			if (size <= 27) {
+                editingLine = getClampedIndex(slot, 10, 2);
+                editorManager.getOwnerState().setMetaDescriptionLine(editingLine);
 
-				ItemStack item = ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(size + 1)));
+                MetaState metaState =
+                        isEditingDescription ? MetaState.HAT_DESCRIPTION : MetaState.HAT_PERMISSION_DESCRIPTION;
+                editorManager.getOwnerState().setMetaState(metaState);
+                core.prompt(owner, metaState);
 
-				description.add("");
-				EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
+                menuManager.closeInventory();
 
-				setLineDescription(item, "");
-				setItem(0, getNormalIndex(size, 10, 2), item);
+                isModified = true;
 
-			}
+            } else if (event.isShiftRightClick()) {
 
-			setEmpty(false);
-			isModified = true;
+                deleteSlot(0, slot);
 
-			return MenuClickResult.NEUTRAL;
+                isModified = true;
 
-		});
+                return MenuClickResult.NEGATIVE;
+            }
 
-		final MenuAction editAction = (event, slot) -> {
+            return MenuClickResult.NEUTRAL;
+        };
 
-			if (event.isLeftClick()) {
+        for (int i = 0; i < 28; i++) {
 
-				if (event.isShiftClick()) {
+            setAction(getNormalIndex(i, 10, 2), editAction);
+        }
 
-					onInsert(slot);
+        List<String> description = getDescription();
 
-					return MenuClickResult.NEUTRAL;
+        if (description.size() == 0) {
 
-				}
+            setEmpty(true);
 
-				editingLine = getClampedIndex(slot, 10, 2);
-				editorManager.getOwnerState().setMetaDescriptionLine(editingLine);
+            return;
+        }
 
-				MetaState metaState = isEditingDescription ? MetaState.HAT_DESCRIPTION : MetaState.HAT_PERMISSION_DESCRIPTION;
-				editorManager.getOwnerState().setMetaState(metaState);
-				core.prompt(owner, metaState);
+        for (int i = 0; i < description.size(); i++) {
 
-				menuManager.closeInventory();
+            ItemStack lineItem =
+                    ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(i + 1)));
+            String line = description.get(i);
 
-				isModified = true;
+            setLineDescription(lineItem, line);
+            setItem(0, getNormalIndex(i, 10, 2), lineItem);
+        }
+    }
 
-			}
+    @Override
+    public void onClose(boolean forced) {
 
-			else if (event.isShiftRightClick()) {
+        if (isModified) {
 
-				deleteSlot(0, slot);
+            Database database = core.getDatabase();
+            DataType type = isEditingDescription ? DataType.DESCRIPTION : DataType.PERMISSION_DESCRIPTION;
+            String menuName = editorManager.getMenuName();
 
-				isModified = true;
+            database.saveMetaData(menuName, targetHat, type, 0);
+        }
+    }
 
-				return MenuClickResult.NEGATIVE;
+    @Override
+    public void onTick(int ticks) {}
 
-			}
+    @Override
+    public void deleteSlot(int page, int slot) {
 
-			return MenuClickResult.NEUTRAL;
+        super.deleteSlot(page, slot);
 
-		};
+        int clampedIndex = getClampedIndex(slot, 10, 2);
+        getDescription().remove(clampedIndex);
+        EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
+        for (int i = clampedIndex; i <= 27; i++) {
 
-		for (int i = 0; i < 28; i++) {
+            ItemStack item = getItem(0, getNormalIndex(i, 10, 2));
+            if (item == null) {
 
-			setAction(getNormalIndex(i, 10, 2), editAction);
+                continue;
+            }
 
-		}
+            ItemUtil.setItemName(item, lineTitle.replace("{1}", Integer.toString(i + 1)));
+        }
 
-		List<String> description = getDescription();
+        if (getDescription().size() == 0) {
 
-		if (description.size() == 0) {
+            setEmpty(true);
+        }
+    }
 
-			setEmpty(true);
+    /**
+     * Get the hat's description depending on the <b>isEditingDescription</b> value
+     * @return
+     */
+    private List<String> getDescription() {
 
-			return;
+        return isEditingDescription ? targetHat.getDescription() : targetHat.getPermissionDescription();
+    }
 
-		}
+    /**
+     * Adds a line to this item's description
+     * @param item
+     * @param line
+     */
+    private void setLineDescription(ItemStack item, String line) {
 
-		for (int i = 0; i < description.size(); i++) {
+        String prefix = "";
+        if (!line.isEmpty() && line.charAt(0) != '&') {
 
-			ItemStack lineItem = ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(i + 1)));
-			String line = description.get(i);
+            prefix = "&5&o";
+        }
 
-			setLineDescription(lineItem, line);
-			setItem(0, getNormalIndex(i, 10, 2), lineItem);
+        String s = line.equals("") ? descriptionInfo[1] : prefix + line;
+        String d = lineDescription.replace(descriptionInfo[0], s);
 
-		}
+        ItemUtil.setItemDescription(item, StringUtil.parseDescription(d));
+    }
 
-	}
+    private void onInsert(int slot) {
 
-	@Override
-	public void onClose(boolean forced) {
+        List<String> description = getDescription();
+        int size = description.size();
+        if (size <= 27) {
 
-		if (isModified) {
+            int index = getClampedIndex(slot, 10, 2) + 1;
+            description.add(index, "");
 
-			Database database = core.getDatabase();
-			DataType type = isEditingDescription ? DataType.DESCRIPTION : DataType.PERMISSION_DESCRIPTION;
-			String menuName = editorManager.getMenuName();
+            for (int i = size - 1; i >= index; i--) {
 
-			database.saveMetaData(menuName, targetHat, type, 0);
+                int fromSlot = getNormalIndex(i, 10, 2);
+                int toSlot = getNormalIndex(i + 1, 10, 2);
 
-		}
+                ItemStack item = getItem(0, fromSlot);
+                ItemUtil.setItemName(item, lineTitle.replace("{1}", Integer.toString(i + 2)));
 
-	}
+                setItem(0, fromSlot, null);
+                setItem(0, toSlot, item);
+            }
 
-	@Override
-	public void onTick(int ticks) {}
+            ItemStack item =
+                    ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(index + 1)));
+            EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
 
-	@Override
-	public void deleteSlot (int page, int slot) {
-
-		super.deleteSlot(page, slot);
-
-		int clampedIndex = getClampedIndex(slot, 10, 2);
-		getDescription().remove(clampedIndex);
-		EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
-		for (int i = clampedIndex; i <= 27; i++) {
-
-			ItemStack item = getItem(0, getNormalIndex(i, 10, 2));
-			if (item == null) {
-
-				continue;
-
-			}
-
-			ItemUtil.setItemName(item, lineTitle.replace("{1}", Integer.toString(i + 1)));
-
-		}
-
-		if (getDescription().size() == 0) {
-
-			setEmpty(true);
-
-		}
-
-	}
-
-	/**
-	 * Get the hat's description depending on the <b>isEditingDescription</b> value
-	 * @return
-	 */
-	private List<String> getDescription () {
-
-		return isEditingDescription ? targetHat.getDescription() : targetHat.getPermissionDescription();
-
-	}
-
-	/**
-	 * Adds a line to this item's description
-	 * @param item
-	 * @param line
-	 */
-	private void setLineDescription (ItemStack item, String line) {
-
-		String prefix = "";
-		if (! line.isEmpty() && line.charAt(0) != '&') {
-
-			prefix = "&5&o";
-
-		}
-
-		String s = line.equals("") ? descriptionInfo[1] : prefix + line;
-		String d = lineDescription.replace(descriptionInfo[0], s);
-
-		ItemUtil.setItemDescription(item, StringUtil.parseDescription(d));
-
-	}
-
-	private void onInsert (int slot) {
-
-		List<String> description = getDescription();
-		int size = description.size();
-		if (size <= 27) {
-
-			int index = getClampedIndex(slot, 10, 2) + 1;
-			description.add(index, "");
-
-			for (int i = size - 1; i >= index; i--) {
-
-				int fromSlot = getNormalIndex(i, 10, 2);
-				int toSlot = getNormalIndex(i + 1, 10, 2);
-
-				ItemStack item = getItem(0, fromSlot);
-				ItemUtil.setItemName(item, lineTitle.replace("{1}", Integer.toString(i + 2)));
-
-				setItem(0, fromSlot, null);
-				setItem(0, toSlot, item);
-
-			}
-
-			ItemStack item = ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(index + 1)));
-			EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
-
-			setLineDescription(item, "");
-			setItem(0, getNormalIndex(index, 10, 2), item);
-
-		}
-
-	}
-
+            setLineDescription(item, "");
+            setItem(0, getNormalIndex(index, 10, 2), item);
+        }
+    }
 }

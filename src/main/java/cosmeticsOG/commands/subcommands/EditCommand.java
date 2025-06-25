@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -17,266 +11,236 @@ import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.player.PlayerState;
 import cosmeticsOG.ui.MenuInventory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows for GUI-based editing of Menus in the database.
 public class EditCommand extends Command {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	public EditCommand (final CosmeticsOG core) {
+    public EditCommand(final CosmeticsOG core) {
 
-		this.core = core;
+        this.core = core;
+    }
 
-	}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (args.size() == 1) {
 
-		if (args.size() == 1) {
+            List<String> menus =
+                    new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+            List<String> result = new ArrayList<String>();
 
-			List<String> menus = new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
-			List<String> result = new ArrayList<String>();
+            menus.add("purchase");
 
-			menus.add("purchase");
+            for (String menu : menus) {
 
-			for (String menu : menus) {
+                if (hasPermission(sender, menu)) {
 
-				if (hasPermission(sender, menu)) {
+                    result.add(menu);
+                }
+            }
 
-					result.add(menu);
+            return result;
+        }
 
-				}
+        return Arrays.asList("");
+    }
 
-			}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-			return result;
+        if (args.size() < 1) {
 
-		}
+            if (sender.isPlayer()) {
 
-		return Arrays.asList("");
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_EDIT_USAGE.getValue());
 
-	}
+            } else {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(Message.COMMAND_EDIT_USAGE.getValue());
+            }
 
-		if (args.size() < 1) {
+            return false;
+        }
 
-			if (sender.isPlayer()) {
+        PlayerState playerState = core.getPlayerState(sender.getPlayer());
+        Database database = core.getDatabase();
+        if (playerState.hasEditorOpen()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_EDIT_USAGE.getValue());
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
-			}
-			else {
+            return false;
+        }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(Message.COMMAND_EDIT_USAGE.getValue());
+        String menuName = (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
+        if (menuName.equalsIgnoreCase("purchase")) {
 
-			}
+            MenuInventory inventory = database.getPurchaseMenu(playerState);
+            if (inventory != null) {
 
-			return false;
+                PurchaseMenuManager purchaseManager =
+                        core.getMenuManagerFactory().getPurchaseMenuManager(playerState);
 
-		}
+                purchaseManager.setEditingMenu(inventory);
+                purchaseManager.open();
+            }
 
-		PlayerState playerState = core.getPlayerState(sender.getPlayer());	
-		Database database = core.getDatabase();
-		if (playerState.hasEditorOpen()) {
+            return false;
+        }
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+        if (!database.menuExists(menuName)) {
 
-			return false;
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
-		}
+            return false;
+        }
 
-		String menuName = (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));	
-		if (menuName.equalsIgnoreCase("purchase")) {
+        MenuInventory inventory = database.loadInventory(menuName, playerState);
+        if (inventory == null) {
 
-			MenuInventory inventory = database.getPurchaseMenu(playerState);
-			if (inventory != null) {
+            return false;
+        }
 
-				PurchaseMenuManager purchaseManager = core.getMenuManagerFactory().getPurchaseMenuManager(playerState);
+        EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
 
-				purchaseManager.setEditingMenu(inventory);
-				purchaseManager.open();
+        editorManager.setEditingMenu(inventory);
+        editorManager.open();
 
-			}
+        return true;
+    }
 
-			return false;
+    @Override
+    public String getName() {
 
-		}
+        return "edit menu";
+    }
 
-		if (! database.menuExists(menuName)) {
+    @Override
+    public String getArgumentName() {
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+        return "edit";
+    }
 
-			return false;
+    @Override
+    public Message getUsage() {
 
-		}
+        return Message.COMMAND_EDIT_USAGE;
+    }
 
-		MenuInventory inventory = database.loadInventory(menuName, playerState);
-		if (inventory == null) {
+    @Override
+    public Message getDescription() {
 
-			return false;
+        return Message.COMMAND_EDIT_DESCRIPTION;
+    }
 
-		}
+    @Override
+    public Permission getPermission() {
 
-		EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
+        return Permission.COMMAND_EDIT;
+    }
 
-		editorManager.setEditingMenu(inventory);
-		editorManager.open();
+    @Override
+    public boolean hasWildcardPermission() {
 
-		return true;
+        return true;
+    }
 
-	}
+    @Override
+    public Permission getWildcardPermission() {
 
-	@Override
-	public String getName() {
+        return Permission.COMMAND_EDIT_ALL;
+    }
 
-		return "edit menu";
+    @Override
+    public boolean showInHelp() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public String getArgumentName () {
+    @Override
+    public boolean isPlayerOnly() {
 
-		return "edit";
+        return true;
+    }
 
-	}
+    @Override
+    public boolean hasPermission(Sender sender) {
 
-	@Override
-	public Message getUsage() {
+        if (!sender.isPlayer()) {
 
-		return Message.COMMAND_EDIT_USAGE;
+            return true;
+        }
 
-	}
+        // /h wild card check.
+        if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
-	@Override
-	public Message getDescription() {
+            return true;
+        }
 
-		return Message.COMMAND_EDIT_DESCRIPTION;
+        // Specific command wild card check.
+        if (hasWildcardPermission()) {
 
-	}
+            if (getWildcardPermission().hasPermission(sender)) {
 
-	@Override
-	public Permission getPermission() {
+                return true;
+            }
+        }
 
-		return Permission.COMMAND_EDIT;
+        // Check for individual menu permissions.
+        List<String> menus =
+                new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+        menus.add("purchase");
 
-	}
+        for (String menu : menus) {
 
-	@Override
-	public boolean hasWildcardPermission () {
+            if (sender.hasPermission(getPermission().append(menu))) {
 
-		return true;
+                return true;
+            }
+        }
 
-	}
+        return false;
+    }
 
-	@Override
-	public Permission getWildcardPermission () {
+    @Override
+    public boolean hasPermission(Sender sender, String arg) {
 
-		return Permission.COMMAND_EDIT_ALL;
+        if (!sender.isPlayer()) {
 
-	}
+            return true;
+        }
 
-	@Override
-	public boolean showInHelp() {
+        // /h wild card check.
+        if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
-		return true;
+            return true;
+        }
 
-	}
+        // Specific command wild card check.
+        if (hasWildcardPermission()) {
 
-	@Override
-	public boolean isPlayerOnly() {
+            if (getWildcardPermission().hasPermission(sender)) {
 
-		return true;
+                return true;
+            }
+        }
 
-	}
+        if (arg != null && !arg.equals("")) {
 
-	@Override
-	public boolean hasPermission (Sender sender) {
+            if (sender.hasPermission(getPermission().append(arg))) {
 
-		if (! sender.isPlayer()) {
+                return true;
+            }
+        }
 
-			return true;
-
-		}
-
-		// /h wild card check.
-		if (Permission.COMMAND_ALL.hasPermission(sender)) {
-
-			return true;
-
-		}
-
-		// Specific command wild card check.
-		if (hasWildcardPermission()) {
-
-			if (getWildcardPermission().hasPermission(sender)) {
-
-				return true;
-
-			}
-
-		}
-
-		// Check for individual menu permissions.
-		List<String> menus = new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
-		menus.add("purchase");
-
-		for (String menu : menus) {
-
-			if (sender.hasPermission(getPermission().append(menu))) {
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-	@Override
-	public boolean hasPermission (Sender sender, String arg) {		
-
-		if (! sender.isPlayer()) {
-
-			return true;
-
-		}
-
-		// /h wild card check.
-		if (Permission.COMMAND_ALL.hasPermission(sender)) {
-
-			return true;
-
-		}
-
-		// Specific command wild card check.
-		if (hasWildcardPermission()) {
-
-			if (getWildcardPermission().hasPermission(sender)) {
-
-				return true;
-
-			}
-
-		}
-
-		if (arg != null && !arg.equals("")) {
-
-			if (sender.hasPermission(getPermission().append(arg))) {
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

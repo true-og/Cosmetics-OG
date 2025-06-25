@@ -1,250 +1,224 @@
 package cosmeticsOG.ui;
 
+import cosmeticsOG.CosmeticsOG;
+import cosmeticsOG.editor.MetaState;
+import cosmeticsOG.player.PlayerState;
+import cosmeticsOG.ui.AbstractMenu.MenuClickResult;
+import cosmeticsOG.util.PlayerUtil;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.UUID;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 
-import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.editor.MetaState;
-import cosmeticsOG.player.PlayerState;
-import cosmeticsOG.ui.AbstractMenu.MenuClickResult;
-import cosmeticsOG.util.PlayerUtil;
-
 public abstract class MenuManager {
 
-	protected final CosmeticsOG core;
+    protected final CosmeticsOG core;
 
-	protected final Player owner;
-	protected final UUID ownerID;
-	protected final PlayerState ownerState;
+    protected final Player owner;
+    protected final UUID ownerID;
+    protected final PlayerState ownerState;
 
-	protected Deque<AbstractMenu> openMenus;
+    protected Deque<AbstractMenu> openMenus;
 
-	protected boolean openingMenu = false;
+    protected boolean openingMenu = false;
 
-	public MenuManager (final CosmeticsOG core, final Player owner) {
+    public MenuManager(final CosmeticsOG core, final Player owner) {
 
-		this.core = core;
+        this.core = core;
 
-		this.owner = owner;
-		this.ownerID = owner.getUniqueId();
-		this.ownerState = core.getPlayerState(owner);
+        this.owner = owner;
+        this.ownerID = owner.getUniqueId();
+        this.ownerState = core.getPlayerState(owner);
 
-		openMenus = new ArrayDeque<AbstractMenu>();
+        openMenus = new ArrayDeque<AbstractMenu>();
+    }
 
-	}
+    protected void onClick(InventoryClickEvent event, boolean inMenu, AbstractMenu menu) {
 
-	protected void onClick (InventoryClickEvent event, boolean inMenu, AbstractMenu menu) {
+        if (menu == null) {
 
-		if (menu == null) {
+            return;
+        }
 
-			return;
+        final Inventory inventory = event.getInventory();
+        if (!menu.hasInventory(inventory)) {
 
-		}
+            ownerState.setMenuManager(null);
 
-		final Inventory inventory = event.getInventory();
-		if (! menu.hasInventory(inventory)) {		
+            return;
+        }
 
-			ownerState.setMenuManager(null);
+        event.setCancelled(true);
 
-			return;
+        MenuClickResult result = menu.onClick(event, event.getRawSlot(), inMenu);
+        if (result != MenuClickResult.NONE) {
 
-		}
+            playSound(result);
+        }
+    }
 
-		event.setCancelled(true);
+    public abstract void onClick(InventoryClickEvent event, boolean inMenu);
 
-		MenuClickResult result = menu.onClick(event, event.getRawSlot(), inMenu);
-		if (result != MenuClickResult.NONE) {
+    /**
+     * Returns the owner's PlayerState
+     * @return
+     */
+    public PlayerState getOwnerState() {
 
-			playSound(result);
+        return ownerState;
+    }
 
-		}
+    /**
+     * Notifies the manager that this menu will be opened
+     * @param menu
+     */
+    public void isOpeningMenu(AbstractMenu menu) {
 
-	}
+        openingMenu = true;
+    }
 
-	public abstract void onClick (InventoryClickEvent event, boolean inMenu);
+    /**
+     * Add a new menu to the stack
+     * @param menu
+     */
+    public void addMenu(AbstractMenu menu) {
 
-	/**
-	 * Returns the owner's PlayerState
-	 * @return
-	 */
-	public PlayerState getOwnerState () {
+        openMenus.add(menu);
+    }
 
-		return ownerState;
+    /**
+     * Returns the menu currently being viewed
+     * @return
+     */
+    public AbstractMenu getCurrentMenu() {
 
-	}
+        return openMenus.getLast();
+    }
 
-	/**
-	 * Notifies the manager that this menu will be opened
-	 * @param menu
-	 */
-	public void isOpeningMenu (AbstractMenu menu) {
+    /**
+     * Closes the current menu and opens the previous menu.
+     * This method will always make sure there is 1 menu in the stack at all times.
+     */
+    public void closeCurrentMenu() {
 
-		openingMenu = true;
+        if (openMenus.size() > 1) {
 
-	}
+            openMenus.pollLast().onClose(false);
+        }
 
-	/**
-	 * Add a new menu to the stack
-	 * @param menu
-	 */
-	public void addMenu (AbstractMenu menu) {
+        openMenus.getLast().open();
+    }
 
-		openMenus.add(menu);
+    public void closeInventory() {
 
-	}
-
-	/**
-	 * Returns the menu currently being viewed
-	 * @return
-	 */
-	public AbstractMenu getCurrentMenu () {
-
-		return openMenus.getLast();
-
-	}
-
-	/**
-	 * Closes the current menu and opens the previous menu.
-	 * This method will always make sure there is 1 menu in the stack at all times.
-	 */
-	public void closeCurrentMenu () {
-
-		if (openMenus.size() > 1) {
-
-			openMenus.pollLast().onClose(false);
-
-		}
-
-		openMenus.getLast().open();
-
-	}
-
-	public void closeInventory () {
-
-		PlayerUtil.closeInventory(owner);
-
-	}
-
-	/**
-	 * Opens the most current menu
-	 */
-	public void openCurrentMenu () {
-
-		if (openMenus.size() == 0) {
-
-			return;
-
-		}
-
-		getCurrentMenu().open();
-
-	}
-
-	/**
-	 * Reopens this MenuManager to the last open menu
-	 */
-	public void reopen () {
-
-		ownerState.setMetaState(MetaState.NONE);
-
-		openCurrentMenu();
-
-	}
-
-	/**
-	 * Removes the current menu from the stack
-	 */
-	public void removeCurrentMenu () {
-
-		openMenus.removeLast();
-
-	}
-
-	/**
-	 * Check to see if this MenuManager can be unregistered
-	 * @return
-	 */
-	protected boolean canUnregister () {
-
-		return ! openingMenu;
-
-	}
-
-	/**
-	 * Notifies the MenuManager that it is about to unregister
-	 * Use this method to save any changes
-	 */
-	public void willUnregister () {
-
-		for (AbstractMenu menu : openMenus) {
-
-			menu.onClose(true);
-
-		}
-
-		unregister();
-
-	}
-
-	/**
-	 * Unregisters this MenuManager
-	 */
-	protected void unregister () {
-
-		ownerState.setMetaState(MetaState.NONE);
-		ownerState.setMenuManager(null);
-
-	}
-
-	/**
-	 * Open the first menu in the stack
-	 */
-	public abstract void open ();
-
-	/**
-	 * 
-	 * @param ticks
-	 */
-	public abstract void onTick (int ticks);
-
-	/**
-	 * Plays a sound any time a button is clicked inside a menu
-	 * @param result
-	 */
-	public abstract void playSound (MenuClickResult result);
-
-	/**
-	 * Called any time an inventory is opened for this MenuManager
-	 * @param event
-	 */
-	public void onInventoryOpen (InventoryOpenEvent event) {
-
-		openingMenu = false;
-
-	}
-
-	/**
-	 * Called any time an inventory is closed for this MenuManager
-	 * @param event
-	 */
-	public void onInventoryClose (InventoryCloseEvent event) {
-
-		// Unregister this menu manager since we're not opening another menu.
-		if (canUnregister()) {
-
-			willUnregister();
-
-		}
-
-		openingMenu = false;
-
-	}
-
+        PlayerUtil.closeInventory(owner);
+    }
+
+    /**
+     * Opens the most current menu
+     */
+    public void openCurrentMenu() {
+
+        if (openMenus.size() == 0) {
+
+            return;
+        }
+
+        getCurrentMenu().open();
+    }
+
+    /**
+     * Reopens this MenuManager to the last open menu
+     */
+    public void reopen() {
+
+        ownerState.setMetaState(MetaState.NONE);
+
+        openCurrentMenu();
+    }
+
+    /**
+     * Removes the current menu from the stack
+     */
+    public void removeCurrentMenu() {
+
+        openMenus.removeLast();
+    }
+
+    /**
+     * Check to see if this MenuManager can be unregistered
+     * @return
+     */
+    protected boolean canUnregister() {
+
+        return !openingMenu;
+    }
+
+    /**
+     * Notifies the MenuManager that it is about to unregister
+     * Use this method to save any changes
+     */
+    public void willUnregister() {
+
+        for (AbstractMenu menu : openMenus) {
+
+            menu.onClose(true);
+        }
+
+        unregister();
+    }
+
+    /**
+     * Unregisters this MenuManager
+     */
+    protected void unregister() {
+
+        ownerState.setMetaState(MetaState.NONE);
+        ownerState.setMenuManager(null);
+    }
+
+    /**
+     * Open the first menu in the stack
+     */
+    public abstract void open();
+
+    /**
+     *
+     * @param ticks
+     */
+    public abstract void onTick(int ticks);
+
+    /**
+     * Plays a sound any time a button is clicked inside a menu
+     * @param result
+     */
+    public abstract void playSound(MenuClickResult result);
+
+    /**
+     * Called any time an inventory is opened for this MenuManager
+     * @param event
+     */
+    public void onInventoryOpen(InventoryOpenEvent event) {
+
+        openingMenu = false;
+    }
+
+    /**
+     * Called any time an inventory is closed for this MenuManager
+     * @param event
+     */
+    public void onInventoryClose(InventoryCloseEvent event) {
+
+        // Unregister this menu manager since we're not opening another menu.
+        if (canUnregister()) {
+
+            willUnregister();
+        }
+
+        openingMenu = false;
+    }
 }

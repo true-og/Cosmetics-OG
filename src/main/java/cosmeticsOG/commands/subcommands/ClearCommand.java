@@ -1,164 +1,139 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 // Handles the "clear" command to remove active hats for a player.
 public class ClearCommand extends Command {
 
-	private final ClearPlayerCommand clearPlayerCommand;
+    private final ClearPlayerCommand clearPlayerCommand;
 
-	public ClearCommand () {
+    public ClearCommand() {
 
-		clearPlayerCommand = new ClearPlayerCommand();
+        clearPlayerCommand = new ClearPlayerCommand();
 
-		register(clearPlayerCommand);
+        register(clearPlayerCommand);
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        // Self.
+        if (args.size() == 0) {
 
-		// Self.
-		if (args.size() == 0) {
+            if (!sender.isPlayer()) {
 
-			if (! sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_USAGE.getValue());
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_USAGE.getValue());
+                return false;
+            }
 
-				return false;
+            core.getPlayerState(sender.getPlayer()).clearActiveHats();
 
-			}
+            if (sender.isPlayer()) {
 
-			core.getPlayerState(sender.getPlayer()).clearActiveHats();
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_SUCCESS.getValue());
 
-			if (sender.isPlayer()) {
+            } else {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_SUCCESS.getValue());
+                Utils.logToConsole(Message.COMMAND_CLEAR_SUCCESS.getValue());
+            }
 
-			}
-			else {
+            return true;
 
-				Utils.logToConsole(Message.COMMAND_CLEAR_SUCCESS.getValue());
+        } else {
 
-			}
+            return clearPlayerCommand.onCommand(core, sender, label, args);
+        }
+    }
 
-			return true;
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		}
+        if (args.size() == 1) {
 
-		else {
+            if (clearPlayerCommand.hasPermission(sender)) {
 
-			return clearPlayerCommand.onCommand(core, sender, label, args);
+                List<String> players = new ArrayList<String>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
 
-		}
+                    players.add(p.getName());
+                }
 
-	}
+                if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
-	@Override
-	public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+                    players.add("@p");
+                    players.add("@r");
+                }
 
-		if (args.size() == 1) {
+                return players;
+            }
+        }
 
-			if (clearPlayerCommand.hasPermission(sender)) {
+        return Arrays.asList("");
+    }
 
-				List<String> players = new ArrayList<String>();
-				for (Player p : Bukkit.getOnlinePlayers()) {
+    @Override
+    public String getName() {
 
-					players.add(p.getName());
+        return "clear";
+    }
 
-				}
+    @Override
+    public String getArgumentName() {
 
-				if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
+        return "clear";
+    }
 
-					players.add("@p");
-					players.add("@r");
+    @Override
+    public Message getUsage() {
 
-				}
+        return Message.COMMAND_CLEAR_USAGE;
+    }
 
-				return players;
+    @Override
+    public Message getDescription() {
 
-			}
+        return Message.COMMAND_CLEAR_DESCRIPTION;
+    }
 
-		}
+    @Override
+    public Permission getPermission() {
 
-		return Arrays.asList("");
+        return Permission.COMMAND_CLEAR;
+    }
 
-	}
+    @Override
+    public boolean hasWildcardPermission() {
 
-	@Override
-	public String getName() {
+        return true;
+    }
 
-		return "clear";
+    @Override
+    public Permission getWildcardPermission() {
 
-	}
+        return Permission.COMMAND_CLEAR_ALL;
+    }
 
-	@Override
-	public String getArgumentName () {
+    @Override
+    public boolean showInHelp() {
 
-		return "clear";
+        return true;
+    }
 
-	}
+    @Override
+    public boolean isPlayerOnly() {
 
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_CLEAR_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_CLEAR_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_CLEAR;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_CLEAR_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

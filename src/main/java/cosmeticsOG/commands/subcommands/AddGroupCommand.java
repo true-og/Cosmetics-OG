@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -14,168 +8,151 @@ import cosmeticsOG.database.properties.Group;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Handles the "add group" command to create a new group in the system.
 public class AddGroupCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() < 2) {
+        if (args.size() < 2) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(getUsage().getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        String groupName = args.get(0);
+        String defaultMenu = args.get(1);
 
-		}
+        int weight = 0;
 
-		String groupName = args.get(0);
-		String defaultMenu = args.get(1);
+        if (args.size() >= 3) {
 
-		int weight = 0;
+            weight = StringUtil.toInt(args.get(2), 0);
+        }
 
-		if (args.size() >= 3) {
+        boolean found = false;
+        List<Group> groups = core.getDatabase().getGroups(false);
+        for (Group g : groups) {
 
-			weight = StringUtil.toInt(args.get(2), 0);
+            if (g.getName().equals(groupName)) {
 
-		}
+                found = true;
 
-		boolean found = false;
-		List<Group> groups = core.getDatabase().getGroups(false);
-		for (Group g : groups) {
+                break;
+            }
+        }
 
-			if (g.getName().equals(groupName)) {
+        if (found) {
 
-				found = true;
+            if (sender.isPlayer()) {
 
-				break;
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
 
-			}
+            } else {
 
-		}
+                Utils.logToConsole(Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
+            }
 
-		if (found) {
+            return false;
+        }
 
-			if (sender.isPlayer()) {
+        core.getDatabase().addGroup(groupName, defaultMenu, weight);
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
+        if (sender.isPlayer()) {
 
-			}
-			else {
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender, Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
 
-				Utils.logToConsole(Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
+        } else {
 
-			}
+            Utils.logToConsole(Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
+        }
 
-			return false;
+        return true;
+    }
 
-		}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		core.getDatabase().addGroup(groupName, defaultMenu, weight);
+        switch (args.size()) {
+            case 1:
+                return Arrays.asList("name");
+            case 2:
+                return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+            case 3:
+                return Arrays.asList("weight");
+        }
 
-		if (sender.isPlayer()) {
+        return Arrays.asList("");
+    }
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
+    @Override
+    public String getName() {
 
-		}
-		else {
+        return "add group";
+    }
 
-			Utils.logToConsole(Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
+    @Override
+    public String getArgumentName() {
 
-		}
+        return "add";
+    }
 
-		return true;
+    @Override
+    public Message getUsage() {
 
-	}
+        return Message.COMMAND_ADD_GROUP_USAGE;
+    }
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public Message getDescription() {
 
-		switch (args.size()) {
-		case 1:
-			return Arrays.asList("name");
-		case 2:
-			return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
-		case 3:
-			return Arrays.asList("weight");
-		}
+        return Message.COMMAND_ADD_GROUP_DESCRIPTION;
+    }
 
-		return Arrays.asList("");
+    @Override
+    public Permission getPermission() {
 
-	}
+        return Permission.COMMAND_GROUP_ADD;
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public boolean hasWildcardPermission() {
 
-		return "add group";
+        return true;
+    }
 
-	}
+    @Override
+    public Permission getWildcardPermission() {
 
-	@Override
-	public String getArgumentName () {
+        return Permission.COMMAND_GROUP_ALL;
+    }
 
-		return "add";
+    @Override
+    public boolean showInHelp() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public Message getUsage() {
+    @Override
+    public boolean isPlayerOnly() {
 
-		return Message.COMMAND_ADD_GROUP_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_ADD_GROUP_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_GROUP_ADD;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_GROUP_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

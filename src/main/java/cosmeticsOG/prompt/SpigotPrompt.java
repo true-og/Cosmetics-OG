@@ -1,48 +1,41 @@
 package cosmeticsOG.prompt;
 
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.Utils;
 import cosmeticsOG.editor.MetaState;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 
 public class SpigotPrompt extends BukkitPrompt {
 
-	private boolean success = true;
+    private boolean success = true;
 
-	@Override
-	public void prompt(Player player, String message) {
+    @Override
+    public void prompt(Player player, String message) {
 
-		try {
+        try {
 
-			Component component = Utils.legacySerializerAnyCase(message);
+            Component component = Utils.legacySerializerAnyCase(message);
 
-			// Send an action bar message using Adventure API.
-			player.sendActionBar(component);
+            // Send an action bar message using Adventure API.
+            player.sendActionBar(component);
 
-		}
-		catch (NoSuchMethodError error) {
+        } catch (NoSuchMethodError error) {
 
-			super.prompt(player, message);
+            super.prompt(player, message);
 
-			success = false;
+            success = false;
+        }
+    }
 
-		}
+    @Override
+    public void prompt(Player player, MetaState state) {
 
-	}
+        prompt(player, state.getDescription());
+    }
 
-	@Override
-	public void prompt(Player player, MetaState state) {
+    @Override
+    public boolean canPrompt(int passes) {
 
-		prompt(player, state.getDescription());
-
-	}
-
-	@Override
-	public boolean canPrompt(int passes) {
-
-		return success ? passes % 1 == 0 : super.canPrompt(passes);
-
-	}
-
+        return success ? passes % 1 == 0 : super.canPrompt(passes);
+    }
 }

@@ -1,135 +1,122 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import org.bukkit.entity.Player;
 
 // Clears the active hats of a specified player.
 public class ClearPlayerCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		Player player = getPlayer(sender, args.get(0));
-		if (player == null) {
+        Player player = getPlayer(sender, args.get(0));
+        if (player == null) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        if (!player.isOnline()) {
 
-		}
+            if (sender.isPlayer()) {
 
-		if (! player.isOnline()) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
-			if (sender.isPlayer()) {
+            } else {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+            }
 
-			}
-			else {
+            return false;
+        }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+        core.getPlayerState(player).clearActiveHats();
 
-			}
+        if (sender.isPlayer()) {
 
-			return false;
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender,
+                    Message.COMMAND_CLEAR_PLAYER_SUCCESS.getValue().replace("{1}", player.getName()));
 
-		}
+        } else {
 
-		core.getPlayerState(player).clearActiveHats();
+            Utils.logToConsole(Message.COMMAND_CLEAR_PLAYER_SUCCESS.getValue().replace("{1}", player.getName()));
+        }
 
-		if (sender.isPlayer()) {
+        return true;
+    }
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_SUCCESS.getValue().replace("{1}", player.getName()));
+    @Override
+    public String getName() {
 
-		}
-		else {
+        return "clear player";
+    }
 
-			Utils.logToConsole(Message.COMMAND_CLEAR_PLAYER_SUCCESS.getValue().replace("{1}", player.getName()));
+    @Override
+    public String getArgumentName() {
 
-		}
+        return "player";
+    }
 
-		return true;
+    @Override
+    public Message getUsage() {
 
-	}
+        return Message.COMMAND_CLEAR_PLAYER_USAGE;
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public Message getDescription() {
 
-		return "clear player";
+        return Message.COMMAND_CLEAR_PLAYER_DESCRIPTION;
+    }
 
-	}
+    @Override
+    public Permission getPermission() {
 
-	@Override
-	public String getArgumentName () {
+        return Permission.COMMAND_CLEAR_PLAYER;
+    }
 
-		return "player";
+    @Override
+    public boolean hasWildcardPermission() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public Message getUsage() {
+    @Override
+    public Permission getWildcardPermission() {
 
-		return Message.COMMAND_CLEAR_PLAYER_USAGE;
+        return Permission.COMMAND_CLEAR_ALL;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public Message getDescription() {
+        return true;
+    }
 
-		return Message.COMMAND_CLEAR_PLAYER_DESCRIPTION;
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_CLEAR_PLAYER;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_CLEAR_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

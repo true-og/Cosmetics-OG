@@ -1,13 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -18,113 +10,120 @@ import cosmeticsOG.ui.MenuManager;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.MathUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.HashMap;
+import java.util.Map;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorTagMenu extends AbstractListMenu {
 
-	private final String tagTitle = Message.EDITOR_TAG_MENU_TAG_TITLE.getValue();
-	private final MenuAction selectAction;
+    private final String tagTitle = Message.EDITOR_TAG_MENU_TAG_TITLE.getValue();
+    private final MenuAction selectAction;
 
-	private Map<Integer, ParticleTag> storedTags;
+    private Map<Integer, ParticleTag> storedTags;
 
-	public EditorTagMenu(CosmeticsOG core, MenuManager menuManager, Player owner, MenuObjectCallback callback) {
+    public EditorTagMenu(CosmeticsOG core, MenuManager menuManager, Player owner, MenuObjectCallback callback) {
 
-		super(core, menuManager, owner, false);
+        super(core, menuManager, owner, false);
 
-		this.storedTags = new HashMap<Integer, ParticleTag>();
-		this.totalPages = MathUtil.calculatePageCount(ParticleTag.values().length, 28);
+        this.storedTags = new HashMap<Integer, ParticleTag>();
+        this.totalPages = MathUtil.calculatePageCount(ParticleTag.values().length, 28);
 
-		this.selectAction = (event, slot) -> {
+        this.selectAction = (event, slot) -> {
+            int index = getClampedIndex(slot, 10, 2);
+            if (storedTags.containsKey(index)) {
 
-			int index = getClampedIndex(slot, 10, 2);
-			if (storedTags.containsKey(index)) {
+                callback.onSelect(storedTags.get(index));
 
-				callback.onSelect(storedTags.get(index));
+                return MenuClickResult.NEUTRAL;
+            }
 
-				return MenuClickResult.NEUTRAL;
+            return MenuClickResult.NONE;
+        };
 
-			}
+        build();
+    }
 
-			return MenuClickResult.NONE;
+    @Override
+    public void insertEmptyItem() {}
 
-		};
+    @Override
+    public void removeEmptyItem() {}
 
-		build();
+    @Override
+    protected void build() {
 
-	}
+        String title = Message.EDITOR_TAG_MENU_TITLE.getValue();
 
-	@Override
-	public void insertEmptyItem() {}
+        for (int i = 0; i < totalPages; i++) {
 
-	@Override
-	public void removeEmptyItem() {}
+            Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
+            menu.setItem(49, backButtonItem);
 
-	@Override
-	protected void build() {
+            // Next page.
+            if ((i + 1) < totalPages) {
 
-		String title = Message.EDITOR_TAG_MENU_TITLE.getValue();
+                menu.setItem(
+                        50,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+            }
 
-		for (int i = 0; i < totalPages; i++) {
+            // Previous page.
+            if ((i + 1) > 1) {
 
-			Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
-			menu.setItem(49, backButtonItem);
+                menu.setItem(
+                        48,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+            }
 
-			// Next page.
-			if ((i + 1) < totalPages) {
+            setMenu(i, menu);
+        }
 
-				menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+        setAction(49, backButtonAction);
 
-			}
+        int index = 0;
+        int page = 0;
 
-			// Previous page.
-			if ((i + 1) > 1) {
+        for (ParticleTag tag : ParticleTag.values()) {
 
-				menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+            if (tag == ParticleTag.NONE || tag == ParticleTag.CUSTOM) {
 
-			}
+                continue;
+            }
 
-			setMenu(i, menu);
+            ItemStack tagItem = ItemUtil.createItem(
+                    CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
+                    tagTitle.replace("{1}", tag.getDisplayName()),
+                    StringUtil.parseDescription(tag.getDescription()));
+            setItem(page, getNormalIndex(index, 10, 2), tagItem);
 
-		}
+            storedTags.put(index++, tag);
 
-		setAction(49, backButtonAction);
+            if (index % 28 == 0) {
 
-		int index = 0;
-		int page = 0;
+                index = 0;
 
-		for (ParticleTag tag : ParticleTag.values()) {
+                page++;
+            }
+        }
 
-			if (tag == ParticleTag.NONE || tag == ParticleTag.CUSTOM) {
+        for (int i = 0; i < 28; i++) {
 
-				continue;
+            setAction(getNormalIndex(i, 10, 2), selectAction);
+        }
+    }
 
-			}
+    @Override
+    public void onClose(boolean forced) {}
 
-			ItemStack tagItem = ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), tagTitle.replace("{1}", tag.getDisplayName()), StringUtil.parseDescription(tag.getDescription()));			
-			setItem(page, getNormalIndex(index, 10, 2), tagItem);
-
-			storedTags.put(index++, tag);
-
-			if (index % 28 == 0) {
-
-				index = 0;
-
-				page++;
-
-			}
-
-		}
-
-		for (int i = 0; i < 28; i++) {
-
-			setAction(getNormalIndex(i, 10, 2), selectAction);
-
-		}
-	}
-
-	@Override
-	public void onClose(boolean forced) {}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

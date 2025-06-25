@@ -1,12 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -18,196 +11,198 @@ import cosmeticsOG.particles.properties.ParticleTag;
 import cosmeticsOG.ui.AbstractListMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorTagMenuOverview extends AbstractListMenu {
 
-	private final EditorMenuManager editorManager;
-	private final Hat targetHat;
-	private final String tagTitle = Message.EDITOR_TAG_OVERVIEW_MENU_TAG_TITLE.getValue();
-	private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_EMPTY.getValue());
+    private final EditorMenuManager editorManager;
+    private final Hat targetHat;
+    private final String tagTitle = Message.EDITOR_TAG_OVERVIEW_MENU_TAG_TITLE.getValue();
+    private final ItemStack emptyItem = ItemUtil.createItem(
+            CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_EMPTY.getValue());
 
-	private boolean isModified = false;
+    private boolean isModified = false;
 
-	public EditorTagMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
+    public EditorTagMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
 
-		super(core, menuManager, owner, true);
+        super(core, menuManager, owner, true);
 
-		this.editorManager = menuManager;
-		this.targetHat = menuManager.getBaseHat();
-		this.totalPages = 1;
+        this.editorManager = menuManager;
+        this.targetHat = menuManager.getBaseHat();
+        this.totalPages = 1;
 
-		setMenu(0, Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_TAG_OVERVIEW_MENU_TITLE.getValue())));
+        setMenu(
+                0,
+                Bukkit.createInventory(
+                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_TAG_OVERVIEW_MENU_TITLE.getValue())));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    public void insertEmptyItem() {
 
-	@Override
-	public void insertEmptyItem() {
+        setItem(0, 22, emptyItem);
+    }
 
-		setItem(0, 22, emptyItem);
+    @Override
+    public void removeEmptyItem() {
 
-	}
+        setItem(0, 22, null);
+    }
 
-	@Override
-	public void removeEmptyItem() {
+    @Override
+    protected void build() {
 
-		setItem(0, 22, null);
+        setButton(0, 46, backButtonItem, backButtonAction);
 
-	}
+        List<TextComponent> overviewTitleTextComponents =
+                StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_INFO.getValue()).stream()
+                        .map(component ->
+                                (TextComponent) component) // Convert list of Components to list of TextComponents.
+                        .collect(Collectors.toList());
 
-	@Override
-	protected void build() {
+        setItem(
+                0,
+                49,
+                ItemUtil.createItem(
+                        CompatibleMaterial.REDSTONE_TORCH.getMaterial(),
+                        1,
+                        Message.EDITOR_TAG_OVERVIEW_MENU_INFO_TITLE.getValue(),
+                        overviewTitleTextComponents));
 
-		setButton(0, 46, backButtonItem, backButtonAction);
+        // Add tag.
+        ItemStack addItem = ItemUtil.createItem(
+                CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_ADD_TAG.getValue());
+        setButton(0, 52, addItem, (event, slot) -> {
+            EditorTagMenu editorTagMenu = new EditorTagMenu(core, editorManager, owner, (tagName) -> {
+                if (tagName == null) {
 
-		List<TextComponent> overviewTitleTextComponents = StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_INFO.getValue())
-				.stream()
-				.map(component -> (TextComponent) component) // Convert list of Components to list of TextComponents.
-				.collect(Collectors.toList());
+                    return;
+                }
 
-		setItem(0, 49, ItemUtil.createItem(CompatibleMaterial.REDSTONE_TORCH.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_INFO_TITLE.getValue(), overviewTitleTextComponents));
+                ParticleTag tag = (ParticleTag) tagName;
+                List<ParticleTag> tags = targetHat.getTags();
+                if (tags.contains(tag)) {
 
-		// Add tag.
-		ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_ADD_TAG.getValue());
-		setButton(0, 52, addItem, (event, slot) -> {
+                    menuManager.closeCurrentMenu();
 
-			EditorTagMenu editorTagMenu = new EditorTagMenu(core, editorManager, owner, (tagName) -> {
+                    return;
+                }
 
-				if (tagName == null) {
+                int size = tags.size();
+                if (size < 28) {
 
-					return;
+                    List<TextComponent> overviewDescriptionTextComponents =
+                            StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue())
+                                    .stream()
+                                    .map(component -> (TextComponent) component)
+                                    .collect(Collectors.toList());
 
-				}
+                    ItemStack tagItem = ItemUtil.createItem(
+                            CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
+                            1,
+                            tagTitle.replace("{1}", tag.getDisplayName()),
+                            overviewDescriptionTextComponents);
 
-				ParticleTag tag = (ParticleTag) tagName;
-				List<ParticleTag> tags = targetHat.getTags();
-				if (tags.contains(tag)) {
+                    setItem(0, getNormalIndex(size, 10, 2), tagItem);
 
-					menuManager.closeCurrentMenu();
+                    tags.add(tag);
+                }
 
-					return;
+                if (isEmpty) {
 
-				}
+                    setEmpty(false);
+                }
 
-				int size = tags.size();
-				if (size < 28) {
+                isModified = true;
 
-					List<TextComponent> overviewDescriptionTextComponents = StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue())
-							.stream()
-							.map(component -> (TextComponent) component)
-							.collect(Collectors.toList());
+                menuManager.closeCurrentMenu();
+            });
 
-					ItemStack tagItem = ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1, tagTitle.replace("{1}", tag.getDisplayName()), overviewDescriptionTextComponents);
+            menuManager.addMenu(editorTagMenu);
 
-					setItem(0, getNormalIndex(size, 10, 2), tagItem);
+            editorTagMenu.open();
 
-					tags.add(tag);
+            return MenuClickResult.NEUTRAL;
+        });
 
-				}
+        // Edit action.
+        final MenuAction editAction = (event, slot) -> {
+            if (event.isShiftRightClick()) {
 
-				if (isEmpty) {
+                deleteSlot(0, slot);
 
-					setEmpty(false);
+                return MenuClickResult.NEGATIVE;
+            }
 
-				}
+            return MenuClickResult.NONE;
+        };
 
-				isModified = true;
+        for (int i = 0; i < 28; i++) {
 
-				menuManager.closeCurrentMenu();
+            setAction(getNormalIndex(i, 10, 2), editAction);
+        }
 
-			});
+        // Tags.
+        List<ParticleTag> tags = targetHat.getTags();
 
-			menuManager.addMenu(editorTagMenu);
+        if (tags.isEmpty()) {
 
-			editorTagMenu.open();
+            setEmpty(true);
 
-			return MenuClickResult.NEUTRAL;
+            return;
+        }
 
-		});
+        for (int i = 0; i < tags.size(); i++) {
 
-		// Edit action.
-		final MenuAction editAction = (event, slot) -> {
+            ParticleTag tag = tags.get(i);
+            String titleString = Utils.legacySerializerAnyCase(tagTitle.replace("{1}", tag.getDisplayName()))
+                    .content();
+            List<TextComponent> textComponents =
+                    StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue()).stream()
+                            .map(component -> (TextComponent) component)
+                            .collect(Collectors.toList());
 
-			if (event.isShiftRightClick()) {
+            ItemStack tagItem =
+                    ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1, titleString, textComponents);
 
-				deleteSlot(0, slot);
+            setItem(0, getNormalIndex(i, 10, 2), tagItem);
+        }
+    }
 
-				return MenuClickResult.NEGATIVE;
+    @Override
+    public void onClose(boolean forced) {
 
-			}
+        if (isModified) {
 
-			return MenuClickResult.NONE;
+            core.getDatabase().saveMetaData(editorManager.getMenuName(), targetHat, DataType.TAGS, -1);
+        }
+    }
 
-		};
+    @Override
+    public void onTick(int ticks) {}
 
-		for (int i = 0; i < 28; i++) {
+    @Override
+    public void deleteSlot(int page, int slot) {
 
-			setAction(getNormalIndex(i, 10, 2), editAction);
+        super.deleteSlot(page, slot);
 
-		}
+        int clampedIndex = getClampedIndex(slot, 10, 2);
+        List<ParticleTag> tags = targetHat.getTags();
 
-		// Tags.
-		List<ParticleTag> tags = targetHat.getTags();
+        tags.remove(clampedIndex);
 
-		if (tags.isEmpty()) {
+        if (tags.isEmpty()) {
 
-			setEmpty(true);
+            setEmpty(true);
+        }
 
-			return;
-
-		}
-
-		for (int i = 0; i < tags.size(); i++) {
-
-			ParticleTag tag = tags.get(i);
-			String titleString = Utils.legacySerializerAnyCase(tagTitle.replace("{1}", tag.getDisplayName())).content();
-			List<TextComponent> textComponents = StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue())
-					.stream()
-					.map(component -> (TextComponent) component)
-					.collect(Collectors.toList());
-
-			ItemStack tagItem = ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1, titleString, textComponents);
-
-			setItem(0, getNormalIndex(i, 10, 2), tagItem);
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {
-
-		if (isModified) {
-
-			core.getDatabase().saveMetaData(editorManager.getMenuName(), targetHat, DataType.TAGS, -1);
-
-		}
-
-	}
-
-	@Override
-	public void onTick(int ticks) {}
-
-	@Override
-	public void deleteSlot (int page, int slot) {
-
-		super.deleteSlot(page, slot);
-
-		int clampedIndex = getClampedIndex(slot, 10, 2);
-		List<ParticleTag> tags = targetHat.getTags();
-
-		tags.remove(clampedIndex);
-
-		if (tags.isEmpty()) {
-
-			setEmpty(true);
-
-		}
-
-		isModified = true;
-
-	}
-
+        isModified = true;
+    }
 }

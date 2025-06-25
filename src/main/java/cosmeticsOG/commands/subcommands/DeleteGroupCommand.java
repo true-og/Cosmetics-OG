@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -13,163 +7,145 @@ import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.properties.Group;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows for the deletion of Groups from the database.
 public class DeleteGroupCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() < 1) {
+        if (args.size() < 1) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(getUsage().getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        String groupName = args.get(0);
 
-		}
+        boolean found = false;
+        List<Group> groups = core.getDatabase().getGroups(false);
 
-		String groupName = args.get(0);
+        for (Group g : groups) {
 
-		boolean found = false;
-		List<Group> groups = core.getDatabase().getGroups(false);
+            if (g.getName().equals(groupName)) {
 
-		for (Group g : groups) {
+                found = true;
+                break;
+            }
+        }
 
-			if (g.getName().equals(groupName)) {
+        if (!found) {
 
-				found = true;
-				break;
+            if (sender.isPlayer()) {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
 
-		}
+            } else {
 
-		if (! found) {
+                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+            }
 
-			if (sender.isPlayer()) {
+            return false;
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+        core.getDatabase().deleteGroup(groupName);
 
-			}
-			else {
+        if (sender.isPlayer()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender, Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
 
-			}
+        } else {
 
-			return false;
+            Utils.logToConsole(Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+        }
 
-		}
+        return true;
+    }
 
-		core.getDatabase().deleteGroup(groupName);
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (sender.isPlayer()) {
+        if (args.size() == 1) {
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+            List<String> groups = new ArrayList<String>();
+            for (Group g : core.getDatabase().getGroups(false)) {
 
-		}
-		else {
+                groups.add(g.getName());
+            }
 
-			Utils.logToConsole(Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+            return groups;
+        }
 
-		}
+        return Arrays.asList("");
+    }
 
-		return true;
+    @Override
+    public String getName() {
 
-	}
+        return "remove group";
+    }
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public String getArgumentName() {
 
-		if (args.size() == 1) {
+        return "remove";
+    }
 
-			List<String> groups = new ArrayList<String>();
-			for (Group g : core.getDatabase().getGroups(false)) {
+    @Override
+    public Message getUsage() {
 
-				groups.add(g.getName());
+        return Message.COMMAND_REMOVE_GROUP_USAGE;
+    }
 
-			}
+    @Override
+    public Message getDescription() {
 
-			return groups;
+        return Message.COMMAND_REMOVE_GROUP_DESCRIPTION;
+    }
 
-		}
+    @Override
+    public Permission getPermission() {
 
-		return Arrays.asList("");
+        return Permission.COMMAND_GROUP_REMOVE;
+    }
 
-	}
+    @Override
+    public boolean hasWildcardPermission() {
 
-	@Override
-	public String getName() {
+        return true;
+    }
 
-		return "remove group";
+    @Override
+    public Permission getWildcardPermission() {
 
-	}
+        return Permission.COMMAND_GROUP_ALL;
+    }
 
-	@Override
-	public String getArgumentName () {
+    @Override
+    public boolean showInHelp() {
 
-		return "remove";
+        return true;
+    }
 
-	}
+    @Override
+    public boolean isPlayerOnly() {
 
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_REMOVE_GROUP_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_REMOVE_GROUP_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_GROUP_REMOVE;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_GROUP_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

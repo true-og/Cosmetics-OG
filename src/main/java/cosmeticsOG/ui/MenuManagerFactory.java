@@ -7,107 +7,94 @@ import cosmeticsOG.player.PlayerState;
 
 public class MenuManagerFactory {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	public MenuManagerFactory (final CosmeticsOG core) {
+    public MenuManagerFactory(final CosmeticsOG core) {
 
-		this.core = core;
+        this.core = core;
+    }
 
-	}
+    /**
+     * Returns a new StaticMenuManager class, unregisters any existing menu manager classes
+     * @param playerState
+     * @return
+     */
+    public StaticMenuManager getStaticMenuManager(PlayerState playerState) {
 
-	/**
-	 * Returns a new StaticMenuManager class, unregisters any existing menu manager classes
-	 * @param playerState
-	 * @return
-	 */
-	public StaticMenuManager getStaticMenuManager (PlayerState playerState) {
+        MenuManager menuManager = playerState.getMenuManager();
+        if (menuManager == null) {
 
-		MenuManager menuManager = playerState.getMenuManager();
-		if (menuManager == null) {
+            StaticMenuManager staticMenuManager = new StaticMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(staticMenuManager);
 
-			StaticMenuManager staticMenuManager = new StaticMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(staticMenuManager);
+            return staticMenuManager;
 
-			return staticMenuManager;
+        } else if (!(menuManager instanceof StaticMenuManager)) {
 
-		}
-		else if (! (menuManager instanceof StaticMenuManager)) {
+            menuManager.willUnregister();
 
-			menuManager.willUnregister();
+            StaticMenuManager staticMenuManager = new StaticMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(staticMenuManager);
 
-			StaticMenuManager staticMenuManager = new StaticMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(staticMenuManager);
+            return staticMenuManager;
+        }
 
-			return staticMenuManager;
+        return (StaticMenuManager) menuManager;
+    }
 
-		}
+    /**
+     * Returns a new EditorMenuManager class, unregisters any existing menu manager classes
+     * @param playerState
+     * @return
+     */
+    public EditorMenuManager getEditorMenuManager(PlayerState playerState) {
 
-		return (StaticMenuManager) menuManager;
+        MenuManager menuManager = playerState.getMenuManager();
+        if (menuManager == null) {
 
-	}
+            EditorMenuManager editorManager = new EditorMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(editorManager);
 
-	/**
-	 * Returns a new EditorMenuManager class, unregisters any existing menu manager classes
-	 * @param playerState
-	 * @return
-	 */
-	public EditorMenuManager getEditorMenuManager (PlayerState playerState) {
+            return editorManager;
 
-		MenuManager menuManager = playerState.getMenuManager();
-		if (menuManager == null) {
+        } else if (!(menuManager instanceof EditorMenuManager)) {
 
-			EditorMenuManager editorManager = new EditorMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(editorManager);
+            menuManager.willUnregister();
 
-			return editorManager;
+            EditorMenuManager editorManager = new EditorMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(editorManager);
 
-		}
+            return editorManager;
+        }
 
-		else if (! (menuManager instanceof EditorMenuManager)) {
+        return (EditorMenuManager) menuManager;
+    }
 
-			menuManager.willUnregister();
+    /**
+     * Returns a new PurchaseMenuManager class, unregistering any existing menu manager classes
+     * @param playerState
+     * @return
+     */
+    public PurchaseMenuManager getPurchaseMenuManager(PlayerState playerState) {
 
-			EditorMenuManager editorManager = new EditorMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(editorManager);
+        MenuManager menuManager = playerState.getMenuManager();
+        if (menuManager == null) {
 
-			return editorManager;
+            PurchaseMenuManager purchaseManager = new PurchaseMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(purchaseManager);
 
-		}
+            return purchaseManager;
 
-		return (EditorMenuManager) menuManager;
+        } else if (!(menuManager instanceof PurchaseMenuManager)) {
 
-	}
+            menuManager.willUnregister();
 
-	/**
-	 * Returns a new PurchaseMenuManager class, unregistering any existing menu manager classes
-	 * @param playerState
-	 * @return
-	 */
-	public PurchaseMenuManager getPurchaseMenuManager (PlayerState playerState) {
+            PurchaseMenuManager purchaseManager = new PurchaseMenuManager(core, playerState.getOwner());
+            playerState.setMenuManager(purchaseManager);
 
-		MenuManager menuManager = playerState.getMenuManager();
-		if (menuManager == null) {
+            return purchaseManager;
+        }
 
-			PurchaseMenuManager purchaseManager = new PurchaseMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(purchaseManager);
-
-			return purchaseManager;
-
-		}
-
-		else if (! (menuManager instanceof PurchaseMenuManager)) {
-
-			menuManager.willUnregister();
-
-			PurchaseMenuManager purchaseManager = new PurchaseMenuManager(core, playerState.getOwner());
-			playerState.setMenuManager(purchaseManager);
-
-			return purchaseManager;
-
-		}
-
-		return (PurchaseMenuManager) menuManager;
-
-	}
-
+        return (PurchaseMenuManager) menuManager;
+    }
 }

@@ -1,81 +1,70 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.List;
 
 // Allows for the deletion of menus from the database.
 public class DebugDeleteMenu extends Command {
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+        return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        String menuName = args.get(0);
+        core.getDatabase().deleteMenu(menuName);
 
-		String menuName = args.get(0);
-		core.getDatabase().deleteMenu(menuName);
+        return false;
+    }
 
-		return false;
+    @Override
+    public String getName() {
 
-	}
+        return "delete";
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public String getArgumentName() {
 
-		return "delete";
+        return "delete";
+    }
 
-	}
+    @Override
+    public Message getUsage() {
 
-	@Override
-	public String getArgumentName () {
+        return Message.COMMAND_ARGUMENT_NONE;
+    }
 
-		return "delete";
+    @Override
+    public Message getDescription() {
 
-	}
+        return Message.COMMAND_ARGUMENT_NONE;
+    }
 
-	@Override
-	public Message getUsage() {
+    @Override
+    public Permission getPermission() {
 
-		return Message.COMMAND_ARGUMENT_NONE;
+        return Permission.COMMAND_ALL;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public Message getDescription() {
+        return false;
+    }
 
-		return Message.COMMAND_ARGUMENT_NONE;
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return false;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return true;
-
-	}
-
+        return true;
+    }
 }

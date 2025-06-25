@@ -1,12 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -14,176 +7,163 @@ import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 // Allows the command runner to toggle someone else's cosmetics on or off.
 public class TogglePlayerCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() != 2) {
+        if (args.size() != 2) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(getUsage().getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        Player player = getPlayer(sender, args.get(1));
+        if (player == null) {
 
-		}
+            if (sender.isPlayer()) {
 
-		Player player = getPlayer(sender, args.get(1));
-		if (player == null) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
-			if (sender.isPlayer()) {
+            } else {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+            }
 
-			}
-			else {
+            return false;
+        }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+        if (!player.isOnline()) {
 
-			}
+            if (sender.isPlayer()) {
 
-			return false;
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
-		}
+            } else {
 
-		if (! player.isOnline()) {
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+            }
 
-			if (sender.isPlayer()) {
+            return false;
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+        boolean toggleStatus = StringUtil.getToggleValue(args.get(0));
+        core.getPlayerState(player).toggleHats(!toggleStatus);
+        if (toggleStatus) {
 
-			}
-			else {
+            if (sender.isPlayer()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
 
-			}
+            } else {
 
-			return false;
+                Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
+            }
 
-		}
+        } else {
 
-		boolean toggleStatus = StringUtil.getToggleValue(args.get(0));
-		core.getPlayerState(player).toggleHats(! toggleStatus);
-		if (toggleStatus) {
+            if (sender.isPlayer()) {
 
-			if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
+            } else {
 
-			}
-			else {
+                Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
+            }
+        }
 
-				Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
+        return true;
+    }
 
-			}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		}
-		else {
+        if (args.size() == 2) {
 
-			if (sender.isPlayer()) {
+            List<String> players = new ArrayList<String>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
+                players.add(p.getName());
+            }
 
-			}
-			else {
+            if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
-				Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
+                players.add("@p");
+                players.add("@r");
+            }
 
-			}
+            return players;
+        }
 
-		}
+        return Arrays.asList("");
+    }
 
-		return true;
+    @Override
+    public String getName() {
 
-	}
+        return "toggle player";
+    }
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public String getArgumentName() {
 
-		if (args.size() == 2) {
+        return "player";
+    }
 
-			List<String> players = new ArrayList<String>();
-			for (Player p : Bukkit.getOnlinePlayers()) {
+    @Override
+    public Message getUsage() {
 
-				players.add(p.getName());
+        return Message.COMMAND_TOGGLE_PLAYER_USAGE;
+    }
 
-			}
+    @Override
+    public Message getDescription() {
 
-			if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
+        return Message.COMMAND_TOGGLE_PLAYER_DESCRIPTION;
+    }
 
-				players.add("@p");
-				players.add("@r");
+    @Override
+    public Permission getPermission() {
 
-			}
+        return Permission.COMMAND_TOGGLE_PLAYER;
+    }
 
-			return players;
+    @Override
+    public boolean showInHelp() {
 
-		}
+        return true;
+    }
 
-		return Arrays.asList("");
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public String getName() {
-
-		return "toggle player";
-
-	}
-
-	@Override
-	public String getArgumentName() {
-
-		return "player";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_TOGGLE_PLAYER_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_TOGGLE_PLAYER_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_TOGGLE_PLAYER;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

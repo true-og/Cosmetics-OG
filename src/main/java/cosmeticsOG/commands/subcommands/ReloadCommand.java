@@ -1,86 +1,73 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import org.bukkit.entity.Player;
 
 // Allows for the plugin to be reloaded.
 public class ReloadCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {	
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		core.onReload();
+        core.onReload();
 
-		if (sender.isPlayer()) {
+        if (sender.isPlayer()) {
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_RELOAD_SUCCESS.getValue());
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_RELOAD_SUCCESS.getValue());
 
-		}
-		else {
+        } else {
 
-			Utils.logToConsole(Message.COMMAND_RELOAD_SUCCESS.getValue());
+            Utils.logToConsole(Message.COMMAND_RELOAD_SUCCESS.getValue());
+        }
 
-		}
+        return true;
+    }
 
-		return true;
+    @Override
+    public String getName() {
 
-	}
+        return "reload";
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public String getArgumentName() {
 
-		return "reload";
+        return "reload";
+    }
 
-	}
+    @Override
+    public Message getUsage() {
 
-	@Override
-	public String getArgumentName () {
+        return Message.COMMAND_RELOAD_USAGE;
+    }
 
-		return "reload";
+    @Override
+    public Message getDescription() {
 
-	}
+        return Message.COMMAND_RELOAD_DESCRIPTION;
+    }
 
-	@Override
-	public Message getUsage() {
+    @Override
+    public Permission getPermission() {
 
-		return Message.COMMAND_RELOAD_USAGE;
+        return Permission.COMMAND_RELOAD;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public Message getDescription() {
+        return true;
+    }
 
-		return Message.COMMAND_RELOAD_DESCRIPTION;
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_RELOAD;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

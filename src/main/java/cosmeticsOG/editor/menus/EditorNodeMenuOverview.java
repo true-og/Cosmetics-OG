@@ -1,12 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -17,175 +10,171 @@ import cosmeticsOG.particles.Hat;
 import cosmeticsOG.ui.AbstractListMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorNodeMenuOverview extends AbstractListMenu {
 
-	private final EditorMenuManager editorManager;
-	private final Hat targetHat;
-	private final String nodeTitle = Message.EDITOR_NODE_OVERVIEW_NODE_TITLE.getValue();
-	private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_NODE_OVERVIEW_MENU_EMPTY.getValue());
+    private final EditorMenuManager editorManager;
+    private final Hat targetHat;
+    private final String nodeTitle = Message.EDITOR_NODE_OVERVIEW_NODE_TITLE.getValue();
+    private final ItemStack emptyItem = ItemUtil.createItem(
+            CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_NODE_OVERVIEW_MENU_EMPTY.getValue());
 
-	public EditorNodeMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
+    public EditorNodeMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
 
-		super(core, menuManager, owner, true);
+        super(core, menuManager, owner, true);
 
-		this.editorManager = menuManager;
-		this.targetHat = menuManager.getBaseHat();
-		this.totalPages = 1;
+        this.editorManager = menuManager;
+        this.targetHat = menuManager.getBaseHat();
+        this.totalPages = 1;
 
-		setMenu(0, Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_NODE_OVERVIEW_MENU_TITLE.getValue())));
+        setMenu(
+                0,
+                Bukkit.createInventory(
+                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_NODE_OVERVIEW_MENU_TITLE.getValue())));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    public void insertEmptyItem() {
 
-	@Override
-	public void insertEmptyItem() {
+        setButton(0, 22, emptyItem, emptyAction);
+    }
 
-		setButton(0, 22, emptyItem, emptyAction);
+    @Override
+    public void removeEmptyItem() {
 
-	}
+        setButton(0, 22, null, emptyAction);
+    }
 
-	@Override
-	public void removeEmptyItem() {
+    @Override
+    protected void build() {
 
-		setButton(0, 22, null, emptyAction);
+        setButton(0, 46, backButtonItem, backButtonAction);
 
-	}
+        ItemStack addItem = ItemUtil.createItem(
+                CompatibleMaterial.TURTLE_HELMET.getMaterial(),
+                1,
+                Message.EDITOR_NODE_OVERVIEW_MENU_ADD_NODE.getValue());
+        setButton(0, 52, addItem, (event, slot) -> {
+            List<Hat> nodes = targetHat.getNodes();
+            int size = nodes.size();
+            if (size >= 28) {
 
-	@Override
-	protected void build() {
+                return MenuClickResult.NONE;
+            }
 
-		setButton(0, 46, backButtonItem, backButtonAction);
+            int index = size > 0 ? nodes.get(size - 1).getIndex() + 1 : 0;
+            Hat node = new Hat();
 
-		ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_NODE_OVERVIEW_MENU_ADD_NODE.getValue());
-		setButton(0, 52, addItem, (event, slot) -> {
+            node.setIndex(index);
+            node.setSlot(targetHat.getSlot());
+            node.setParent(targetHat);
+            nodes.add(node);
 
-			List<Hat> nodes = targetHat.getNodes();
-			int size = nodes.size();
-			if (size >= 28) {
+            String title = nodeTitle.replace("{1}", Integer.toString(size + 1));
+            ItemStack item = ItemUtil.createItem(
+                    Material.LEATHER_HELMET,
+                    title,
+                    StringUtil.parseDescription(Message.EDITOR_NODE_OVERVIEW_MENU_NODE_DESCRIPTION.getValue()));
 
-				return MenuClickResult.NONE;
+            setItem(0, getNormalIndex(size, 10, 2), item);
 
-			}
+            setEmpty(false);
 
-			int index = size > 0 ? nodes.get(size - 1).getIndex() + 1 : 0;
-			Hat node = new Hat();
+            return MenuClickResult.NEUTRAL;
+        });
 
-			node.setIndex(index);
-			node.setSlot(targetHat.getSlot());
-			node.setParent(targetHat);
-			nodes.add(node);
+        MenuAction editAction = (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			String title = nodeTitle.replace("{1}", Integer.toString(size + 1));
-			ItemStack item = ItemUtil.createItem(Material.LEATHER_HELMET, title, StringUtil.parseDescription(Message.EDITOR_NODE_OVERVIEW_MENU_NODE_DESCRIPTION.getValue()));
+                int index = getClampedIndex(slot, 10, 2);
+                Hat node = targetHat.getNode(index);
+                if (node == null) {
 
-			setItem(0, getNormalIndex(size, 10, 2), item);
+                    return MenuClickResult.NONE;
+                }
 
-			setEmpty(false);
+                editorManager.setTargetNode(node);
 
-			return MenuClickResult.NEUTRAL;
+                EditorNodeMainMenu editorNodeMainMenu = new EditorNodeMainMenu(core, editorManager, owner);
+                menuManager.addMenu(editorNodeMainMenu);
 
-		});
+                editorNodeMainMenu.open();
 
-		MenuAction editAction = (event, slot) -> {
+            } else if (event.isShiftRightClick()) {
 
-			if (event.isLeftClick()) {
+                deleteSlot(0, slot);
+            }
 
-				int index = getClampedIndex(slot, 10, 2);
-				Hat node = targetHat.getNode(index);
-				if (node == null) {
+            return MenuClickResult.NEUTRAL;
+        };
 
-					return MenuClickResult.NONE;
+        for (int i = 0; i < 28; i++) {
 
-				}
+            setAction(getNormalIndex(i, 10, 2), editAction);
+        }
 
-				editorManager.setTargetNode(node);
+        List<Hat> hatNodes = targetHat.getNodes();
+        if (hatNodes.size() == 0) {
 
-				EditorNodeMainMenu editorNodeMainMenu = new EditorNodeMainMenu(core, editorManager, owner);
-				menuManager.addMenu(editorNodeMainMenu);
+            setEmpty(true);
 
-				editorNodeMainMenu.open();
+            return;
+        }
 
-			}
+        for (int i = 0; i < hatNodes.size(); i++) {
 
-			else if (event.isShiftRightClick()) {
+            String title = nodeTitle.replace("{1}", Integer.toString(i + 1));
+            ItemStack item = ItemUtil.createItem(
+                    Material.LEATHER_HELMET,
+                    title,
+                    StringUtil.parseDescription(Message.EDITOR_NODE_OVERVIEW_MENU_NODE_DESCRIPTION.getValue()));
 
-				deleteSlot(0, slot);
+            EditorLore.updateHatDescription(item, hatNodes.get(i), false);
 
-			}
+            setItem(0, getNormalIndex(i, 10, 2), item);
+        }
+    }
 
-			return MenuClickResult.NEUTRAL;
+    @Override
+    public void onClose(boolean forced) {
 
-		};
+        editorManager.setTargetNode(null);
+    }
 
-		for (int i = 0; i < 28; i++) {
+    @Override
+    public void onTick(int ticks) {}
 
-			setAction(getNormalIndex(i, 10, 2), editAction);
+    @Override
+    public void deleteSlot(int page, int slot) {
 
-		}
+        super.deleteSlot(page, slot);
 
-		List<Hat> hatNodes = targetHat.getNodes();
-		if (hatNodes.size() == 0) {
+        int index = getClampedIndex(slot, 10, 2);
+        Hat node = targetHat.getNodes().remove(index);
 
-			setEmpty(true);
+        core.getDatabase().deleteNode(editorManager.getMenuName(), node.getSlot(), node.getIndex());
 
-			return;
+        for (int i = index; i <= 27; i++) {
 
-		}
+            ItemStack item = getItem(0, getNormalIndex(i, 10, 2));
+            if (item == null) {
 
-		for (int i = 0; i < hatNodes.size(); i++) {
+                continue;
+            }
 
-			String title = nodeTitle.replace("{1}", Integer.toString(i + 1));
-			ItemStack item = ItemUtil.createItem(Material.LEATHER_HELMET, title, StringUtil.parseDescription(Message.EDITOR_NODE_OVERVIEW_MENU_NODE_DESCRIPTION.getValue()));
+            ItemUtil.setItemName(item, nodeTitle.replace("{1}", Integer.toString(i + 1)));
+        }
 
-			EditorLore.updateHatDescription(item, hatNodes.get(i), false);
+        if (targetHat.getNodes().size() == 0) {
 
-			setItem(0, getNormalIndex(i, 10, 2), item);
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {
-
-		editorManager.setTargetNode(null);
-
-	}
-
-	@Override
-	public void onTick(int ticks) {}
-
-	@Override
-	public void deleteSlot(int page, int slot) {
-
-		super.deleteSlot(page, slot);
-
-		int index = getClampedIndex(slot, 10, 2);
-		Hat node = targetHat.getNodes().remove(index);
-
-		core.getDatabase().deleteNode(editorManager.getMenuName(), node.getSlot(), node.getIndex());
-
-		for (int i = index; i <= 27; i++) {
-
-			ItemStack item = getItem(0, getNormalIndex(i, 10, 2));
-			if (item == null) {
-
-				continue;
-
-			}
-
-			ItemUtil.setItemName(item, nodeTitle.replace("{1}", Integer.toString(i + 1)));
-
-		}
-
-		if (targetHat.getNodes().size() == 0) {
-
-			setEmpty(true);
-
-		}
-
-	}
-
+            setEmpty(true);
+        }
+    }
 }

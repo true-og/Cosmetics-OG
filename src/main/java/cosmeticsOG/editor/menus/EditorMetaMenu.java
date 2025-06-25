@@ -1,10 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -17,251 +12,225 @@ import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.Hat;
 import cosmeticsOG.ui.AbstractStaticMenu;
 import cosmeticsOG.util.ItemUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorMetaMenu extends AbstractStaticMenu {
 
-	private final EditorMenuManager editorManager;
-	private final Hat targetHat;
+    private final EditorMenuManager editorManager;
+    private final Hat targetHat;
 
-	public EditorMetaMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
+    public EditorMetaMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.editorManager = menuManager;
-		this.targetHat = menuManager.getBaseHat();
-		this.inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_META_MENU_TITLE.getValue()));
+        this.editorManager = menuManager;
+        this.targetHat = menuManager.getBaseHat();
+        this.inventory = Bukkit.createInventory(
+                null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_META_MENU_TITLE.getValue()));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    public void open() {
 
-	@Override
-	public void open () {
+        EditorLore.updateNameDescription(getItem(13), targetHat);
+        EditorLore.updateDescriptionDescription(getItem(11), targetHat.getDescription());
+        EditorLore.updateDescriptionDescription(getItem(19), targetHat.getPermissionDescription());
+        EditorLore.updatePermissionDescription(getItem(15), targetHat);
+        EditorLore.updateLabelDescription(getItem(29), targetHat.getLabel());
+        EditorLore.updateEquipDescription(getItem(33), targetHat.getEquipDisplayMessage());
+        EditorLore.updatePermissionDeniedDescription(getItem(25), targetHat.getPermissionDeniedDisplayMessage());
 
-		EditorLore.updateNameDescription(getItem(13), targetHat);	
-		EditorLore.updateDescriptionDescription(getItem(11), targetHat.getDescription());
-		EditorLore.updateDescriptionDescription(getItem(19), targetHat.getPermissionDescription());
-		EditorLore.updatePermissionDescription(getItem(15), targetHat);
-		EditorLore.updateLabelDescription(getItem(29), targetHat.getLabel());
-		EditorLore.updateEquipDescription(getItem(33), targetHat.getEquipDisplayMessage());
-		EditorLore.updatePermissionDeniedDescription(getItem(25), targetHat.getPermissionDeniedDisplayMessage());
+        super.open();
+    }
 
-		super.open();
+    @Override
+    protected void build() {
 
-	}
+        setButton(49, backButtonItem, backButtonAction);
 
-	@Override
-	protected void build() {
+        // Name.
+        ItemStack nameItem = ItemUtil.createItem(
+                CompatibleMaterial.PLAYER_HEAD.getMaterial(), 1, Message.EDITOR_META_MENU_SET_NAME.getValue());
+        setButton(13, nameItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-		setButton(49, backButtonItem, backButtonAction);
+                editorManager.getOwnerState().setMetaState(MetaState.HAT_NAME);
 
-		// Name.
-		ItemStack nameItem = ItemUtil.createItem(CompatibleMaterial.PLAYER_HEAD.getMaterial(), 1, Message.EDITOR_META_MENU_SET_NAME.getValue());
-		setButton(13, nameItem, (event, slot) -> {
+                core.prompt(owner, MetaState.HAT_NAME);
 
-			if (event.isLeftClick()) {
+                menuManager.closeInventory();
 
-				editorManager.getOwnerState().setMetaState(MetaState.HAT_NAME);
+            } else {
 
-				core.prompt(owner, MetaState.HAT_NAME);
+                targetHat.setName(Message.EDITOR_MISC_NEW_PARTICLE.getValue());
 
-				menuManager.closeInventory();
+                EditorLore.updateNameDescription(getItem(13), targetHat);
+            }
 
-			}
+            return MenuClickResult.NEUTRAL;
+        });
 
-			else {
+        // Description.
+        ItemStack descriptionItem = ItemUtil.createItem(
+                CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1, Message.EDITOR_META_MENU_SET_DESCRIPTION.getValue());
+        setButton(11, descriptionItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-				targetHat.setName(Message.EDITOR_MISC_NEW_PARTICLE.getValue());
+                EditorDescriptionMenu editorDescriptionMenu =
+                        new EditorDescriptionMenu(core, editorManager, owner, true);
 
-				EditorLore.updateNameDescription(getItem(13), targetHat);
+                menuManager.addMenu(editorDescriptionMenu);
 
-			}
+                editorDescriptionMenu.open();
 
-			return MenuClickResult.NEUTRAL;
+            } else if (event.isShiftRightClick()) {
 
-		});
+                if (!targetHat.getDescription().isEmpty()) {
 
-		// Description.
-		ItemStack descriptionItem = ItemUtil.createItem(CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1, Message.EDITOR_META_MENU_SET_DESCRIPTION.getValue());
-		setButton(11, descriptionItem, (event, slot) -> {
+                    targetHat.getDescription().clear();
 
-			if (event.isLeftClick()) {
+                    Database database = core.getDatabase();
+                    String menuName = editorManager.getMenuName();
+                    database.saveMetaData(menuName, targetHat, DataType.DESCRIPTION, 0);
 
-				EditorDescriptionMenu editorDescriptionMenu = new EditorDescriptionMenu(core, editorManager, owner, true);
+                    EditorLore.updateDescriptionDescription(getItem(11), targetHat.getDescription());
+                }
+            }
 
-				menuManager.addMenu(editorDescriptionMenu);
+            return MenuClickResult.NEUTRAL;
+        });
 
-				editorDescriptionMenu.open();
+        // Permission description.
+        ItemStack permissionDescriptionItem =
+                ItemUtil.createItem(Material.BOOK, 1, Message.EDITOR_META_MENU_SET_PERMISSION_DESCRIPTION.getValue());
+        setButton(19, permissionDescriptionItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			}
+                EditorDescriptionMenu editorDescriptionMenu =
+                        new EditorDescriptionMenu(core, editorManager, owner, false);
 
-			else if (event.isShiftRightClick()) {
+                menuManager.addMenu(editorDescriptionMenu);
 
-				if (! targetHat.getDescription().isEmpty()) {
+                editorDescriptionMenu.open();
 
-					targetHat.getDescription().clear();
+            } else if (event.isShiftRightClick()) {
 
-					Database database = core.getDatabase();
-					String menuName = editorManager.getMenuName();
-					database.saveMetaData(menuName, targetHat, DataType.DESCRIPTION, 0);
+                if (!targetHat.getPermissionDescription().isEmpty()) {
 
-					EditorLore.updateDescriptionDescription(getItem(11), targetHat.getDescription());
+                    targetHat.getPermissionDescription().clear();
 
-				}
+                    Database database = core.getDatabase();
+                    String menuName = editorManager.getMenuName();
+                    database.saveMetaData(menuName, targetHat, DataType.PERMISSION_DESCRIPTION, 0);
 
-			}
+                    EditorLore.updateDescriptionDescription(getItem(19), targetHat.getPermissionDescription());
+                }
+            }
 
-			return MenuClickResult.NEUTRAL;
+            return MenuClickResult.NEUTRAL;
+        });
 
-		});
+        // Permission.
+        ItemStack permissionItem =
+                ItemUtil.createItem(Material.PAPER, 1, Message.EDITOR_META_MENU_SET_PERMISSION.getValue());
+        setButton(15, permissionItem, (event, slot) -> {
+            editorManager.getOwnerState().setMetaState(MetaState.HAT_PERMISSION);
 
-		// Permission description.
-		ItemStack permissionDescriptionItem = ItemUtil.createItem(Material.BOOK, 1, Message.EDITOR_META_MENU_SET_PERMISSION_DESCRIPTION.getValue());
-		setButton(19, permissionDescriptionItem, (event, slot) -> {
+            core.prompt(owner, MetaState.HAT_PERMISSION);
 
-			if (event.isLeftClick()) {
+            menuManager.closeInventory();
 
-				EditorDescriptionMenu editorDescriptionMenu = new EditorDescriptionMenu(core, editorManager, owner, false);
+            return MenuClickResult.NEUTRAL;
+        });
 
-				menuManager.addMenu(editorDescriptionMenu);
+        // Label.
+        ItemStack labelItem = ItemUtil.createItem(Material.NAME_TAG, 1, Message.EDITOR_META_MENU_SET_LABEL.getValue());
+        setButton(29, labelItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-				editorDescriptionMenu.open();
+                editorManager.getOwnerState().setMetaState(MetaState.HAT_LABEL);
 
-			}
+                core.prompt(owner, MetaState.HAT_LABEL);
 
-			else if (event.isShiftRightClick()) {
+                menuManager.closeInventory();
 
-				if (! targetHat.getPermissionDescription().isEmpty()) {
+            } else if (event.isShiftRightClick()) {
 
-					targetHat.getPermissionDescription().clear();
+                core.getDatabase().onLabelChange(targetHat.getLabel(), null, null, -1);
 
-					Database database = core.getDatabase();
-					String menuName = editorManager.getMenuName();
-					database.saveMetaData(menuName, targetHat, DataType.PERMISSION_DESCRIPTION, 0);
+                targetHat.removeLabel();
 
-					EditorLore.updateDescriptionDescription(getItem(19), targetHat.getPermissionDescription());
+                EditorLore.updateLabelDescription(getItem(29), targetHat.getLabel());
+            }
 
-				}
+            return MenuClickResult.NEUTRAL;
+        });
 
-			}
+        // Equip.
+        ItemStack equipItem =
+                ItemUtil.createItem(Material.LEATHER_HELMET, 1, Message.EDITOR_META_MENU_SET_EQUIP_MESSAGE.getValue());
+        setButton(33, equipItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-			return MenuClickResult.NEUTRAL;
+                editorManager.getOwnerState().setMetaState(MetaState.HAT_EQUIP_MESSAGE);
 
-		});
+                core.prompt(owner, MetaState.HAT_EQUIP_MESSAGE);
 
-		// Permission.
-		ItemStack permissionItem = ItemUtil.createItem(Material.PAPER, 1, Message.EDITOR_META_MENU_SET_PERMISSION.getValue());
-		setButton(15, permissionItem, (event, slot) -> {
+                menuManager.closeInventory();
 
-			editorManager.getOwnerState().setMetaState(MetaState.HAT_PERMISSION);
+            } else if (event.isShiftRightClick()) {
 
-			core.prompt(owner, MetaState.HAT_PERMISSION);
+                targetHat.removeEquipMessage();
 
-			menuManager.closeInventory();
+                EditorLore.updateEquipDescription(getItem(33), targetHat.getEquipDisplayMessage());
+            }
 
-			return MenuClickResult.NEUTRAL;
+            return MenuClickResult.NEUTRAL;
+        });
 
-		});
+        // Permission denied.
+        ItemStack permissionDeniedItem = ItemUtil.createItem(
+                CompatibleMaterial.MAP.getMaterial(), 1, Message.EDITOR_META_MENU_SET_PERMISSION_MESSAGE.getValue());
+        setButton(25, permissionDeniedItem, (event, slot) -> {
+            if (event.isLeftClick()) {
 
-		// Label.
-		ItemStack labelItem = ItemUtil.createItem(Material.NAME_TAG, 1, Message.EDITOR_META_MENU_SET_LABEL.getValue());
-		setButton(29, labelItem, (event, slot) -> {
+                editorManager.getOwnerState().setMetaState(MetaState.HAT_PERMISSION_MESSAGE);
 
-			if (event.isLeftClick()) {
+                core.prompt(owner, MetaState.HAT_PERMISSION_MESSAGE);
 
-				editorManager.getOwnerState().setMetaState(MetaState.HAT_LABEL);
+                menuManager.closeInventory();
 
-				core.prompt(owner, MetaState.HAT_LABEL);
+            } else if (event.isShiftRightClick()) {
 
-				menuManager.closeInventory();
+                targetHat.removePermissionDeniedMessage();
 
-			}
+                EditorLore.updatePermissionDeniedDescription(
+                        getItem(25), targetHat.getPermissionDeniedDisplayMessage());
+            }
 
-			else if (event.isShiftRightClick()) {
+            return MenuClickResult.NEUTRAL;
+        });
 
-				core.getDatabase().onLabelChange(targetHat.getLabel(), null, null, -1);
+        // Tags.
+        ItemStack tagItem = ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_META_MENU_SET_TAG.getValue());
+        setButton(31, tagItem, (event, slot) -> {
+            EditorTagMenuOverview editorTagMenuOverview = new EditorTagMenuOverview(core, editorManager, owner);
+            menuManager.addMenu(editorTagMenuOverview);
 
-				targetHat.removeLabel();
+            editorTagMenuOverview.open();
 
-				EditorLore.updateLabelDescription(getItem(29), targetHat.getLabel());
+            return MenuClickResult.NEUTRAL;
+        });
+    }
 
-			}
+    @Override
+    public void onClose(boolean forced) {}
 
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-		// Equip.
-		ItemStack equipItem = ItemUtil.createItem(Material.LEATHER_HELMET, 1, Message.EDITOR_META_MENU_SET_EQUIP_MESSAGE.getValue());
-		setButton(33, equipItem, (event, slot) -> {
-
-			if (event.isLeftClick()) {
-
-				editorManager.getOwnerState().setMetaState(MetaState.HAT_EQUIP_MESSAGE);
-
-				core.prompt(owner, MetaState.HAT_EQUIP_MESSAGE);
-
-				menuManager.closeInventory();
-
-			}
-
-			else if (event.isShiftRightClick()) {
-
-				targetHat.removeEquipMessage();
-
-				EditorLore.updateEquipDescription(getItem(33), targetHat.getEquipDisplayMessage());
-
-			}
-
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-		// Permission denied.
-		ItemStack permissionDeniedItem = ItemUtil.createItem(CompatibleMaterial.MAP.getMaterial(), 1, Message.EDITOR_META_MENU_SET_PERMISSION_MESSAGE.getValue());
-		setButton(25, permissionDeniedItem, (event, slot) -> {
-
-			if (event.isLeftClick()) {
-
-				editorManager.getOwnerState().setMetaState(MetaState.HAT_PERMISSION_MESSAGE);
-
-				core.prompt(owner, MetaState.HAT_PERMISSION_MESSAGE);
-
-				menuManager.closeInventory();
-
-			}
-
-			else if (event.isShiftRightClick()) {
-
-				targetHat.removePermissionDeniedMessage();
-
-				EditorLore.updatePermissionDeniedDescription(getItem(25), targetHat.getPermissionDeniedDisplayMessage());
-
-			}
-
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-		// Tags.
-		ItemStack tagItem = ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_META_MENU_SET_TAG.getValue());
-		setButton(31, tagItem, (event, slot) -> {
-
-			EditorTagMenuOverview editorTagMenuOverview = new EditorTagMenuOverview(core, editorManager, owner);		
-			menuManager.addMenu(editorTagMenuOverview);
-
-			editorTagMenuOverview.open();
-
-			return MenuClickResult.NEUTRAL;
-
-		});
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

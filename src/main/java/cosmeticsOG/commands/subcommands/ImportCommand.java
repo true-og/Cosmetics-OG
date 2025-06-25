@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -15,171 +9,152 @@ import cosmeticsOG.database.type.DatabaseType;
 import cosmeticsOG.database.type.mysql.MySQLDatabase;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows for the importing of a custom menu from a YAML file into the database.
 public class ImportCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() < 1) {
+        if (args.size() < 1) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_IMPORT_USAGE.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_IMPORT_USAGE.getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(Message.COMMAND_IMPORT_USAGE.getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(Message.COMMAND_IMPORT_USAGE.getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        if (core.getDatabaseType().equals(DatabaseType.YAML)) {
 
-		}
+            if (sender.isPlayer()) {
 
-		if (core.getDatabaseType().equals(DatabaseType.YAML)) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ADD_TYPE_ERROR.getValue());
 
-			if (sender.isPlayer()) {
+            } else {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ADD_TYPE_ERROR.getValue());
+                Utils.logToConsole(Message.COMMAND_ADD_TYPE_ERROR.getValue());
+            }
 
-			}
-			else {
+            return false;
+        }
 
-				Utils.logToConsole(Message.COMMAND_ADD_TYPE_ERROR.getValue());
+        String menuName = args.get(0);
+        if (core.getDatabase().getMenus(false).containsKey(menuName)) {
 
-			}
+            if (sender.isPlayer()) {
 
-			return false;
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
 
-		}
+            } else {
 
-		String menuName = args.get(0);
-		if (core.getDatabase().getMenus(false).containsKey(menuName)) {
+                Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
+            }
 
-			if (sender.isPlayer()) {
+            return false;
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
+        MySQLDatabase database = (MySQLDatabase) core.getDatabase();
 
-			}
-			else {
+        CustomConfig config = core.getResourceManager().getConfig(menuName);
+        if (config == null) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
+            if (sender.isPlayer()) {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
-			return false;
+            } else {
 
-		}
+                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            }
 
-		MySQLDatabase database = (MySQLDatabase) core.getDatabase();
+            return false;
+        }
 
-		CustomConfig config = core.getResourceManager().getConfig(menuName);
-		if (config == null) {
+        database.importMenu(sender, config);
 
-			if (sender.isPlayer()) {
+        if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            Utils.cosmeticsOGPlaceholderMessage(
+                    (Player) sender, Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
 
-			}
-			else {
+        } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            Utils.logToConsole(Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
+        }
 
-			}
+        return true;
+    }
 
-			return false;
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		}
+        if (args.size() == 1) {
 
-		database.importMenu(sender, config);
+            List<String> menus = new ArrayList<String>();
+            for (String menu : core.getResourceManager().getMenus()) {
 
-		if (sender.isPlayer()) {
+                menus.add(menu);
+            }
 
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
+            return menus;
+        }
 
-		}
-		else {
+        return Arrays.asList("");
+    }
 
-			Utils.logToConsole(Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
+    @Override
+    public String getName() {
 
-		}
+        return "import menu";
+    }
 
-		return true;
+    @Override
+    public String getArgumentName() {
 
-	}
+        return "import";
+    }
 
-	@Override
-	public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public Message getUsage() {
 
-		if (args.size() == 1) {
+        return Message.COMMAND_IMPORT_USAGE;
+    }
 
-			List<String> menus = new ArrayList<String>();
-			for (String menu : core.getResourceManager().getMenus()) {
+    @Override
+    public Message getDescription() {
 
-				menus.add(menu);
+        return Message.COMMAND_IMPORT_DESCRIPTION;
+    }
 
-			}
+    @Override
+    public Permission getPermission() {
 
-			return menus;
+        return Permission.COMMAND_IMPORT;
+    }
 
-		}
+    @Override
+    public boolean showInHelp() {
 
-		return Arrays.asList("");
+        return true;
+    }
 
-	}
+    @Override
+    public boolean isPlayerOnly() {
 
-	@Override
-	public String getName() {
-
-		return "import menu";
-
-	}
-
-	@Override
-	public String getArgumentName() {
-
-		return "import";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_IMPORT_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_IMPORT_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_IMPORT;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

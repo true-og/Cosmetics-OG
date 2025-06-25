@@ -1,12 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -19,304 +12,266 @@ import cosmeticsOG.ui.AbstractMenu;
 import cosmeticsOG.ui.MenuInventory;
 import cosmeticsOG.ui.StaticMenu;
 import cosmeticsOG.ui.StaticMenuManager;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import org.bukkit.entity.Player;
 
 // Allows a player to open a specified menu.
 public class OpenCommand extends Command {
 
-	private final CosmeticsOG core;
-	private final Database database;
+    private final CosmeticsOG core;
+    private final Database database;
 
-	private OpenPlayerCommand openPlayerCommand;
+    private OpenPlayerCommand openPlayerCommand;
 
-	public OpenCommand(final CosmeticsOG core) {
+    public OpenCommand(final CosmeticsOG core) {
 
-		this.core = core;
-		database = core.getDatabase();
+        this.core = core;
+        database = core.getDatabase();
 
-		openPlayerCommand = new OpenPlayerCommand(this);
-		register(openPlayerCommand);
+        openPlayerCommand = new OpenPlayerCommand(this);
+        register(openPlayerCommand);
+    }
 
-	}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (args.size() == 1) {
 
-		if (args.size() == 1) {
+            Set<String> menus = database.getMenus(false).keySet();
+            List<String> result = new ArrayList<String>();
+            for (String menu : menus) {
 
-			Set<String> menus = database.getMenus(false).keySet();
-			List<String> result = new ArrayList<String>();
-			for (String menu : menus) {
+                if (hasPermission(sender, menu)) {
 
-				if (hasPermission(sender, menu)) {
+                    result.add(menu);
+                }
+            }
 
-					result.add(menu);
+            return result;
 
-				}
+        } else if (args.size() == 2) {
 
-			}
+            return openPlayerCommand.onTabComplete(core, sender, label, args);
+        }
 
-			return result;
+        return Arrays.asList("");
+    }
 
-		}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		else if (args.size() == 2) {
+        if (args.size() == 0) {
 
-			return openPlayerCommand.onTabComplete(core, sender, label, args);
+            if (sender.isPlayer()) {
 
-		}
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_USAGE.getValue());
 
-		return Arrays.asList("");
+            } else {
 
-	}
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(Message.COMMAND_OPEN_USAGE.getValue());
+            }
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+            return false;
+        }
 
-		if (args.size() == 0) {
+        if (args.size() == 1) {
 
-			if (sender.isPlayer()) {
+            if (!sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_USAGE.getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
 
-			}
-			else {
+                return false;
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(Message.COMMAND_OPEN_USAGE.getValue());
+            } else {
 
-			}
+                PlayerState playerState = core.getPlayerState(sender.getPlayer());
+                if (playerState.hasEditorOpen()) {
 
-			return false;
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            (Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
-		}
+                    return false;
+                }
 
-		if (args.size() == 1) {
+                AbstractMenu menu = getRequestedMenu(playerState, args.get(0), sender, sender.getPlayer());
+                if (menu == null) {
 
-			if (! sender.isPlayer()) {
+                    return false;
+                }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+                StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
+                staticManager.addMenu(menu);
 
-				return false;
+                menu.open();
 
-			}
-			else {
+                return true;
+            }
 
-				PlayerState playerState = core.getPlayerState(sender.getPlayer());
-				if (playerState.hasEditorOpen()) {
+        } else {
 
-					Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+            return openPlayerCommand.onCommand(core, sender, label, args);
+        }
+    }
 
-					return false;
+    @Override
+    public String getName() {
 
-				}
+        return "open menu";
+    }
 
-				AbstractMenu menu = getRequestedMenu(playerState, args.get(0), sender, sender.getPlayer());
-				if (menu == null) {
+    @Override
+    public String getArgumentName() {
 
-					return false;
+        return "open";
+    }
 
-				}
+    @Override
+    public Message getUsage() {
 
-				StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
-				staticManager.addMenu(menu);
+        return Message.COMMAND_OPEN_USAGE;
+    }
 
-				menu.open();
+    @Override
+    public Message getDescription() {
 
-				return true;
+        return Message.COMMAND_OPEN_DESCRIPTION;
+    }
 
-			}
+    @Override
+    public Permission getPermission() {
 
-		}
+        return Permission.COMMAND_OPEN;
+    }
 
-		else {
+    @Override
+    public boolean hasWildcardPermission() {
 
-			return openPlayerCommand.onCommand(core, sender, label, args);
+        return true;
+    }
 
-		}
+    @Override
+    public Permission getWildcardPermission() {
 
-	}
+        return Permission.COMMAND_OPEN_ALL;
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public boolean showInHelp() {
 
-		return "open menu";
+        return true;
+    }
 
-	}
+    @Override
+    public boolean isPlayerOnly() {
 
-	@Override
-	public String getArgumentName () {
+        return false;
+    }
 
-		return "open";
+    @Override
+    public boolean hasPermission(Sender sender) {
 
-	}
+        if (!sender.isPlayer()) {
 
-	@Override
-	public Message getUsage() {
+            return true;
+        }
 
-		return Message.COMMAND_OPEN_USAGE;
+        // /h wild card check.
+        if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
-	}
+            return true;
+        }
 
-	@Override
-	public Message getDescription() {
+        // Specific command wild card check.
+        if (hasWildcardPermission()) {
 
-		return Message.COMMAND_OPEN_DESCRIPTION;
+            if (getWildcardPermission().hasPermission(sender)) {
 
-	}
+                return true;
+            }
+        }
 
-	@Override
-	public Permission getPermission() {
+        // Check for individual menu permissions
+        for (String menu : core.getDatabase().getMenus(false).keySet()) {
 
-		return Permission.COMMAND_OPEN;
+            if (sender.hasPermission(getPermission().append(menu))) {
 
-	}
+                return true;
+            }
+        }
 
-	@Override
-	public boolean hasWildcardPermission () {
+        return false;
+    }
 
-		return true;
+    @Override
+    public boolean hasPermission(Sender sender, String arg) {
 
-	}
+        if (!sender.isPlayer()) {
 
-	@Override
-	public Permission getWildcardPermission () {
+            return true;
+        }
 
-		return Permission.COMMAND_OPEN_ALL;
+        // /h wild card check.
+        if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
-	}
+            return true;
+        }
 
-	@Override
-	public boolean showInHelp() {
+        // Specific command wild card check.
+        if (hasWildcardPermission()) {
 
-		return true;
+            if (getWildcardPermission().hasPermission(sender)) {
 
-	}
+                return true;
+            }
+        }
 
-	@Override
-	public boolean isPlayerOnly() {
+        if (arg != null && !arg.equals("")) {
 
-		return false;
+            if (sender.hasPermission(getPermission().append(arg))) {
 
-	}
+                return true;
+            }
+        }
 
-	@Override
-	public boolean hasPermission (Sender sender) {
+        return false;
+    }
 
-		if (! sender.isPlayer()) {
+    public AbstractMenu getRequestedMenu(
+            PlayerState playerState, String requestedMenuName, Sender sender, Player player) {
 
-			return true;
+        // Grab the name without any extensions.
+        String menuName = (requestedMenuName.contains(".") ? requestedMenuName.split("\\.")[0] : requestedMenuName);
 
-		}
+        if (menuName.equals("purchase")) {
 
-		// /h wild card check.
-		if (Permission.COMMAND_ALL.hasPermission(sender)) {
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_ERROR.replace("{1}", menuName));
 
-			return true;
+            return null;
+        }
 
-		}
+        StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
+        AbstractMenu menu = staticManager.getMenuFromCache(menuName);
+        if (menu == null) {
 
-		// Specific command wild card check.
-		if (hasWildcardPermission()) {
+            CosmeticsOG.debug("cache didnt exist, loading menu " + menuName);
+            MenuInventory menuInventory = core.getDatabase().loadInventory(menuName, playerState);
 
-			if (getWildcardPermission().hasPermission(sender)) {
+            if (menuInventory == null) {
 
-				return true;
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
-			}
+                return null;
+            }
 
-		}
+            return new StaticMenu(core, staticManager, player, menuInventory);
+        }
 
-		// Check for individual menu permissions
-		for (String menu : core.getDatabase().getMenus(false).keySet()) {
-
-			if (sender.hasPermission(getPermission().append(menu))) {
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-	@Override
-	public boolean hasPermission(Sender sender, String arg) {
-
-		if (! sender.isPlayer()) {
-
-			return true;
-
-		}
-
-		// /h wild card check.
-		if (Permission.COMMAND_ALL.hasPermission(sender)) {
-
-			return true;
-
-		}
-
-		// Specific command wild card check.
-		if (hasWildcardPermission()) {
-
-			if (getWildcardPermission().hasPermission(sender)) {
-
-				return true;
-
-			}
-
-		}
-
-		if (arg != null && ! arg.equals("")) {
-
-			if (sender.hasPermission(getPermission().append(arg))) {
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-	public AbstractMenu getRequestedMenu(PlayerState playerState, String requestedMenuName, Sender sender, Player player) {
-
-		// Grab the name without any extensions.
-		String menuName = (requestedMenuName.contains(".") ? requestedMenuName.split("\\.")[0] : requestedMenuName);
-
-		if (menuName.equals("purchase")) {
-
-			Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_ERROR.replace("{1}", menuName));
-
-			return null;
-
-		}
-
-		StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
-		AbstractMenu menu = staticManager.getMenuFromCache(menuName);
-		if (menu == null) {
-
-			CosmeticsOG.debug("cache didnt exist, loading menu " + menuName);
-			MenuInventory menuInventory = core.getDatabase().loadInventory(menuName, playerState);
-
-			if (menuInventory == null) {
-
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
-
-				return null;
-
-			}
-
-			return new StaticMenu(core, staticManager, player, menuInventory);
-
-		}
-
-		return menu;
-
-	}
-
+        return menu;
+    }
 }

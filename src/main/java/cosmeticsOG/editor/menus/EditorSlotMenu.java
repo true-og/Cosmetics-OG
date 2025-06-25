@@ -1,12 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.Arrays;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -16,131 +9,127 @@ import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.Hat;
 import cosmeticsOG.ui.AbstractStaticMenu;
 import cosmeticsOG.util.ItemUtil;
+import java.util.Arrays;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class EditorSlotMenu extends AbstractStaticMenu {
 
-	private final EditorMenuManager editorManager;
-	private final EditorBaseMenu editorBaseMenu;
-	private final boolean cloning;
-	private final int size;
+    private final EditorMenuManager editorManager;
+    private final EditorBaseMenu editorBaseMenu;
+    private final boolean cloning;
+    private final int size;
 
-	public EditorSlotMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, EditorBaseMenu editorBaseMenu, boolean cloning) {
+    public EditorSlotMenu(
+            CosmeticsOG core,
+            EditorMenuManager menuManager,
+            Player owner,
+            EditorBaseMenu editorBaseMenu,
+            boolean cloning) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.editorManager = menuManager;
-		this.editorBaseMenu = editorBaseMenu;
-		this.cloning = cloning;
-		this.size = editorBaseMenu.getMenuInventory().getSize();
-		this.inventory = Bukkit.createInventory(null, size, Utils.legacySerializerAnyCase(Message.EDITOR_SLOT_MENU_TITlE.getValue()));
+        this.editorManager = menuManager;
+        this.editorBaseMenu = editorBaseMenu;
+        this.cloning = cloning;
+        this.size = editorBaseMenu.getMenuInventory().getSize();
+        this.inventory = Bukkit.createInventory(
+                null, size, Utils.legacySerializerAnyCase(Message.EDITOR_SLOT_MENU_TITlE.getValue()));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    protected void build() {
 
-	@Override
-	protected void build() {
+        int targetSlot = editorManager.getTargetSlot();
+        final MenuAction selectAction = (event, slot) -> {
+            if (cloning) {
 
-		int targetSlot = editorManager.getTargetSlot(); 
-		final MenuAction selectAction = (event, slot) -> {
-			if (cloning) {
+                editorBaseMenu.cloneHat(targetSlot, slot);
 
-				editorBaseMenu.cloneHat(targetSlot, slot);
+                editorManager.returnToBaseMenu();
 
-				editorManager.returnToBaseMenu();
+                return MenuClickResult.NEUTRAL;
+            }
 
-				return MenuClickResult.NEUTRAL;
+            editorBaseMenu.changeSlots(targetSlot, slot, false);
 
-			}
+            menuManager.closeCurrentMenu();
 
-			editorBaseMenu.changeSlots(targetSlot, slot, false);
+            return MenuClickResult.NEUTRAL;
+        };
 
-			menuManager.closeCurrentMenu();
+        final MenuAction swapAction = (event, slot) -> {
+            editorBaseMenu.changeSlots(targetSlot, slot, true);
 
-			return MenuClickResult.NEUTRAL;
+            editorManager.returnToBaseMenu();
 
-		};
+            return MenuClickResult.NEUTRAL;
+        };
 
-		final MenuAction swapAction = (event, slot) -> {
+        final MenuAction secretAction = (event, slot) -> {
+            CompatibleSound.ENTITY_VILLAGER_NO.play(owner, 0.5f, 1.0f);
 
-			editorBaseMenu.changeSlots(targetSlot, slot, true);
+            return MenuClickResult.NONE;
+        };
 
-			editorManager.returnToBaseMenu();
+        for (int i = 0; i < size; i++) {
 
-			return MenuClickResult.NEUTRAL;
+            ItemStack item;
+            Hat hat = editorBaseMenu.getMenuInventory().getHat(i);
+            if (hat != null) {
 
-		};
+                item = hat.getItem().clone();
 
-		final MenuAction secretAction = (event, slot) -> {
+            } else {
 
-			CompatibleSound.ENTITY_VILLAGER_NO.play(owner, 0.5f, 1.0f);
+                item = ItemUtil.createItem(
+                        CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(),
+                        1,
+                        Message.EDITOR_SLOT_MENU_SELECT.getValue());
+            }
 
-			return MenuClickResult.NONE;
+            String displayName = Message.EDITOR_SLOT_MENU_SELECT.getValue();
+            if (i == targetSlot) {
 
-		};
+                ItemUtil.setItemType(item, Material.NETHER_STAR, 0);
 
-		for (int i = 0; i < size; i++) {
+                displayName = Message.EDITOR_SLOT_MENU_CANCEL.getValue();
 
-			ItemStack item;
-			Hat hat = editorBaseMenu.getMenuInventory().getHat(i);
-			if (hat != null) {
+                setAction(i, backButtonAction);
 
-				item = hat.getItem().clone();
+            } else if (editorBaseMenu.getMenuInventory().getHat(i) != null) {
+                if (!cloning) {
 
-			}
-			else {
+                    displayName = Message.EDITOR_SLOT_MENU_SWAP.getValue();
 
-				item = ItemUtil.createItem(CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(), 1, Message.EDITOR_SLOT_MENU_SELECT.getValue());
+                    setAction(i, swapAction);
 
-			}
+                } else {
 
-			String displayName = Message.EDITOR_SLOT_MENU_SELECT.getValue();
-			if (i  == targetSlot) {
+                    displayName = Message.EDITOR_SLOT_MENU_OCCUPIED.getValue();
 
-				ItemUtil.setItemType(item, Material.NETHER_STAR, 0);
+                    setAction(i, secretAction);
+                }
 
-				displayName = Message.EDITOR_SLOT_MENU_CANCEL.getValue();
+            } else {
 
-				setAction(i, backButtonAction);
+                setAction(i, selectAction);
+            }
 
-			}
-			else if (editorBaseMenu.getMenuInventory().getHat(i) != null){
-				if (! cloning) {
+            ItemUtil.setItemName(item, displayName);
+            ItemUtil.setItemDescription(item, Arrays.asList());
 
-					displayName = Message.EDITOR_SLOT_MENU_SWAP.getValue();
+            inventory.setItem(i, item);
+        }
+    }
 
-					setAction(i, swapAction);
+    @Override
+    public void onClose(boolean forced) {}
 
-				}
-				else {
-
-					displayName = Message.EDITOR_SLOT_MENU_OCCUPIED.getValue();
-
-					setAction(i, secretAction);
-
-				}
-
-			}
-
-			else {
-
-				setAction(i, selectAction);
-
-			}
-
-			ItemUtil.setItemName(item, displayName);
-			ItemUtil.setItemDescription(item, Arrays.asList());
-
-			inventory.setItem(i, item);
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

@@ -1,12 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -16,181 +9,166 @@ import cosmeticsOG.permission.Permission;
 import cosmeticsOG.player.PlayerState;
 import cosmeticsOG.ui.AbstractMenu;
 import cosmeticsOG.ui.StaticMenuManager;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 // Allows for opening a cosmetics menu on behalf of another player.
 public class OpenPlayerCommand extends Command {
 
-	private final OpenCommand parent;
+    private final OpenCommand parent;
 
-	public OpenPlayerCommand(final OpenCommand parent) {
+    public OpenPlayerCommand(final OpenCommand parent) {
 
-		this.parent = parent;
+        this.parent = parent;
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (args.size() <= 1) {
 
-		if (args.size() <= 1) {
+            if (sender.isPlayer()) {
 
-			if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+            } else {
 
-			}
-			else {
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-				Utils.logToConsole(getUsage().getValue());
+            return false;
+        }
 
-			}
+        Player targetPlayer = getPlayer(sender, args.get(1));
+        if (targetPlayer == null) {
 
-			return false;
+            if (sender.isPlayer()) {
 
-		}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
-		Player targetPlayer = getPlayer(sender, args.get(1));
-		if (targetPlayer == null) {
+            } else {
 
-			if (sender.isPlayer()) {
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+            }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+            return false;
+        }
 
-			}
-			else {
+        if (!targetPlayer.isOnline()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+            if (sender.isPlayer()) {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
 
-			return false;
+            } else {
 
-		}
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
+            }
 
-		if (! targetPlayer.isOnline()) {
+            return false;
+        }
 
-			if (sender.isPlayer()) {
+        PlayerState playerState = core.getPlayerState(targetPlayer.getPlayer());
+        if (playerState.hasEditorOpen()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
+            if (sender.isPlayer()) {
 
-			}
-			else {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
 
-				Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
+            } else {
 
-			}
+                Utils.logToConsole(Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+            }
 
-			return false;
+            return false;
+        }
 
-		}
+        AbstractMenu menu = parent.getRequestedMenu(playerState, args.get(0), sender, targetPlayer);
+        if (menu == null) {
 
-		PlayerState playerState = core.getPlayerState(targetPlayer.getPlayer());
-		if (playerState.hasEditorOpen()) {
+            return false;
+        }
 
-			if (sender.isPlayer()) {
+        StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
+        staticManager.addMenu(menu);
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+        menu.open();
 
-			}
-			else {
+        return true;
+    }
 
-				Utils.logToConsole(Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-			}
+        if (args.size() == 2) {
 
-			return false;
+            List<String> players = new ArrayList<String>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
 
-		}
+                players.add(p.getName());
+            }
 
-		AbstractMenu menu = parent.getRequestedMenu(playerState, args.get(0), sender, targetPlayer);
-		if (menu == null) {
+            if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
-			return false;
+                players.add("@p");
+                players.add("@r");
+            }
 
-		}
+            return players;
+        }
 
-		StaticMenuManager staticManager = (StaticMenuManager)playerState.getMenuManager();
-		staticManager.addMenu(menu);
+        return Arrays.asList("");
+    }
 
-		menu.open();
+    @Override
+    public String getName() {
 
-		return true;
+        return "open menu for player";
+    }
 
-	}
+    @Override
+    public String getArgumentName() {
 
-	@Override
-	public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        return "player";
+    }
 
-		if (args.size() == 2) {
+    @Override
+    public Message getUsage() {
 
-			List<String> players = new ArrayList<String>();
-			for (Player p : Bukkit.getOnlinePlayers()) {
+        return Message.COMMAND_OPEN_PLAYER_USAGE;
+    }
 
-				players.add(p.getName());
+    @Override
+    public Message getDescription() {
 
-			}
+        return Message.COMMAND_OPEN_PLAYER_DESCRIPTION;
+    }
 
-			if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
+    @Override
+    public Permission getPermission() {
 
-				players.add("@p");
-				players.add("@r");
+        return Permission.COMMAND_OPEN_PLAYER;
+    }
 
-			}
+    @Override
+    public boolean showInHelp() {
 
-			return players;
+        return true;
+    }
 
-		}
+    @Override
+    public boolean isPlayerOnly() {
 
-		return Arrays.asList("");
-
-	}
-
-	@Override
-	public String getName() {
-
-		return "open menu for player";
-
-	}
-
-	@Override
-	public String getArgumentName() {
-
-		return "player";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_OPEN_PLAYER_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_OPEN_PLAYER_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_OPEN_PLAYER;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

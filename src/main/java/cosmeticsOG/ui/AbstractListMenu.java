@@ -1,16 +1,14 @@
 package cosmeticsOG.ui;
 
+import cosmeticsOG.CosmeticsOG;
+import cosmeticsOG.locale.Message;
+import cosmeticsOG.util.ItemUtil;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.locale.Message;
-import cosmeticsOG.util.ItemUtil;
 
 /**
  * Menu that will have multiple pages of inventories
@@ -19,227 +17,203 @@ import cosmeticsOG.util.ItemUtil;
  */
 public abstract class AbstractListMenu extends AbstractMenu {
 
-	protected final ItemStack emptyItem = ItemUtil.createItem(Material.BARRIER, 1, Message.EDITOR_MISC_EMPTY_MENU.getValue());
-	protected final boolean canEdit;
+    protected final ItemStack emptyItem =
+            ItemUtil.createItem(Material.BARRIER, 1, Message.EDITOR_MISC_EMPTY_MENU.getValue());
+    protected final boolean canEdit;
 
-	protected Map<Integer, Inventory> menus;
+    protected Map<Integer, Inventory> menus;
 
-	protected int totalPages = 0;
-	protected int currentPage = 0;
+    protected int totalPages = 0;
+    protected int currentPage = 0;
 
-	protected boolean isEmpty = false;
+    protected boolean isEmpty = false;
 
-	public AbstractListMenu(CosmeticsOG core, MenuManager menuManager, Player owner, final boolean canEdit) {
+    public AbstractListMenu(CosmeticsOG core, MenuManager menuManager, Player owner, final boolean canEdit) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.canEdit = canEdit;
-		this.menus = new HashMap<Integer, Inventory>();
+        this.canEdit = canEdit;
+        this.menus = new HashMap<Integer, Inventory>();
+    }
 
-	}
+    public abstract void insertEmptyItem();
 
-	public abstract void insertEmptyItem ();
+    public abstract void removeEmptyItem();
 
-	public abstract void removeEmptyItem ();
+    @Override
+    public void open() {
 
-	@Override
-	public void open () {
+        Inventory inventory = menus.get(currentPage);
+        if (inventory == null) {
 
-		Inventory inventory = menus.get(currentPage);
-		if (inventory == null) {
+            return;
+        }
 
-			return;
+        menuManager.isOpeningMenu(this);
+        owner.openInventory(inventory);
+    }
 
-		}
+    @Override
+    public boolean hasInventory(Inventory inventory) {
 
-		menuManager.isOpeningMenu(this);
-		owner.openInventory(inventory);
+        return menus.containsValue(inventory);
+    }
 
-	}
+    @Override
+    public String getName() {
 
-	@Override
-	public boolean hasInventory (Inventory inventory) {
+        return "";
+    }
 
-		return menus.containsValue(inventory);
+    /**
+     * Set whether this menu's content is empty
+     * @param isEmpty
+     */
+    public void setEmpty(boolean isEmpty) {
 
-	}
+        if (this.isEmpty == isEmpty) {
 
-	@Override
-	public String getName () {
+            return;
+        }
 
-		return "";
+        this.isEmpty = isEmpty;
 
-	}
+        if (isEmpty) {
 
-	/**
-	 * Set whether this menu's content is empty
-	 * @param isEmpty
-	 */
-	public void setEmpty (boolean isEmpty) {
+            insertEmptyItem();
 
-		if (this.isEmpty == isEmpty) {
+        } else {
 
-			return;
+            removeEmptyItem();
+        }
+    }
 
-		}
+    /**
+     * Get the ItemStack at the current slot
+     * @param page
+     * @param slot
+     * @return
+     */
+    protected ItemStack getItem(int page, int slot) {
 
-		this.isEmpty = isEmpty;
+        Inventory inventory = menus.get(page);
+        if (inventory == null) {
 
-		if (isEmpty) {
+            return null;
+        }
 
-			insertEmptyItem();
+        return inventory.getItem(slot);
+    }
 
-		}
-		else {
+    /**
+     * Place an item into the inventory at the given page
+     * @param slot
+     * @param item
+     */
+    protected void setItem(int page, int slot, ItemStack item) {
 
-			removeEmptyItem();
+        Inventory inventory = menus.get(page);
+        if (inventory == null) {
 
-		}
+            return;
+        }
 
-	}
+        inventory.setItem(slot, item);
+    }
 
-	/**
-	 * Get the ItemStack at the current slot
-	 * @param page
-	 * @param slot
-	 * @return
-	 */
-	protected ItemStack getItem (int page, int slot) {
+    /**
+     * Set the ItemStack and MenuAction for the given slot in the given menu
+     * @param page
+     * @param slot
+     * @param item
+     * @param action
+     */
+    protected void setButton(int page, int slot, ItemStack item, MenuAction action) {
 
-		Inventory inventory = menus.get(page);
-		if (inventory == null) {
+        setItem(page, slot, item);
+        setAction(slot, action);
+    }
 
-			return null;
+    /**
+     * Set the MenuButton for the given slot in the given menu
+     * @param page
+     * @param slot
+     * @param button
+     */
+    protected void setButton(int page, int slot, MenuButton button) {
 
-		}
+        setItem(page, slot, button.getItem());
+        setAction(slot, button.getAction());
+    }
 
-		return inventory.getItem(slot);
+    /**
+     * Set the inventory at the given page
+     * @param page
+     * @param inventory
+     */
+    protected void setMenu(int page, Inventory inventory) {
 
-	}
+        menus.put(page, inventory);
+    }
 
-	/**
-	 * Place an item into the inventory at the given page
-	 * @param slot
-	 * @param item
-	 */
-	protected void setItem (int page, int slot, ItemStack item) {
+    /**
+     * Deletes the content at the given slot and shifts all other content over
+     * @param page
+     * @param slot
+     */
+    protected void deleteSlot(int page, int slot) {
 
-		Inventory inventory = menus.get(page);
-		if (inventory == null) {
+        if (!canEdit) {
 
-			return;
+            return;
+        }
 
-		}
+        if (page >= this.totalPages) {
 
-		inventory.setItem(slot, item);
+            return;
+        }
 
-	}
+        setItem(page, slot, null);
 
-	/**
-	 * Set the ItemStack and MenuAction for the given slot in the given menu
-	 * @param page
-	 * @param slot
-	 * @param item
-	 * @param action
-	 */
-	protected void setButton (int page, int slot, ItemStack item, MenuAction action) {
+        int startingIndex = (page * 28) + getClampedIndex(slot, 10, 2);
+        int totalSlots = 28 * totalPages;
+        for (int i = startingIndex + 1; i < totalSlots; i++) {
 
-		setItem(page, slot, item);
-		setAction(slot, action);
+            int currentPage = Math.floorDiv(i, 28);
+            int currentIndex = getNormalIndex(i - (currentPage * 28), 10, 2);
 
-	}
+            int shiftedPage = Math.floorDiv(i - 1, 28);
+            int shiftedIndex = getNormalIndex((i - 1) - (shiftedPage * 28), 10, 2);
 
-	/**
-	 * Set the MenuButton for the given slot in the given menu
-	 * @param page
-	 * @param slot
-	 * @param button
-	 */
-	protected void setButton (int page, int slot, MenuButton button) {
+            ItemStack item = menus.get(currentPage).getItem(currentIndex);
 
-		setItem(page, slot, button.getItem());
-		setAction(slot, button.getAction());
+            setItem(currentPage, currentIndex, null);
+            setItem(shiftedPage, shiftedIndex, item);
+        }
+    }
 
-	}
+    /**
+     * Clear all content in each menu
+     */
+    protected void clearContent() {
 
-	/**
-	 * Set the inventory at the given page
-	 * @param page
-	 * @param inventory
-	 */
-	protected void setMenu (int page, Inventory inventory) {
+        if (!canEdit) {
 
-		menus.put(page, inventory);
+            return;
+        }
 
-	}
+        int totalSlots = 28 * totalPages;
+        for (int i = 0; i < totalSlots; i++) {
 
-	/**
-	 * Deletes the content at the given slot and shifts all other content over
-	 * @param page
-	 * @param slot
-	 */
-	protected void deleteSlot (int page, int slot) {
+            int currentPage = Math.floorDiv(i, 28);
+            int currentIndex = getNormalIndex(i - (currentPage * 28), 10, 2);
 
-		if (! canEdit) {
+            menus.get(currentPage).setItem(currentIndex, null);
+        }
 
-			return;
+        for (int i = 0; i < 28; i++) {
 
-		}
-
-		if (page >= this.totalPages) {
-
-			return;
-
-		}
-
-		setItem(page, slot, null);
-
-		int startingIndex = (page * 28) + getClampedIndex(slot, 10, 2);
-		int totalSlots = 28 * totalPages;
-		for (int i = startingIndex + 1; i < totalSlots; i++) {
-
-			int currentPage = Math.floorDiv(i, 28);
-			int currentIndex = getNormalIndex(i - (currentPage * 28), 10, 2);
-
-			int shiftedPage = Math.floorDiv(i - 1, 28);
-			int shiftedIndex = getNormalIndex((i - 1) - (shiftedPage * 28), 10, 2);
-
-			ItemStack item = menus.get(currentPage).getItem(currentIndex);
-
-			setItem(currentPage, currentIndex, null);
-			setItem(shiftedPage, shiftedIndex, item);
-
-		}
-
-	}
-
-	/**
-	 * Clear all content in each menu
-	 */
-	protected void clearContent () {
-
-		if (! canEdit) {
-
-			return;
-
-		}
-
-		int totalSlots = 28 * totalPages;
-		for (int i = 0; i < totalSlots; i++) {
-
-			int currentPage = Math.floorDiv(i, 28);
-			int currentIndex = getNormalIndex(i - (currentPage * 28), 10, 2);
-
-			menus.get(currentPage).setItem(currentIndex, null);
-
-		}
-
-		for (int i = 0; i < 28; i++) {
-
-			setAction(getNormalIndex(i, 10, 2), null);
-
-		}
-
-	}
-
+            setAction(getNormalIndex(i, 10, 2), null);
+        }
+    }
 }

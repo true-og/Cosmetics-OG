@@ -1,9 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -15,144 +11,132 @@ import cosmeticsOG.permission.Permission;
 import cosmeticsOG.player.PlayerState;
 import cosmeticsOG.ui.MenuInventory;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import org.bukkit.entity.Player;
 
 // Creates a new cosmetics GUI menu.
 public class CreateCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() == 1) {
+        if (args.size() == 1) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				PlayerState playerState = core.getPlayerState(sender.getPlayer());
-				if (playerState.hasEditorOpen()) {
+                PlayerState playerState = core.getPlayerState(sender.getPlayer());
+                if (playerState.hasEditorOpen()) {
 
-					Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            (Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
-					return false;
+                    return false;
+                }
+            }
 
-				}
+            String unsanitizedMenuName =
+                    (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
+            String menuName = StringUtil.sanitizeString(unsanitizedMenuName);
+            if (menuName.isEmpty()) {
 
-			}
+                if (sender.isPlayer()) {
 
-			String unsanitizedMenuName = (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
-			String menuName = StringUtil.sanitizeString(unsanitizedMenuName);
-			if (menuName.isEmpty()) {
+                    Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CREATE_INVALID.getValue());
 
-				if (sender.isPlayer()) {
+                } else {
 
-					Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CREATE_INVALID.getValue());
+                    Utils.logToConsole(Message.COMMAND_CREATE_INVALID.getValue());
+                }
 
-				}
-				else {
+                return false;
+            }
 
-					Utils.logToConsole(Message.COMMAND_CREATE_INVALID.getValue());
+            Database database = core.getDatabase();
 
-				}
+            // "purchase" is a reserved menu name, used for the plugin's purchase menu.
+            if (database.menuExists(menuName) || menuName.equalsIgnoreCase("purchase")) {
 
-				return false;
+                if (sender.isPlayer()) {
 
-			}
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            (Player) sender,
+                            Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
 
-			Database database = core.getDatabase();
+                } else {
 
-			// "purchase" is a reserved menu name, used for the plugin's purchase menu.
-			if (database.menuExists(menuName) || menuName.equalsIgnoreCase("purchase")) {
+                    Utils.logToConsole(
+                            Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+                }
 
-				if (sender.isPlayer()) {
+                return false;
+            }
 
-					Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+            database.createMenu(menuName);
 
-				}
-				else {
+            if (!sender.isPlayer()) {
 
-					Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+                Utils.logToConsole(Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
 
-				}
+                return true;
 
-				return false;
+            } else {
 
-			}
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender, Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
 
-			database.createMenu(menuName);
+                PlayerState playerState = core.getPlayerState(sender.getPlayer());
+                EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
+                MenuInventory inventory = new MenuInventory(menuName, Utils.legacySerializerAnyCase(menuName), 6, null);
 
-			if (! sender.isPlayer()) {
+                editorManager.setEditingMenu(inventory);
+                editorManager.open();
+            }
 
-				Utils.logToConsole(Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
+            return true;
+        }
 
-				return true;
+        return false;
+    }
 
-			}
-			else {
+    @Override
+    public String getName() {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
+        return "create menu";
+    }
 
-				PlayerState playerState = core.getPlayerState(sender.getPlayer());
-				EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
-				MenuInventory inventory = new MenuInventory(menuName, Utils.legacySerializerAnyCase(menuName), 6, null);
+    @Override
+    public String getArgumentName() {
 
-				editorManager.setEditingMenu(inventory);
-				editorManager.open();
+        return "create";
+    }
 
-			}
+    @Override
+    public Message getUsage() {
 
-			return true;
+        return Message.COMMAND_CREATE_USAGE;
+    }
 
-		}
+    @Override
+    public Message getDescription() {
 
-		return false;
+        return Message.COMMAND_CREATE_DESCRIPTION;
+    }
 
-	}
+    @Override
+    public Permission getPermission() {
 
-	@Override
-	public String getName() {
+        return Permission.COMMAND_CREATE;
+    }
 
-		return "create menu";
+    @Override
+    public boolean showInHelp() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public String getArgumentName () {
+    @Override
+    public boolean isPlayerOnly() {
 
-		return "create";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_CREATE_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_CREATE_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_CREATE;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

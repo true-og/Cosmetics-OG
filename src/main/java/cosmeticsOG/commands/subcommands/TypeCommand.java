@@ -1,156 +1,132 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map.Entry;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
 
 // Allows for adding and removing types using subcommands.
 public class TypeCommand extends Command {
 
-	public TypeCommand () {
+    public TypeCommand() {
 
-		register(new AddTypeCommand());
-		register(new RemoveTypeCommand());
+        register(new AddTypeCommand());
+        register(new RemoveTypeCommand());
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (args.size() > 1) {
 
-		if (args.size() > 1) {	
+            String argument = args.get(0);
+            if (subCommands.containsKey(argument)) {
 
-			String argument = args.get(0);
-			if (subCommands.containsKey(argument)) {	
+                args.remove(0);
 
-				args.remove(0);
+                return subCommands.get(argument).onCommand(core, sender, label, args);
+            }
+        }
 
-				return subCommands.get(argument).onCommand(core, sender, label, args);
+        return false;
+    }
 
-			}
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		}
+        if (args.size() == 1) {
 
-		return false;
+            List<String> commands = new ArrayList<String>();
+            for (Entry<String, Command> entry : subCommands.entrySet()) {
 
-	}
+                if (sender.hasPermission(entry.getValue().getPermission())) {
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+                    commands.add(entry.getKey());
+                }
+            }
 
-		if (args.size() == 1) {
+            return commands;
 
-			List<String> commands = new ArrayList<String>();
-			for (Entry<String, Command> entry : subCommands.entrySet()) {
+        } else {
 
-				if (sender.hasPermission(entry.getValue().getPermission())) {
+            String argument = args.get(0);
+            if (subCommands.containsKey(argument)) {
 
-					commands.add(entry.getKey());
+                Command subCommand = subCommands.get(argument);
+                if (sender.hasPermission(subCommand.getPermission())) {
 
-				}
+                    args.remove(0);
 
-			}
+                    return subCommand.onTabComplete(core, sender, label, args);
+                }
+            }
+        }
 
-			return commands;
+        return Arrays.asList("");
+    }
 
-		}
+    @Override
+    public String getName() {
 
-		else {
+        return "type";
+    }
 
-			String argument = args.get(0);
-			if (subCommands.containsKey(argument)) {
+    @Override
+    public String getArgumentName() {
 
-				Command subCommand = subCommands.get(argument);
-				if (sender.hasPermission(subCommand.getPermission())) {
+        return "type";
+    }
 
-					args.remove(0);
+    @Override
+    public Message getUsage() {
 
-					return subCommand.onTabComplete(core, sender, label, args);
+        return Message.UNKNOWN;
+    }
 
-				}
+    @Override
+    public Message getDescription() {
 
-			}
+        return Message.UNKNOWN;
+    }
 
-		}
+    @Override
+    public Permission getPermission() {
 
-		return Arrays.asList("");
+        return Permission.COMMAND_TYPE;
+    }
 
-	}
+    @Override
+    public boolean hasPermission() {
 
-	@Override
-	public String getName() {
+        return false;
+    }
 
-		return "type";
+    @Override
+    public boolean hasWildcardPermission() {
 
-	}
+        return true;
+    }
 
-	@Override
-	public String getArgumentName () {
+    @Override
+    public Permission getWildcardPermission() {
 
-		return "type";
+        return Permission.COMMAND_TYPE_ALL;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public Message getUsage() {
+        return false;
+    }
 
-		return Message.UNKNOWN;
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.UNKNOWN;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_TYPE;
-
-	}
-
-	@Override
-	public boolean hasPermission () {
-
-		return false;
-
-	}
-
-	@Override
-	public boolean hasWildcardPermission () {
-
-		return true;
-
-	}
-
-	@Override
-	public Permission getWildcardPermission () {
-
-		return Permission.COMMAND_TYPE_ALL;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return false;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

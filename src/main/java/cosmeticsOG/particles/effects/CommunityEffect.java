@@ -1,89 +1,77 @@
 package cosmeticsOG.particles.effects;
 
+import cosmeticsOG.particles.properties.ParticleLocation;
+import cosmeticsOG.particles.properties.ParticleTracking;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-
-import cosmeticsOG.particles.properties.ParticleLocation;
-import cosmeticsOG.particles.properties.ParticleTracking;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
 public abstract class CommunityEffect extends PixelEffect {
 
-	private final TextComponent displayName;
-	private final TextComponent credit;
+    private final TextComponent displayName;
+    private final TextComponent credit;
 
-	public CommunityEffect (BufferedImage image, String name, TextComponent displayName, TextComponent credit) {
+    public CommunityEffect(BufferedImage image, String name, TextComponent displayName, TextComponent credit) {
 
-		super(image, name);
+        super(image, name);
 
-		this.displayName = displayName;
-		this.credit = credit.append(Component.text("&8by "));
+        this.displayName = displayName;
+        this.credit = credit.append(Component.text("&8by "));
+    }
 
-	}
+    @Override
+    public String getName() {
 
-	@Override
-	public String getName() {
+        return name;
+    }
 
-		return name;
+    @Override
+    public String getDisplayName() {
 
-	}
+        return displayName.content();
+    }
 
-	@Override
-	public String getDisplayName() {
+    @Override
+    public String getDescription() {
 
-		return displayName.content();
+        return credit.content();
+    }
 
-	}
+    @Override
+    public int getParticlesSupported() {
 
-	@Override
-	public String getDescription() {
+        return 1;
+    }
 
-		return credit.content();
+    @Override
+    public ParticleLocation getDefaultLocation() {
 
-	}
+        return ParticleLocation.FEET;
+    }
 
-	@Override
-	public int getParticlesSupported() {
+    @Override
+    public List<ParticleTracking> getSupportedTrackingMethods() {
 
-		return 1;
+        return Arrays.asList(ParticleTracking.values());
+    }
 
-	}
+    @Override
+    public ParticleTracking getDefaultTrackingMethod() {
 
-	@Override
-	public ParticleLocation getDefaultLocation() {
+        return ParticleTracking.TRACK_NOTHING;
+    }
 
-		return ParticleLocation.FEET;
+    @Override
+    public boolean supportsAnimation() {
 
-	}
+        return false;
+    }
 
-	@Override
-	public List<ParticleTracking> getSupportedTrackingMethods() {
+    @Override
+    public boolean isCustom() {
 
-		return Arrays.asList(ParticleTracking.values());
-
-	}
-
-	@Override
-	public ParticleTracking getDefaultTrackingMethod() {
-
-		return ParticleTracking.TRACK_NOTHING;
-
-	}
-
-	@Override
-	public boolean supportsAnimation() {
-
-		return false;
-
-	}
-
-	@Override
-	public boolean isCustom() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }

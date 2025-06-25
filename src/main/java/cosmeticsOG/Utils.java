@@ -1,130 +1,113 @@
 package cosmeticsOG;
 
 import java.util.regex.Pattern;
-
-import org.bukkit.entity.Player;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.entity.Player;
 
 public class Utils {
 
-	// Regular expressions to match color codes starting with § or & in Strings.
-	private static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("(?i)[§&][0-9A-FK-OR]");
-	private static final Pattern MINIMESSAGE_TAG_PATTERN = Pattern.compile("<[^>]*>");
+    // Regular expressions to match color codes starting with § or & in Strings.
+    private static final Pattern LEGACY_COLOR_PATTERN = Pattern.compile("(?i)[§&][0-9A-FK-OR]");
+    private static final Pattern MINIMESSAGE_TAG_PATTERN = Pattern.compile("<[^>]*>");
 
-	// Sends a formatted message to the player (including name replacement).
-	public static void cosmeticsOGPlaceholderMessage(Player p, String message) {
+    // Sends a formatted message to the player (including name replacement).
+    public static void cosmeticsOGPlaceholderMessage(Player p, String message) {
 
-		p.sendMessage(legacySerializerAnyCase((message)));
+        p.sendMessage(legacySerializerAnyCase((message)));
+    }
 
-	}
+    public static void logToConsole(Component component) {
 
-	public static void logToConsole(Component component) {
+        String serialized = MiniMessage.miniMessage().serialize(component);
+        String stripped = stripColors(serialized);
 
-		String serialized = MiniMessage.miniMessage().serialize(component);
-		String stripped = stripColors(serialized);
+        CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+    }
 
-		CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+    public static void logToConsole(String message) {
 
-	}
+        TextComponent component = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
 
-	public static void logToConsole(String message) {
+        String serialized = MiniMessage.miniMessage().serialize(component);
+        String stripped = stripColors(serialized);
 
-		TextComponent component = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+        CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+    }
 
-		String serialized = MiniMessage.miniMessage().serialize(component);
-		String stripped = stripColors(serialized);
+    public static TextComponent legacySerializerAnyCase(String subject) {
 
-		CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+        int count = 0;
+        // Count the number of '&' characters to determine the size of the array
+        for (char c : subject.toCharArray()) {
 
-	}
+            if (c == '&') {
 
-	public static TextComponent legacySerializerAnyCase(String subject) {
+                count++;
+            }
+        }
 
-		int count = 0;
-		// Count the number of '&' characters to determine the size of the array
-		for (char c : subject.toCharArray()) {
+        // Create an array to store the positions of '&' characters
+        int[] positions = new int[count];
+        int index = 0;
+        // Find the positions of '&' characters and store in the array
+        for (int i = 0; i < subject.length(); i++) {
 
-			if (c == '&') {
+            if (subject.charAt(i) == '&') {
 
-				count++;
+                if (isUpperBukkitCode(subject.charAt(i + 1))) {
 
-			}
+                    subject = replaceCharAtIndex(subject, (i + 1), Character.toLowerCase(subject.charAt(i + 1)));
+                }
 
-		}
+                positions[index++] = i;
+            }
+        }
 
-		// Create an array to store the positions of '&' characters
-		int[] positions = new int[count];
-		int index = 0;
-		// Find the positions of '&' characters and store in the array
-		for (int i = 0; i < subject.length(); i++) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(subject);
+    }
 
-			if (subject.charAt(i) == '&') {
+    private static boolean isUpperBukkitCode(char input) {
 
-				if (isUpperBukkitCode(subject.charAt(i + 1))) {
+        char[] bukkitColorCodes = {'A', 'B', 'C', 'D', 'E', 'F', 'K', 'L', 'M', 'N', 'O', 'R'};
+        boolean match = false;
 
-					subject = replaceCharAtIndex(subject, (i + 1), Character.toLowerCase(subject.charAt(i + 1)));
+        // Loop through each character in the array.
+        for (char c : bukkitColorCodes) {
+            // Check if the current character in the array is equal to the input character.
+            if (c == input) {
 
-				}
+                match = true;
+            }
+        }
 
-				positions[index++] = i;
+        return match;
+    }
 
-			}
+    private static String replaceCharAtIndex(String original, int index, char newChar) {
 
-		}
+        // Check if the index is valid
+        if (index >= 0 && index < original.length()) {
 
-		return LegacyComponentSerializer.legacyAmpersand().deserialize(subject);
+            // Create a new string with the replaced character
+            return original.substring(0, index) + newChar + original.substring(index + 1);
+        }
 
-	}
+        // If the index is invalid, return the original string
+        return original;
+    }
 
-	private static boolean isUpperBukkitCode(char input) {
+    public static String stripColors(String input) {
+        if (input == null) return null;
 
-		char[] bukkitColorCodes = {'A', 'B', 'C', 'D', 'E', 'F', 'K', 'L', 'M', 'N', 'O', 'R'};
-		boolean match = false;
+        // Remove MiniMessage tags
+        String stripped = MINIMESSAGE_TAG_PATTERN.matcher(input).replaceAll("");
 
-		// Loop through each character in the array.
-		for (char c : bukkitColorCodes) {
-			// Check if the current character in the array is equal to the input character.
-			if (c == input) {
+        // Remove legacy color codes
+        stripped = LEGACY_COLOR_PATTERN.matcher(stripped).replaceAll("");
 
-				match = true;
-
-			}
-
-		}
-
-		return match;
-
-	}
-
-	private static String replaceCharAtIndex(String original, int index, char newChar) {
-
-		// Check if the index is valid
-		if (index >= 0 && index < original.length()) {
-
-			// Create a new string with the replaced character
-			return original.substring(0, index) + newChar + original.substring(index + 1);
-
-		}
-
-		// If the index is invalid, return the original string
-		return original;
-
-	}
-
-	public static String stripColors(String input) {
-		if (input == null) return null;
-
-		// Remove MiniMessage tags
-		String stripped = MINIMESSAGE_TAG_PATTERN.matcher(input).replaceAll("");
-
-		// Remove legacy color codes
-		stripped = LEGACY_COLOR_PATTERN.matcher(stripped).replaceAll("");
-
-		return stripped;
-	}
-
+        return stripped;
+    }
 }

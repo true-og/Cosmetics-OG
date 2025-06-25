@@ -1,10 +1,9 @@
 package cosmeticsOG.ui;
 
+import cosmeticsOG.CosmeticsOG;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import cosmeticsOG.CosmeticsOG;
 
 /**
  * Menu that only has one inventory
@@ -13,80 +12,71 @@ import cosmeticsOG.CosmeticsOG;
  */
 public abstract class AbstractStaticMenu extends AbstractMenu {
 
-	protected Inventory inventory;
+    protected Inventory inventory;
 
-	public AbstractStaticMenu(CosmeticsOG core, MenuManager menuManager, Player owner) {
+    public AbstractStaticMenu(CosmeticsOG core, MenuManager menuManager, Player owner) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
+    }
 
-	}
+    @Override
+    public void open() {
 
-	@Override
-	public void open () {
+        menuManager.isOpeningMenu(this);
+        owner.openInventory(inventory);
+    }
 
-		menuManager.isOpeningMenu(this);
-		owner.openInventory(inventory);
+    @Override
+    public boolean hasInventory(Inventory inventory) {
 
-	}
+        return this.inventory.equals(inventory);
+    }
 
-	@Override
-	public boolean hasInventory (Inventory inventory) {
+    @Override
+    public String getName() {
 
-		return this.inventory.equals(inventory);
+        return "";
+    }
 
-	}
+    /**
+     * Get the item at this slot
+     * @param slot
+     * @return
+     */
+    protected ItemStack getItem(int slot) {
 
-	@Override
-	public String getName () {
+        return inventory.getItem(slot);
+    }
 
-		return "";
+    /**
+     * Place an item into this inventory
+     * @param slot
+     * @param item
+     */
+    protected void setItem(int slot, ItemStack item) {
 
-	}
+        inventory.setItem(slot, item);
+    }
 
-	/**
-	 * Get the item at this slot
-	 * @param slot
-	 * @return
-	 */
-	protected ItemStack getItem (int slot) {
+    /**
+     * Set the ItemStack and MenuAction for the given slot
+     * @param slot
+     * @param item
+     * @param action
+     */
+    protected void setButton(int slot, ItemStack item, MenuAction action) {
 
-		return inventory.getItem(slot);
+        setItem(slot, item);
+        setAction(slot, action);
+    }
 
-	}
+    /**
+     * Set the MenuButton for the given slot
+     * @param button
+     */
+    protected void setButton(int slot, MenuButton button) {
 
-	/**
-	 * Place an item into this inventory
-	 * @param slot
-	 * @param item
-	 */
-	protected void setItem (int slot, ItemStack item) {
-
-		inventory.setItem(slot, item);
-
-	}
-
-	/**
-	 * Set the ItemStack and MenuAction for the given slot
-	 * @param slot
-	 * @param item
-	 * @param action
-	 */
-	protected void setButton (int slot, ItemStack item, MenuAction action) {
-
-		setItem(slot, item);
-		setAction(slot, action);
-
-	}
-
-	/**
-	 * Set the MenuButton for the given slot
-	 * @param button
-	 */
-	protected void setButton (int slot, MenuButton button) {
-
-		setItem(slot, button.getItem());
-		setAction(slot, button.getAction());
-
-	}
-
+        setItem(slot, button.getItem());
+        setAction(slot, button.getAction());
+    }
 }

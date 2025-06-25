@@ -1,217 +1,189 @@
 package cosmeticsOG.configuration;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.util.ResourceUtil;
+import java.io.File;
+import java.io.IOException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class CustomConfig {
 
-	private final CosmeticsOG core;
+    private final CosmeticsOG core;
 
-	private File file;
-	private FileConfiguration config;
+    private File file;
+    private FileConfiguration config;
 
-	private final String path;
-	private final String fileName;
-	private final String name;
-	private final String directory;
+    private final String path;
+    private final String fileName;
+    private final String name;
+    private final String directory;
 
-	public CustomConfig (final CosmeticsOG core, final String path, final String name, boolean logOutput) {
+    public CustomConfig(final CosmeticsOG core, final String path, final String name, boolean logOutput) {
 
-		this.core = core;
-		this.path = path;
-		this.fileName = name;
-		this.name = ResourceUtil.removeExtension(name);
-		this.directory = core.getDataFolder() + File.separator + path;
-		this.file = new File(directory + File.separator + name);
-		this.config = new YamlConfiguration();
+        this.core = core;
+        this.path = path;
+        this.fileName = name;
+        this.name = ResourceUtil.removeExtension(name);
+        this.directory = core.getDataFolder() + File.separator + path;
+        this.file = new File(directory + File.separator + name);
+        this.config = new YamlConfiguration();
 
-		// Load the configuration file.
-		if (! file.exists()) {
+        // Load the configuration file.
+        if (!file.exists()) {
 
-			file = createFile(logOutput);
+            file = createFile(logOutput);
 
-		}
-		else if (logOutput) {
+        } else if (logOutput) {
 
-			Utils.logToConsole("Loading " + path + File.separator + fileName);
+            Utils.logToConsole("Loading " + path + File.separator + fileName);
+        }
 
-		}
+        try {
 
-		try {
+            config.load(file);
 
-			config.load(file);
+        } catch (Exception error) {
 
-		}
-		catch (Exception error) {
+            Utils.logToConsole("There was an error loading " + name + ", error: "
+                    + error.getClass().getSimpleName());
+        }
+    }
 
-			Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+    public CustomConfig(final CosmeticsOG core, final String path, File file, boolean logOutput) {
 
-		}
+        this.core = core;
+        this.path = path;
+        this.fileName = file.getName();
+        this.name = ResourceUtil.removeExtension(file.getName());
+        this.file = file;
+        this.directory = core.getDataFolder() + File.separator + path;
+        this.config = new YamlConfiguration();
 
-	}
+        try {
 
-	public CustomConfig (final CosmeticsOG core, final String path, File file, boolean logOutput) {
+            config.load(file);
 
-		this.core = core;
-		this.path = path;
-		this.fileName = file.getName();
-		this.name = ResourceUtil.removeExtension(file.getName());
-		this.file = file;
-		this.directory = core.getDataFolder() + File.separator + path;
-		this.config = new YamlConfiguration();
+        } catch (Exception error) {
 
-		try {
+            Utils.logToConsole("There was an error loading " + name + ", error: "
+                    + error.getClass().getSimpleName());
+        }
+    }
 
-			config.load(file);
+    /**
+     * Saves any changes in this configuration file.
+     */
+    public void save() {
 
-		}
-		catch (Exception error) {
+        try {
 
-			Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+            config.save(file);
 
-		}
+        } catch (Exception error) {
 
-	}
+            Utils.logToConsole("There was an error saving the config file: " + error.getMessage());
+        }
+    }
 
-	/**
-	 * Saves any changes in this configuration file.
-	 */
-	public void save () {
+    /**
+     * Reloads this configuration file.
+     */
+    public void reload() {
 
-		try {
+        try {
 
-			config.save(file);
+            config = YamlConfiguration.loadConfiguration(file);
 
-		}
-		catch (Exception error) {
+        } catch (Exception error) {
 
-			Utils.logToConsole("There was an error saving the config file: " + error.getMessage());
+            Utils.logToConsole("There was an error loading " + name + ", error: "
+                    + error.getClass().getSimpleName());
+        }
+    }
 
-		}
+    /**
+     * Tries to delete this Configuration File.
+     * @return
+     */
+    public boolean delete() {
 
-	}
+        return file.delete();
+    }
 
-	/**
-	 * Reloads this configuration file.
-	 */
-	public void reload () {
+    public String getFileName() {
 
-		try {
+        return fileName;
+    }
 
-			config = YamlConfiguration.loadConfiguration(file);
+    /**
+     * Returns the name of this file.
+     * @return
+     */
+    public String getName() {
 
-		}
-		catch (Exception error) {
+        return name;
+    }
 
-			Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+    public void set(String path, Object value) {
 
-		}
+        config.set(path, value);
+    }
 
-	}
+    /**
+     * Get this CustomConfig configuration file.
+     * @return
+     */
+    public FileConfiguration getConfig() {
 
-	/**
-	 * Tries to delete this Configuration File.
-	 * @return
-	 */
-	public boolean delete () {
+        return config;
+    }
 
-		return file.delete();
+    /**
+     * Creates a file.
+     * will try to load from an existing file first before creating a blank file.
+     * @param logOutput
+     * @return
+     */
+    private File createFile(boolean logOutput) {
 
-	}
+        file.getParentFile().mkdirs();
+        file = new File(directory + File.separator + fileName);
 
-	public String getFileName () {
+        // Try to copy an existing .yml file into this one.
+        if (core.getResource(fileName) != null) {
 
-		return fileName;
+            try {
 
-	}
+                ResourceUtil.copyFile(core.getResource(fileName), file);
 
-	/**
-	 * Returns the name of this file.
-	 * @return
-	 */
-	public String getName () {
+            } catch (IOException error) {
 
-		return name;
+                Utils.logToConsole("ERROR: Failed to copy resource: " + core.getResource(fileName) + "into file: "
+                        + file.getAbsolutePath());
+            }
 
-	}
+        } else {
 
-	public void set (String path, Object value) {
+            if (!file.exists()) {
 
-		config.set(path, value);
+                try {
 
-	}
+                    file.createNewFile();
 
-	/**
-	 * Get this CustomConfig configuration file.
-	 * @return
-	 */
-	public FileConfiguration getConfig () {
+                } catch (IOException error) {
 
-		return config;
+                    Utils.logToConsole("ERROR: Failed to create file: " + file.getAbsolutePath());
+                }
+            }
+        }
 
-	}
+        if (logOutput) {
 
-	/**
-	 * Creates a file.
-	 * will try to load from an existing file first before creating a blank file.
-	 * @param logOutput
-	 * @return
-	 */
-	private File createFile (boolean logOutput) {
+            Utils.logToConsole("Creating " + path + File.separator + fileName);
+        }
 
-		file.getParentFile().mkdirs();
-		file = new File(directory + File.separator + fileName);
-
-		// Try to copy an existing .yml file into this one.
-		if (core.getResource(fileName) != null) {
-
-			try {
-
-				ResourceUtil.copyFile(core.getResource(fileName), file);
-
-			}
-			catch (IOException error) {
-
-				Utils.logToConsole("ERROR: Failed to copy resource: " + core.getResource(fileName) + "into file: " + file.getAbsolutePath());
-
-			}
-
-		}
-
-		else {
-
-			if (! file.exists()) {
-
-				try {
-
-					file.createNewFile();
-
-				}
-				catch (IOException error) {
-
-					Utils.logToConsole("ERROR: Failed to create file: " + file.getAbsolutePath());
-
-				}
-
-			}
-
-		}
-
-		if (logOutput) {
-
-			Utils.logToConsole("Creating " + path + File.separator + fileName);
-
-		}
-
-		return file;
-
-	}
-
+        return file;
+    }
 }

@@ -1,10 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -16,129 +11,120 @@ import cosmeticsOG.particles.Hat;
 import cosmeticsOG.particles.properties.ItemStackData;
 import cosmeticsOG.ui.AbstractStaticMenu;
 import cosmeticsOG.util.ItemUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class EditorVelocityMenu extends AbstractStaticMenu {
 
-	private final EditorMenuManager editorManager;
-	private final int particleIndex;
-	private final MenuCallback callback;
+    private final EditorMenuManager editorManager;
+    private final int particleIndex;
+    private final MenuCallback callback;
 
-	public EditorVelocityMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex, MenuCallback callback) {
+    public EditorVelocityMenu(
+            CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex, MenuCallback callback) {
 
-		super(core, menuManager, owner);
+        super(core, menuManager, owner);
 
-		this.editorManager = menuManager;
-		this.particleIndex = particleIndex;
-		this.callback = callback;
-		this.inventory = Bukkit.createInventory(null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_VELOCITY_MENU_TITLE.getValue()));
+        this.editorManager = menuManager;
+        this.particleIndex = particleIndex;
+        this.callback = callback;
+        this.inventory = Bukkit.createInventory(
+                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_VELOCITY_MENU_TITLE.getValue()));
 
-		build();
+        build();
+    }
 
-	}
+    @Override
+    protected void build() {
 
-	@Override
-	protected void build() {
+        Hat targetHat = editorManager.getTargetHat();
+        ItemStackData itemStackData = targetHat.getParticleData(particleIndex).getItemStackData();
+        Vector velocity = itemStackData.getVelocity();
 
-		Hat targetHat = editorManager.getTargetHat();
-		ItemStackData itemStackData = targetHat.getParticleData(particleIndex).getItemStackData();
-		Vector velocity = itemStackData.getVelocity();
+        // X Offset.
+        ItemStack xItem = ItemUtil.createItem(
+                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_X.getValue());
+        EditorLore.updateVectorDescription(xItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
+        setButton(14, xItem, (event, slot) -> {
+            return updateVelocity(event, targetHat, VectorAxis.X);
+        });
 
-		// X Offset.
-		ItemStack xItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_X.getValue());
-		EditorLore.updateVectorDescription(xItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
-		setButton(14, xItem, (event, slot) -> {
+        // Y Offset.
+        ItemStack yItem = ItemUtil.createItem(
+                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Y.getValue());
+        EditorLore.updateVectorDescription(yItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
+        setButton(15, yItem, (event, slot) -> {
+            return updateVelocity(event, targetHat, VectorAxis.Y);
+        });
 
-			return updateVelocity(event, targetHat, VectorAxis.X);
+        // Z Offset.
+        ItemStack zItem = ItemUtil.createItem(
+                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Z.getValue());
+        EditorLore.updateVectorDescription(zItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
+        setButton(16, zItem, (event, slot) -> {
+            return updateVelocity(event, targetHat, VectorAxis.Z);
+        });
 
-		});
+        // Back.
+        setButton(10, backButtonItem, backButtonAction);
+    }
 
-		// Y Offset.
-		ItemStack yItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Y.getValue());
-		EditorLore.updateVectorDescription(yItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
-		setButton(15, yItem, (event, slot) -> {
+    @Override
+    public void onClose(boolean forced) {
 
-			return updateVelocity(event, targetHat, VectorAxis.Y);
+        if (!forced) {
 
-		});
+            callback.onCallback();
+        }
+    }
 
-		// Z Offset.
-		ItemStack zItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Z.getValue());
-		EditorLore.updateVectorDescription(zItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
-		setButton(16, zItem, (event, slot) -> {
+    @Override
+    public void onTick(int ticks) {}
 
-			return updateVelocity(event, targetHat, VectorAxis.Z);
+    public MenuClickResult updateVelocity(MenuClickEvent event, Hat hat, VectorAxis axis) {
 
-		});
+        double normalClick = event.isLeftClick() ? 0.1f : -0.1f;
+        double shiftClick = event.isShiftClick() ? 10 : 1;
+        double modifier = normalClick * shiftClick;
+        boolean isMiddleClick = event.isMiddleClick();
 
-		// Back.
-		setButton(10, backButtonItem, backButtonAction);
+        ItemStackData data = hat.getParticleData(particleIndex).getItemStackData();
+        Vector velocity = data.getVelocity();
 
-	}
+        switch (axis) {
+            case X:
+                double vx = !isMiddleClick ? velocity.getX() + modifier : 0;
 
-	@Override
-	public void onClose(boolean forced) {
+                data.setVelocityX(vx);
 
-		if (! forced) {
+                break;
+            case Y:
+                double vy = !isMiddleClick ? velocity.getY() + modifier : 0;
 
-			callback.onCallback();
+                data.setVelocityY(vy);
 
-		}
+                break;
+            case Z:
+                double vz = !isMiddleClick ? velocity.getZ() + modifier : 0;
 
-	}
+                data.setVelocityZ(vz);
 
-	@Override
-	public void onTick(int ticks) {}
+                break;
+        }
 
-	public MenuClickResult updateVelocity (MenuClickEvent event, Hat hat, VectorAxis axis) {
+        EditorLore.updateVectorDescription(getItem(14), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
+        EditorLore.updateVectorDescription(getItem(15), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
+        EditorLore.updateVectorDescription(getItem(16), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
 
-		double normalClick    = event.isLeftClick() ? 0.1f : -0.1f;
-		double shiftClick     = event.isShiftClick() ? 10 : 1;
-		double modifier       = normalClick * shiftClick;
-		boolean isMiddleClick = event.isMiddleClick();
+        if (event.isMiddleClick()) {
 
-		ItemStackData data = hat.getParticleData(particleIndex).getItemStackData();
-		Vector velocity = data.getVelocity();
+            return MenuClickResult.NEUTRAL;
 
-		switch (axis) {
-		case X:
+        } else {
 
-			double vx = !isMiddleClick ? velocity.getX() + modifier : 0;
-
-			data.setVelocityX(vx);
-
-			break;
-		case Y:
-
-			double vy = !isMiddleClick ? velocity.getY() + modifier : 0;
-
-			data.setVelocityY(vy);
-
-			break;
-		case Z:
-
-			double vz = !isMiddleClick ? velocity.getZ() + modifier : 0;
-
-			data.setVelocityZ(vz);
-
-			break;
-		}
-
-		EditorLore.updateVectorDescription(getItem(14), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
-		EditorLore.updateVectorDescription(getItem(15), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
-		EditorLore.updateVectorDescription(getItem(16), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
-
-		if (event.isMiddleClick()) {
-
-			return MenuClickResult.NEUTRAL;
-
-		}
-
-		else {
-
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
-
-		}
-
-	}
-
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        }
+    }
 }

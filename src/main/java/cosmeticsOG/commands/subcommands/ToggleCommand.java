@@ -1,11 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -13,141 +7,124 @@ import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 // Allows the command runner to toggle their cosmetics on or off.
 public class ToggleCommand extends Command {
 
-	private final TogglePlayerCommand togglePlayerCommand;
+    private final TogglePlayerCommand togglePlayerCommand;
 
-	public ToggleCommand () {
+    public ToggleCommand() {
 
-		togglePlayerCommand = new TogglePlayerCommand();
-		register(togglePlayerCommand);
+        togglePlayerCommand = new TogglePlayerCommand();
+        register(togglePlayerCommand);
+    }
 
-	}
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        if (args.size() < 1) {
 
-		if (args.size() < 1) {
+            if (sender.isPlayer()) {
 
-			if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+            } else {
 
-			}
-			else {
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(getUsage().getValue());
+            }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(getUsage().getValue());
+            return false;
+        }
 
-			}
+        if (args.size() > 1) {
 
-			return false;
+            return togglePlayerCommand.onCommand(core, sender, label, args);
+        }
 
-		}
+        if (sender.isPlayer()) {
 
-		if (args.size() > 1) {
+            boolean toggleStatus = StringUtil.getToggleValue(args.get(0));
+            core.getPlayerState(sender.getPlayer()).toggleHats(!toggleStatus);
+            if (toggleStatus) {
 
-			return togglePlayerCommand.onCommand(core, sender, label, args);
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_ON.getValue());
 
-		}
+            } else {
 
-		if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_OFF.getValue());
+            }
+        }
 
-			boolean toggleStatus = StringUtil.getToggleValue(args.get(0));
-			core.getPlayerState(sender.getPlayer()).toggleHats(! toggleStatus);
-			if (toggleStatus) {
+        return true;
+    }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_ON.getValue());
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-			}
-			else {
+        if (args.size() == 2) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_OFF.getValue());
+            return togglePlayerCommand.onTabComplete(core, sender, label, args);
+        }
 
-			}
+        return Arrays.asList("on", "off");
+    }
 
-		}
+    @Override
+    public boolean onCommand(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		return true;
+        if (args.size() == 2) {
 
-	}
+            return togglePlayerCommand.onCommand(core, sender, label, args);
+        }
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        return super.onCommand(core, sender, label, args);
+    }
 
-		if (args.size() == 2) {
+    @Override
+    public String getName() {
 
-			return togglePlayerCommand.onTabComplete(core, sender, label, args);
+        return "Toggle";
+    }
 
-		}
+    @Override
+    public String getArgumentName() {
 
-		return Arrays.asList("on", "off");
+        return "toggle";
+    }
 
-	}
+    @Override
+    public Message getUsage() {
 
-	@Override
-	public boolean onCommand (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        return Message.COMMAND_TOGGLE_USAGE;
+    }
 
-		if (args.size() == 2) {
+    @Override
+    public Message getDescription() {
 
-			return togglePlayerCommand.onCommand(core, sender, label, args);
+        return Message.COMMAND_TOGGLE_DESCRIPTION;
+    }
 
-		}
+    @Override
+    public Permission getPermission() {
 
-		return super.onCommand(core, sender, label, args);
+        return Permission.COMMAND_TOGGLE;
+    }
 
-	}
+    @Override
+    public boolean showInHelp() {
 
-	@Override
-	public String getName() {
+        return true;
+    }
 
-		return "Toggle";
+    @Override
+    public boolean isPlayerOnly() {
 
-	}
-
-	@Override
-	public String getArgumentName() {
-
-		return "toggle";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_TOGGLE_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_TOGGLE_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_TOGGLE;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return true;
-
-	}
-
+        return true;
+    }
 }

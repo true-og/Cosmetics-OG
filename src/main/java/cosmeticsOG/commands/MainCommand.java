@@ -1,10 +1,5 @@
 package cosmeticsOG.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.database.Database;
@@ -17,140 +12,135 @@ import cosmeticsOG.ui.AbstractMenu;
 import cosmeticsOG.ui.MenuInventory;
 import cosmeticsOG.ui.StaticMenu;
 import cosmeticsOG.ui.StaticMenuManager;
+import java.util.ArrayList;
+import java.util.List;
+import org.bukkit.entity.Player;
 
 public class MainCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) 
-	{
-		// Execute this command
-		if (args.size() == 0) {
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+        // Execute this command
+        if (args.size() == 0) {
 
-			if (! sender.isPlayer()) {
+            if (!sender.isPlayer()) {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
-				return false;
+                Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+                return false;
+            }
 
-			}
+            List<Group> groups = core.getDatabase().getGroups(true);
+            String defaultMenu = "";
+            boolean usingGroupMenu = false;
 
-			List<Group> groups = core.getDatabase().getGroups(true);
-			String defaultMenu = "";
-			boolean usingGroupMenu = false;
+            // Check for a players group menu first
+            for (Group g : groups) {
 
-			// Check for a players group menu first
-			for (Group g : groups) {
+                if (sender.hasPermission(Permission.GROUP.append(g.getName()))) {
 
-				if (sender.hasPermission(Permission.GROUP.append(g.getName()))) {
+                    usingGroupMenu = true;
+                    defaultMenu = g.getDefaultMenu();
+                }
+            }
 
-					usingGroupMenu = true;
-					defaultMenu = g.getDefaultMenu();
+            // Use default menu if nothing was found
+            if (defaultMenu.equals("")) {
 
-				}
+                defaultMenu = SettingsManager.DEFAULT_MENU.getString();
+            }
 
-			}
+            String menuName = defaultMenu.contains(".") ? defaultMenu.split("\\.")[0] : defaultMenu;
+            Database database = core.getDatabase();
+            PlayerState playerState = core.getPlayerState(sender.getPlayer());
+            MenuInventory inventory = database.loadInventory(menuName, playerState);
 
-			// Use default menu if nothing was found
-			if (defaultMenu.equals("")) {
+            if (inventory == null) {
 
-				defaultMenu = SettingsManager.DEFAULT_MENU.getString();
+                if (usingGroupMenu) {
 
-			}
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            sender.getPlayer(),
+                            Message.COMMAND_ERROR_UNKNOWN_GROUP_MENU.getValue().replace("{1}", menuName));
 
-			String menuName = defaultMenu.contains(".") ? defaultMenu.split("\\.")[0] : defaultMenu;
-			Database database = core.getDatabase();
-			PlayerState playerState = core.getPlayerState(sender.getPlayer());
-			MenuInventory inventory = database.loadInventory(menuName, playerState);
+                } else {
 
-			if (inventory == null) {
+                    // TODO: Figure out why the menu isn't in the database.
+                    Player player = sender.getPlayer();
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            player,
+                            "Does the menu exist in the database?: " + String.valueOf(database.menuExists(menuName)));
+                    Utils.cosmeticsOGPlaceholderMessage(
+                            player,
+                            Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
+                }
 
-				if (usingGroupMenu) {
+                return false;
+            }
 
-					Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_UNKNOWN_GROUP_MENU.getValue().replace("{1}", menuName));
+            StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
+            AbstractMenu menu = new StaticMenu(core, staticManager, sender.getPlayer(), inventory);
 
-				}
-				else {
+            staticManager.addMenu(menu);
+            menu.open();
 
-					// TODO: Figure out why the menu isn't in the database.
-					Player player = sender.getPlayer();
-					Utils.cosmeticsOGPlaceholderMessage(player, "Does the menu exist in the database?: " + String.valueOf(database.menuExists(menuName)));
-					Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
+            return true;
 
-				}
+        }
+        // Find and execute a sub-command.
+        else {
 
-				return false;
+            String cmd = args.get(0);
+            if (!subCommands.containsKey(cmd)) {
 
-			}
+                if (sender.isPlayer()) {
 
-			StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
-			AbstractMenu menu = new StaticMenu(core, staticManager, sender.getPlayer(), inventory);
+                    Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_UNKNOWN.getValue());
 
-			staticManager.addMenu(menu);
-			menu.open();
+                } else {
 
-			return true;
+                    Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN.getValue());
+                }
 
-		}
-		// Find and execute a sub-command.
-		else {
+                return false;
+            }
 
-			String cmd = args.get(0);
-			if (! subCommands.containsKey(cmd)) {
+            args.remove(0);
+            return subCommands.get(cmd).onCommand(core, sender, label, args);
+        }
+    }
 
-				if(sender.isPlayer()) {
+    @Override
+    public String getName() {
+        return "main";
+    }
 
-					Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_UNKNOWN.getValue());
+    @Override
+    public String getArgumentName() {
+        return "h";
+    }
 
-				}
-				else {
+    @Override
+    public Message getUsage() {
+        return Message.COMMAND_MAIN_USAGE;
+    }
 
-					Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN.getValue());
+    @Override
+    public Message getDescription() {
+        return Message.COMMAND_MAIN_DESCRIPTION;
+    }
 
-				}
+    @Override
+    public Permission getPermission() {
+        return Permission.COMMAND_MAIN;
+    }
 
-				return false;
+    @Override
+    public boolean showInHelp() {
+        return true;
+    }
 
-			}
-
-			args.remove(0);
-			return subCommands.get(cmd).onCommand(core, sender, label, args);
-
-		}
-
-	}
-
-	@Override
-	public String getName() {
-		return "main";
-	}
-
-	@Override
-	public String getArgumentName () {
-		return "h";
-	}
-
-	@Override 
-	public Message getUsage () {
-		return Message.COMMAND_MAIN_USAGE;
-	}
-
-	@Override
-	public Message getDescription() {
-		return Message.COMMAND_MAIN_DESCRIPTION;
-	}
-
-	@Override
-	public Permission getPermission() {
-		return Permission.COMMAND_MAIN;
-	}
-
-	@Override
-	public boolean showInHelp() {
-		return true;
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-		return false;
-	}
-
+    @Override
+    public boolean isPlayerOnly() {
+        return false;
+    }
 }

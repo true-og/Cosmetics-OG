@@ -1,9 +1,14 @@
 package cosmeticsOG.util;
 
+import cosmeticsOG.CosmeticsOG;
+import cosmeticsOG.Utils;
+import cosmeticsOG.compatibility.CompatibleMaterial;
+import cosmeticsOG.locale.Message;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -12,297 +17,259 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
-import cosmeticsOG.compatibility.CompatibleMaterial;
-import cosmeticsOG.locale.Message;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-
 public class ItemUtil {
 
-	public static Material getMaterial(String material, Material fallback) {
+    public static Material getMaterial(String material, Material fallback) {
 
-		Material originalMaterial = Material.getMaterial(material);
+        Material originalMaterial = Material.getMaterial(material);
 
-		return originalMaterial != null ? originalMaterial : fallback;
+        return originalMaterial != null ? originalMaterial : fallback;
+    }
 
-	}
+    public static Material getMaterial(String material, String fallback) {
 
-	public static Material getMaterial(String material, String fallback) {
+        Material originalMaterial = Material.getMaterial(material);
 
-		Material originalMaterial = Material.getMaterial(material);
+        return originalMaterial != null ? originalMaterial : Material.getMaterial(fallback);
+    }
 
-		return originalMaterial != null ? originalMaterial : Material.getMaterial(fallback);
+    @SuppressWarnings("deprecation")
+    @NotNull
+    public static ItemStack createItem(Material material, int quantity, int damage) {
 
-	}
+        ItemStack item = new ItemStack(material, quantity);
+        if (CosmeticsOG.serverVersion >= 13) {
 
-	@SuppressWarnings("deprecation")
-	@NotNull
-	public static ItemStack createItem(Material material, int quantity, int damage) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta instanceof Damageable) {
 
-		ItemStack item = new ItemStack(material, quantity);
-		if (CosmeticsOG.serverVersion >= 13) {
+                // Set damage for versions >= 1.13.
+                ((Damageable) meta).setDamage(damage);
+                item.setItemMeta(meta);
+            }
 
-			ItemMeta meta = item.getItemMeta();
-			if (meta instanceof Damageable) {
+        } else {
 
-				// Set damage for versions >= 1.13.
-				((Damageable) meta).setDamage(damage);
-				item.setItemMeta(meta);
+            // Legacy method for versions < 1.13.
+            item.setDurability((short) damage);
+        }
 
-			}
+        return item;
+    }
 
-		}
-		else {
+    public static ItemStack createItem(
+            Material material, int quantity, String titleString, List<TextComponent> description) {
 
-			// Legacy method for versions < 1.13.
-			item.setDurability((short) damage);
+        TextComponent title = Utils.legacySerializerAnyCase(titleString);
 
-		}
+        ItemStack item = new ItemStack(material, quantity);
+        ItemMeta itemMeta = item.getItemMeta();
 
-		return item;
+        // Convert TextComponent to Component.
+        itemMeta.displayName((Component) title);
 
-	}
+        // Convert List<TextComponent> to List<Component>.
+        List<Component> components =
+                description.stream().map(text -> (Component) text).collect(Collectors.toList());
+        itemMeta.lore(components);
 
-	public static ItemStack createItem(Material material, int quantity, String titleString, List<TextComponent> description) {
+        addItemFlags(itemMeta);
+        item.setItemMeta(itemMeta);
 
-		TextComponent title = Utils.legacySerializerAnyCase(titleString);
+        return item;
+    }
 
-		ItemStack item = new ItemStack(material, quantity);
-		ItemMeta itemMeta = item.getItemMeta();
+    public static ItemStack createItem(Material material, int quantity, String title) {
 
-		// Convert TextComponent to Component.
-		itemMeta.displayName((Component) title);
+        ItemStack item = new ItemStack(material, quantity);
+        ItemMeta itemMeta = item.getItemMeta();
 
-		// Convert List<TextComponent> to List<Component>.
-		List<Component> components = description.stream().map(text -> (Component) text).collect(Collectors.toList());
-		itemMeta.lore(components);
+        itemMeta.displayName(Utils.legacySerializerAnyCase(title));
 
-		addItemFlags(itemMeta);
-		item.setItemMeta(itemMeta);
+        addItemFlags(itemMeta);
+        item.setItemMeta(itemMeta);
 
-		return item;
+        return item;
+    }
 
-	}
+    public static ItemStack createItem(Material material, String displayNameString, List<Component> description) {
 
-	public static ItemStack createItem(Material material, int quantity, String title) {
+        TextComponent displayName = Utils.legacySerializerAnyCase(displayNameString);
 
-		ItemStack item = new ItemStack(material, quantity);
-		ItemMeta itemMeta = item.getItemMeta();
+        // Create the item with the material.
+        ItemStack item = new ItemStack(material);
+        ItemMeta itemMeta = item.getItemMeta();
 
-		itemMeta.displayName(Utils.legacySerializerAnyCase(title));
+        itemMeta.displayName(displayName);
 
-		addItemFlags(itemMeta);
-		item.setItemMeta(itemMeta);
+        // Set the lore.
+        itemMeta.lore(description);
 
-		return item;
+        // Add item flags.
+        addItemFlags(itemMeta);
 
-	}
+        // Apply the meta to the item.
+        item.setItemMeta(itemMeta);
 
-	public static ItemStack createItem(Material material, String displayNameString, List<Component> description) {
+        return item;
+    }
 
-		TextComponent displayName = Utils.legacySerializerAnyCase(displayNameString);
+    public static void setItemDescription(ItemStack item, List<? extends Component> description) {
 
-		// Create the item with the material.
-		ItemStack item = new ItemStack(material);
-		ItemMeta itemMeta = item.getItemMeta();
+        if (item == null || description == null) {
 
-		itemMeta.displayName(displayName);
+            return;
+        }
 
-		// Set the lore.
-		itemMeta.lore(description);
+        ItemMeta itemMeta = item.getItemMeta();
+        if (itemMeta == null) {
 
-		// Add item flags.
-		addItemFlags(itemMeta);
+            return;
+        }
 
-		// Apply the meta to the item.
-		item.setItemMeta(itemMeta);
+        // Process the list, handling both TextComponent and generic Component
+        List<Component> components = description.stream()
+                .map(component -> {
+                    if (component instanceof TextComponent) {
 
-		return item;
+                        // Process color codes for TextComponent
+                        return Utils.legacySerializerAnyCase(((TextComponent) component).content());
 
-	}
+                    } else {
 
-	public static void setItemDescription(ItemStack item, List<? extends Component> description) {
+                        // For other Component types, simply return them as-is.
+                        return component;
+                    }
+                })
+                .collect(Collectors.toList());
 
-		if (item == null || description == null) {
+        // Set the lore (description) of the item
+        itemMeta.lore(components);
+        item.setItemMeta(itemMeta);
+    }
 
-			return;
+    public static void setItemDescription(ItemStack item, TextComponent... description) {
 
-		}
+        if (item == null || description == null) {
 
-		ItemMeta itemMeta = item.getItemMeta();
-		if (itemMeta == null) {
+            return;
+        }
 
-			return;
+        // Convert TextComponent array to List<Component> for color code processing.
+        List<Component> components = Arrays.stream(description)
+                .map(textComponent -> Utils.legacySerializerAnyCase(textComponent.content()))
+                .collect(Collectors.toList());
 
-		}
+        ItemMeta itemMeta = item.getItemMeta();
 
-		// Process the list, handling both TextComponent and generic Component
-		List<Component> components = description.stream()
-				.map(component -> {
+        itemMeta.lore(components);
+        item.setItemMeta(itemMeta);
+    }
 
-					if (component instanceof TextComponent) {
+    // Set item description using Message object.
+    public static void setItemDescription(ItemStack item, Message description) {
 
-						// Process color codes for TextComponent
-						return Utils.legacySerializerAnyCase(((TextComponent) component).content());
+        setItemDescription(item, StringUtil.parseDescription(description.getValue()));
+    }
 
-					}
-					else {
+    public static void setItemName(ItemStack item, String name) {
 
-						// For other Component types, simply return them as-is.
-						return component;
+        if (item == null || name == null) {
 
-					}
+            return;
+        }
 
-				}).collect(Collectors.toList());
+        // Get the item's metadata.
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
 
-		// Set the lore (description) of the item
-		itemMeta.lore(components);
-		item.setItemMeta(itemMeta);
+            return;
+        }
 
-	}
+        // Set the display name of the item using the legacy formatted string.
+        meta.displayName(Utils.legacySerializerAnyCase(name));
 
-	public static void setItemDescription(ItemStack item, TextComponent... description) {
+        // Apply the modified meta back to the item.
+        item.setItemMeta(meta);
+    }
 
-		if (item == null || description == null) {
+    public static void setItemName(ItemStack item, Message name) {
 
-			return;
+        setItemName(item, name.getValue());
+    }
 
-		}
+    public static void setNameAndDescription(ItemStack item, Component name, List<Component> description) {
 
-		// Convert TextComponent array to List<Component> for color code processing.
-		List<Component> components = Arrays.stream(description)
-				.map(textComponent -> Utils.legacySerializerAnyCase(textComponent.content()))
-				.collect(Collectors.toList());
+        ItemMeta itemMeta = item.getItemMeta();
 
-		ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.displayName(name);
+        itemMeta.lore(description);
 
-		itemMeta.lore(components);
-		item.setItemMeta(itemMeta);
+        addItemFlags(itemMeta);
+        item.setItemMeta(itemMeta);
+    }
 
-	}
+    public static void setNameAndDescription(ItemStack item, Message name, Message description) {
 
-	// Set item description using Message object.
-	public static void setItemDescription(ItemStack item, Message description) {
+        setNameAndDescription(
+                item, Component.text(name.getValue()), StringUtil.parseDescription(description.getValue()));
+    }
 
-		setItemDescription(item, StringUtil.parseDescription(description.getValue()));
+    public static void highlightItem(ItemStack item) {
 
-	}
+        if (CosmeticsOG.serverVersion >= 8) {
 
-	public static void setItemName(ItemStack item, String name) {
+            ItemMeta itemMeta = item.getItemMeta();
 
-		if (item == null || name == null) {
+            addItemFlags(itemMeta);
 
-			return;
+            // Add fake enchant for glow.
+            itemMeta.addEnchant(Enchantment.ARROW_DAMAGE, 0, true);
+            item.setItemMeta(itemMeta);
+        }
+    }
 
-		}
+    public static void stripHighlight(ItemStack item) {
 
-		// Get the item's metadata.
-		ItemMeta meta = item.getItemMeta();
-		if (meta == null) {
+        ItemMeta itemMeta = item.getItemMeta();
 
-			return;
+        itemMeta.removeEnchant(Enchantment.ARROW_DAMAGE);
+        item.setItemMeta(itemMeta);
+    }
 
-		}
+    @SuppressWarnings("deprecation")
+    public static void setItemType(ItemStack item, Material material, int damage) {
 
-		// Set the display name of the item using the legacy formatted string.
-		meta.displayName(Utils.legacySerializerAnyCase(name));
+        item.setType(material);
+        if (CosmeticsOG.serverVersion >= 13) {
 
-		// Apply the modified meta back to the item.
-		item.setItemMeta(meta);
+            ItemMeta meta = item.getItemMeta();
+            if (meta instanceof Damageable) {
 
-	}
+                ((Damageable) meta).setDamage(damage);
 
-	public static void setItemName(ItemStack item, Message name) {
+                item.setItemMeta(meta);
+            }
 
-		setItemName(item, name.getValue());
+        } else {
 
-	}
+            // Legacy method for versions < 1.13.
+            item.setDurability((short) damage);
+        }
+    }
 
-	public static void setNameAndDescription(ItemStack item, Component name, List<Component> description) {
+    public static void setItemType(ItemStack item, CompatibleMaterial material) {
 
-		ItemMeta itemMeta = item.getItemMeta();
+        setItemType(item, material.getMaterial(), material.getDurability());
+    }
 
-		itemMeta.displayName(name);
-		itemMeta.lore(description);
+    private static void addItemFlags(ItemMeta itemMeta) {
 
-		addItemFlags(itemMeta);
-		item.setItemMeta(itemMeta);
+        try {
 
-	}
+            itemMeta.addItemFlags(ItemFlag.values());
 
-	public static void setNameAndDescription(ItemStack item, Message name, Message description) {
-
-		setNameAndDescription(item, Component.text(name.getValue()), StringUtil.parseDescription(description.getValue()));
-
-	}
-
-	public static void highlightItem(ItemStack item) {
-
-		if (CosmeticsOG.serverVersion >= 8) {
-
-			ItemMeta itemMeta = item.getItemMeta();
-
-			addItemFlags(itemMeta);
-
-			// Add fake enchant for glow.
-			itemMeta.addEnchant(Enchantment.ARROW_DAMAGE, 0, true);
-			item.setItemMeta(itemMeta);
-
-		}
-
-	}
-
-	public static void stripHighlight(ItemStack item) {
-
-		ItemMeta itemMeta = item.getItemMeta();
-
-		itemMeta.removeEnchant(Enchantment.ARROW_DAMAGE);
-		item.setItemMeta(itemMeta);
-
-	}
-
-	@SuppressWarnings("deprecation")
-	public static void setItemType(ItemStack item, Material material, int damage) {
-
-		item.setType(material);
-		if (CosmeticsOG.serverVersion >= 13) {
-
-			ItemMeta meta = item.getItemMeta();
-			if (meta instanceof Damageable) {
-
-				((Damageable) meta).setDamage(damage);
-
-				item.setItemMeta(meta);
-
-			}
-
-		}
-		else {
-
-			// Legacy method for versions < 1.13.
-			item.setDurability((short) damage);
-
-		}
-
-	}
-
-	public static void setItemType(ItemStack item, CompatibleMaterial material) {
-
-		setItemType(item, material.getMaterial(), material.getDurability());
-
-	}
-
-	private static void addItemFlags(ItemMeta itemMeta) {
-
-		try {
-
-			itemMeta.addItemFlags(ItemFlag.values());
-
-		}
-		catch (NoClassDefFoundError ignored) {}
-
-	}
-
+        } catch (NoClassDefFoundError ignored) {
+        }
+    }
 }

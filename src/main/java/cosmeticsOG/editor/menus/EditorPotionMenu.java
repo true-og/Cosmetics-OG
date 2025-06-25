@@ -1,19 +1,5 @@
 package cosmeticsOG.editor.menus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
@@ -26,235 +12,228 @@ import cosmeticsOG.ui.AbstractListMenu;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.MathUtil;
 import cosmeticsOG.util.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class EditorPotionMenu extends AbstractListMenu {
 
-	private final Hat targetHat;
-	private final MenuCallback callback;
+    private final Hat targetHat;
+    private final MenuCallback callback;
 
-	private final String menuTitle = Message.EDITOR_POTION_MENU_TITLE.getValue();
-	private final String potionTitle = Message.EDITOR_POTION_MENU_POTION_TITLE.getValue();
-	private final String potionSelected = Message.EDITOR_POTION_MENU_POTION_DESCRIPTION.getValue();
+    private final String menuTitle = Message.EDITOR_POTION_MENU_TITLE.getValue();
+    private final String potionTitle = Message.EDITOR_POTION_MENU_POTION_TITLE.getValue();
+    private final String potionSelected = Message.EDITOR_POTION_MENU_POTION_DESCRIPTION.getValue();
 
-	private final List<String> potionBlacklist = Arrays.asList(
-			"CONFUSION",
-			"HARM",
-			"POISON",
-			"WEAKNESS",
-			"WITHER",
-			"UNLUCK",
-			"HUNGER",
-			"BAD_OMEN"
-			);
+    private final List<String> potionBlacklist =
+            Arrays.asList("CONFUSION", "HARM", "POISON", "WEAKNESS", "WITHER", "UNLUCK", "HUNGER", "BAD_OMEN");
 
-	private List<PotionEffectType> supportedPotions;
-	private Map<Integer, PotionEffectType> potions;
+    private List<PotionEffectType> supportedPotions;
+    private Map<Integer, PotionEffectType> potions;
 
-	public EditorPotionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, MenuCallback callback) {
+    public EditorPotionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, MenuCallback callback) {
 
-		super(core, menuManager, owner, false);
+        super(core, menuManager, owner, false);
 
-		this.targetHat = menuManager.getBaseHat();
-		this.callback = callback;
-		this.supportedPotions = new ArrayList<PotionEffectType>();
-		this.potions = new HashMap<Integer, PotionEffectType>();
+        this.targetHat = menuManager.getBaseHat();
+        this.callback = callback;
+        this.supportedPotions = new ArrayList<PotionEffectType>();
+        this.potions = new HashMap<Integer, PotionEffectType>();
 
-		boolean useBlacklist = SettingsManager.EDITOR_SHOW_BLACKLISTED_POTIONS.getBoolean();
-		for (PotionEffectType potion : PotionEffectType.values()) {
+        boolean useBlacklist = SettingsManager.EDITOR_SHOW_BLACKLISTED_POTIONS.getBoolean();
+        for (PotionEffectType potion : PotionEffectType.values()) {
 
-			if (potion == null) {
+            if (potion == null) {
 
-				continue;
+                continue;
+            }
 
-			}
+            if (!useBlacklist && potionBlacklist.contains(potion.getName())) {
 
-			if (! useBlacklist && potionBlacklist.contains(potion.getName())) {
+                continue;
+            }
 
-				continue;
+            supportedPotions.add(potion);
+        }
 
-			}
+        this.totalPages = MathUtil.calculatePageCount(supportedPotions.size(), 28);
 
-			supportedPotions.add(potion);
+        build();
+    }
 
-		}
+    @Override
+    public void insertEmptyItem() {}
 
-		this.totalPages = MathUtil.calculatePageCount(supportedPotions.size(), 28);
+    @Override
+    public void removeEmptyItem() {}
 
-		build();
+    @Override
+    protected void build() {
 
-	}
+        for (int i = 0; i < totalPages; i++) {
 
-	@Override
-	public void insertEmptyItem() {}
+            String title =
+                    menuTitle.replace("{1}", Integer.toString(i + 1)).replace("{2}", Integer.toString(totalPages));
+            Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
 
-	@Override
-	public void removeEmptyItem() {}
+            menu.setItem(49, backButtonItem);
 
-	@Override
-	protected void build() {
+            // Next page.
+            if ((i + 1) < totalPages) {
 
-		for (int i = 0; i < totalPages; i++) {
+                menu.setItem(
+                        50,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+            }
 
-			String title = menuTitle.replace("{1}", Integer.toString(i + 1)).replace("{2}", Integer.toString(totalPages));
-			Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
+            // Previous page.
 
-			menu.setItem(49, backButtonItem);
+            if ((i + 1) > 1) {
 
-			// Next page.
-			if ((i + 1) < totalPages) {
+                menu.setItem(
+                        48,
+                        ItemUtil.createItem(
+                                CompatibleMaterial.LIME_DYE.getMaterial(),
+                                1,
+                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+            }
 
-				menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+            // Potion strength.
+            menu.setItem(
+                    52,
+                    ItemUtil.createItem(Material.GHAST_TEAR, 1, Message.EDITOR_POTION_MENU_SET_STRENGTH.getValue()));
 
-			}
+            EditorLore.updatePotionStrengthDescription(menu.getItem(52), targetHat.getPotion());
 
-			// Previous page.
+            setMenu(i, menu);
+        }
 
-			if ((i + 1) > 1) {
+        MenuAction selectAction = (event, slot) -> {
+            int index = getClampedIndex(slot, 10, 2) + (currentPage * 28);
+            if (potions.containsKey(index)) {
 
-				menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1, Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                targetHat.setPotion(potions.get(index), targetHat.getPotionAmplifier());
 
-			}
+                menuManager.closeCurrentMenu();
+            }
 
-			// Potion strength.
-			menu.setItem(52, ItemUtil.createItem(Material.GHAST_TEAR, 1, Message.EDITOR_POTION_MENU_SET_STRENGTH.getValue()));
+            return MenuClickResult.NEUTRAL;
+        };
 
-			EditorLore.updatePotionStrengthDescription(menu.getItem(52), targetHat.getPotion());
+        for (int i = 0; i < 28; i++) {
 
-			setMenu(i, menu);
+            setAction(getNormalIndex(i, 10, 2), selectAction);
+        }
 
-		}
+        setAction(49, backButtonAction);
 
-		MenuAction selectAction = (event, slot) -> {
+        // Previous page.
+        setAction(48, (clickEvent, slot) -> {
+            currentPage--;
 
-			int index = getClampedIndex(slot, 10, 2) + (currentPage * 28);
-			if (potions.containsKey(index))	{
+            open();
 
-				targetHat.setPotion(potions.get(index), targetHat.getPotionAmplifier());
+            return MenuClickResult.NEUTRAL;
+        });
 
-				menuManager.closeCurrentMenu();
+        // Next page.
+        setAction(50, (clickEvent, slot) -> {
+            currentPage++;
 
-			}
+            open();
 
-			return MenuClickResult.NEUTRAL;
+            return MenuClickResult.NEUTRAL;
+        });
 
-		};
+        setAction(52, (event, slot) -> {
+            int strength = 1;
+            PotionEffect pe = targetHat.getPotion();
+            if (pe != null) {
 
-		for (int i = 0; i < 28; i++) {
+                strength = pe.getAmplifier();
+                strength += event.isLeftClick() ? 1 : -1;
 
-			setAction(getNormalIndex(i, 10, 2), selectAction);
+                targetHat.setPotionAmplifier(strength);
+            }
 
-		}
+            ItemStack item = menus.get(currentPage).getItem(52);
+            EditorLore.updatePotionStrengthDescription(item, targetHat.getPotion());
 
-		setAction(49, backButtonAction);
+            return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+        });
 
-		// Previous page.
-		setAction(48, (clickEvent, slot) -> {
+        PotionEffect currentPotion = targetHat.getPotion();
+        PotionEffectType currentType = null;
 
-			currentPage--;
+        if (currentPotion != null) {
 
-			open();
+            currentType = currentPotion.getType();
+        }
 
-			return MenuClickResult.NEUTRAL;
+        String[] selectInfo = StringUtil.parseValue(potionSelected, "1");
+        String[] selectedInfo = StringUtil.parseValue(potionSelected, "2");
 
-		});
+        int globalIndex = 0;
+        int index = 0;
+        int page = 0;
 
-		// Next page.
-		setAction(50, (clickEvent, slot) -> {
+        for (PotionEffectType potion : supportedPotions) {
 
-			currentPage++;
+            String name = StringUtil.capitalizeFirstLetter(potion.getName().toLowerCase());
+            ItemStack item = ItemUtil.createItem(Material.POTION, 1, potionTitle.replace("{1}", name));
 
-			open();
+            if (currentType != null && currentType.equals(potion)) {
 
-			return MenuClickResult.NEUTRAL;
+                ItemUtil.highlightItem(item);
 
-		});
+                String description =
+                        potionSelected.replace(selectInfo[0], "").replace(selectedInfo[0], selectedInfo[1]);
 
-		setAction(52, (event, slot) -> {
+                ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
 
-			int strength = 1;
-			PotionEffect pe = targetHat.getPotion();
-			if (pe != null) {
+            } else {
 
-				strength = pe.getAmplifier();
-				strength += event.isLeftClick() ? 1 : -1;
+                String description =
+                        potionSelected.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
 
-				targetHat.setPotionAmplifier(strength);
+                ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
+            }
 
-			}
+            menus.get(page).setItem(getNormalIndex(index, 10, 2), item);
+            potions.put(globalIndex++, potion);
 
-			ItemStack item = menus.get(currentPage).getItem(52);
-			EditorLore.updatePotionStrengthDescription(item, targetHat.getPotion());
+            index++;
 
-			return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+            if (index % 28 == 0) {
 
-		});
+                index = 0;
 
-		PotionEffect currentPotion = targetHat.getPotion();
-		PotionEffectType currentType = null;
+                page++;
+            }
+        }
+    }
 
-		if (currentPotion != null) {
+    @Override
+    public void onClose(boolean forced) {
 
-			currentType = currentPotion.getType();
+        if (!forced) {
 
-		}
+            callback.onCallback();
+        }
+    }
 
-		String[] selectInfo = StringUtil.parseValue(potionSelected, "1");
-		String[] selectedInfo = StringUtil.parseValue(potionSelected, "2");	
-
-		int globalIndex = 0;
-		int index = 0;
-		int page = 0;
-
-		for (PotionEffectType potion : supportedPotions) {
-
-			String name = StringUtil.capitalizeFirstLetter(potion.getName().toLowerCase());
-			ItemStack item = ItemUtil.createItem(Material.POTION, 1, potionTitle.replace("{1}", name));
-
-			if (currentType != null && currentType.equals(potion)) {
-
-				ItemUtil.highlightItem(item);
-
-				String description = potionSelected.replace(selectInfo[0], "").replace(selectedInfo[0], selectedInfo[1]);
-
-				ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
-
-			}
-			else {
-
-				String description = potionSelected.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
-
-				ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
-
-			}
-
-			menus.get(page).setItem(getNormalIndex(index, 10, 2), item);
-			potions.put(globalIndex++, potion);
-
-			index++;
-
-			if (index % 28 == 0) {
-
-				index = 0;
-
-				page++;
-			}
-
-		}
-
-	}
-
-	@Override
-	public void onClose(boolean forced) {
-
-		if (! forced) {
-
-			callback.onCallback();
-
-		}
-
-	}
-
-	@Override
-	public void onTick(int ticks) {}
-
+    @Override
+    public void onTick(int ticks) {}
 }

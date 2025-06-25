@@ -1,13 +1,5 @@
 package cosmeticsOG.commands.subcommands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import cosmeticsOG.CosmeticsOG;
 import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
@@ -17,219 +9,199 @@ import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.Hat;
 import cosmeticsOG.permission.Permission;
 import cosmeticsOG.player.PlayerState;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 // Allows for the removal of a cosmetic from a specified player.
 public class UnsetCommand extends Command {
 
-	@Override
-	public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {		
+    @Override
+    public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-		if (args.size() < 2 || args.size() > 3) {
+        if (args.size() < 2 || args.size() > 3) {
 
-			if (sender.isPlayer()) {
+            if (sender.isPlayer()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_UNSET_USAGE.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_UNSET_USAGE.getValue());
 
-			}
-			else {
+            } else {
 
-				Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-				Utils.logToConsole(Message.COMMAND_UNSET_USAGE.getValue());
+                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                Utils.logToConsole(Message.COMMAND_UNSET_USAGE.getValue());
+            }
 
-			}
+            return false;
+        }
 
-			return false;
+        Player player = getPlayer(sender, args.get(0));
+        if (player == null) {
 
-		}
+            if (sender.isPlayer()) {
 
-		Player player = getPlayer(sender, args.get(0));
-		if (player == null) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
 
-			if (sender.isPlayer()) {
+            } else {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+            }
 
-			}
-			else {
+            return false;
+        }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+        if (!player.isOnline()) {
 
-			}
+            if (sender.isPlayer()) {
 
-			return false;
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
-		}
+            } else {
 
-		if (! player.isOnline()) {
+                Utils.logToConsole(
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+            }
 
-			if (sender.isPlayer()) {
+            return false;
+        }
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+        boolean tellPlayer = true;
+        if (args.size() >= 3) {
 
-			}
-			else {
+            tellPlayer = Boolean.valueOf(args.get(2));
+        }
 
-				Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+        String hatLabel = args.get(1);
 
-			}
+        // Check to see if this player is wearing a hat with this label.
+        PlayerState playerState = core.getPlayerState(player.getPlayer());
 
-			return false;
+        if (!playerState.getActiveHats().stream().anyMatch(hat -> hat.getLabel().equalsIgnoreCase(hatLabel))) {
 
-		}
+            if (sender.isPlayer()) {
 
-		boolean tellPlayer = true;
-		if (args.size() >= 3) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
 
-			tellPlayer = Boolean.valueOf(args.get(2));
+            } else {
 
-		}
+                Utils.logToConsole(Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
+            }
 
-		String hatLabel = args.get(1);
+            return false;
+        }
 
-		// Check to see if this player is wearing a hat with this label.
-		PlayerState playerState = core.getPlayerState(player.getPlayer());
+        Database database = core.getDatabase();
+        Hat hat = database.getHatFromLabel(hatLabel);
+        if (hat == null) {
 
-		if (! playerState.getActiveHats().stream().anyMatch(hat -> hat.getLabel().equalsIgnoreCase(hatLabel))) {
+            if (sender.isPlayer()) {
 
-			if (sender.isPlayer()) {
+                Utils.cosmeticsOGPlaceholderMessage(
+                        (Player) sender,
+                        Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
+            } else {
 
-			}
-			else {
+                Utils.logToConsole(Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
+            }
 
-				Utils.logToConsole(Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
+            return false;
+        }
 
-			}
+        core.getPlayerState(player).removeHat(hat);
+        if (tellPlayer) {
 
-			return false;
+            player.sendMessage(Message.COMMAND_UNSET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
+        }
 
-		}
+        return true;
+    }
 
-		Database database = core.getDatabase();
-		Hat hat = database.getHatFromLabel(hatLabel);
-		if (hat == null) {
+    @Override
+    public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
-			if (sender.isPlayer()) {
+        switch (args.size()) {
+            case 1: {
+                List<String> players = new ArrayList<String>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
 
-				Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
+                    players.add(p.getName());
+                }
 
-			}
-			else {
+                if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
-				Utils.logToConsole(Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
+                    players.add("@p");
+                    players.add("@r");
+                }
 
-			}
+                return players;
+            }
+            case 2: {
+                List<String> labels = new ArrayList<String>();
+                for (Hat h : core.getPlayerState(sender.getPlayer()).getActiveHats()) {
 
-			return false;
+                    labels.add(h.getLabel());
+                }
 
-		}
+                return labels;
+            }
+            case 3: {
+                return Arrays.asList("true", "false");
+            }
+        }
 
-		core.getPlayerState(player).removeHat(hat);
-		if (tellPlayer) {
+        return Collections.singletonList("");
+    }
 
-			player.sendMessage(Message.COMMAND_UNSET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
+    @Override
+    public String getName() {
 
-		}
+        return "unset";
+    }
 
-		return true;
+    @Override
+    public String getArgumentName() {
 
-	}
+        return "unset";
+    }
 
-	@Override
-	public List<String> tabComplete (CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+    @Override
+    public Message getUsage() {
 
-		switch (args.size()) {
-		case 1: {
+        return Message.COMMAND_UNSET_USAGE;
+    }
 
-			List<String> players = new ArrayList<String>();
-			for (Player p : Bukkit.getOnlinePlayers()) {
+    @Override
+    public Message getDescription() {
 
-				players.add(p.getName());
+        return Message.COMMAND_UNSET_DESCRIPTION;
+    }
 
-			}
+    @Override
+    public Permission getPermission() {
 
-			if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
+        return Permission.COMMAND_UNSET;
+    }
 
-				players.add("@p");
-				players.add("@r");
+    @Override
+    public boolean showInHelp() {
 
-			}
+        return true;
+    }
 
-			return players;
+    @Override
+    public boolean isPlayerOnly() {
 
-		}
-		case 2: {
-
-			List<String> labels = new ArrayList<String>();
-			for (Hat h : core.getPlayerState(sender.getPlayer()).getActiveHats()) {
-
-				labels.add(h.getLabel());
-
-			}
-
-			return labels;
-
-		}
-		case 3: {
-
-			return Arrays.asList("true", "false");
-
-		}
-		}
-
-		return Collections.singletonList("");
-
-	}
-
-	@Override
-	public String getName() {
-
-		return "unset";
-
-	}
-
-	@Override
-	public String getArgumentName () {
-
-		return "unset";
-
-	}
-
-	@Override
-	public Message getUsage() {
-
-		return Message.COMMAND_UNSET_USAGE;
-
-	}
-
-	@Override
-	public Message getDescription() {
-
-		return Message.COMMAND_UNSET_DESCRIPTION;
-
-	}
-
-	@Override
-	public Permission getPermission() {
-
-		return Permission.COMMAND_UNSET;
-
-	}
-
-	@Override
-	public boolean showInHelp() {
-
-		return true;
-
-	}
-
-	@Override
-	public boolean isPlayerOnly() {
-
-		return false;
-
-	}
-
+        return false;
+    }
 }
