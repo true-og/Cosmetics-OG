@@ -1,3 +1,7 @@
+4.6.2-OG:
+- Use TrueOG Network live config files
+- Bundle default particles.yml into .jar
+
 4.6.1-OG:
 
 - Back-Ported to 1.19.4.
