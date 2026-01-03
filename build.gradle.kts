@@ -62,7 +62,7 @@ tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .ja
 tasks.shadowJar {
     exclude("org.bstats.*") // Exclude the bStats package from being shadowed.
     exclude("io.github.miniplaceholders.*") // Exclude the MiniPlaceholders package from being shadowed.
-    from(sourceSets.main.get().resources)
+    from(tasks.processResources)
     isEnableRelocation = true
     relocationPrefix = "${project.group}.shadow"
     archiveClassifier.set("") // Use empty string instead of null.
