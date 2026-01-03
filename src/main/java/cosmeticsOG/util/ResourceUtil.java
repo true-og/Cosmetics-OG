@@ -182,7 +182,14 @@ public class ResourceUtil {
 
         int menuVersion = particleMenuCompatibilityMap.getOrDefault(Math.min((int) CosmeticsOG.serverVersion, 14), 8);
 
-        return core.getResource("menus/particles_" + menuVersion + ".yml");
+        InputStream versionedMenu = core.getResource("menus/particles_" + menuVersion + ".yml");
+        if (versionedMenu != null) {
+
+            return versionedMenu;
+
+        }
+
+        return core.getResource("menus/particles.yml");
 
     }
 
