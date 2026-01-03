@@ -46,12 +46,9 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
     private int currentColorPage = 0;
     private int currentDataPage = 0;
 
-    public EditorParticleSelectionMenu(
-            CosmeticsOG core,
-            EditorMenuManager menuManager,
-            Player owner,
-            int particleIndex,
-            MenuObjectCallback callback) {
+    public EditorParticleSelectionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex,
+            MenuObjectCallback callback)
+    {
 
         super(core, menuManager, owner);
 
@@ -61,8 +58,8 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
         this.particleMenus = new HashMap<Integer, Inventory>();
         this.colorFilterMenus = new HashMap<Integer, Inventory>();
         this.dataFilterMenus = new HashMap<Integer, Inventory>();
-        this.recentFilterMenu = Bukkit.createInventory(
-                null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_MENU_RECENT_FILTER_TITLE.getValue()));
+        this.recentFilterMenu = Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_MENU_RECENT_FILTER_TITLE.getValue()));
 
         this.particles = new HashMap<Integer, ParticleEffect>();
         this.colorParticles = new HashMap<Integer, ParticleEffect>();
@@ -76,13 +73,16 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
         this.inventory = Bukkit.createInventory(null, 54, Component.text(""));
 
         this.particleSelectionAction = (event, slot) -> {
+
             int index = slot;
             switch (menuType) {
+
                 case COLOR:
                     index = slot + (currentColorPage * 45);
                     if (colorParticles.containsKey(index)) {
 
                         callback.onSelect(colorParticles.get(index));
+
                     }
 
                     break;
@@ -91,6 +91,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     if (dataParticles.containsKey(index)) {
 
                         callback.onSelect(dataParticles.get(index));
+
                     }
 
                     break;
@@ -99,6 +100,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     if (recentParticles.containsKey(index)) {
 
                         callback.onSelect(recentParticles.get(index));
+
                     }
 
                     break;
@@ -107,13 +109,17 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     if (particles.containsKey(index)) {
 
                         callback.onSelect(particles.get(index));
+
                     }
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
     @Override
@@ -122,12 +128,14 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
         Inventory inventory = particleMenus.get(currentParticlePage);
 
         open(inventory);
+
     }
 
     private void open(Inventory inventory) {
 
         menuManager.isOpeningMenu(this);
         owner.openInventory(inventory);
+
     }
 
     @Override
@@ -144,61 +152,67 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
 
         // Recents filter.
         recentFilterMenu.setItem(49, backButtonItem);
-        recentFilterMenu.setItem(
-                45, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
-        recentFilterMenu.setItem(
-                46, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
-        recentFilterMenu.setItem(
-                47, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
-        recentFilterMenu.setItem(
-                53,
-                ItemUtil.createItem(
-                        CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                        1,
-                        Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
+        recentFilterMenu.setItem(45,
+                ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
+        recentFilterMenu.setItem(46,
+                ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
+        recentFilterMenu.setItem(47,
+                ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
+        recentFilterMenu.setItem(53, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
 
         // Back button.
         setAction(49, backButtonAction);
 
         // All particles filter.
         setAction(45, (event, slot) -> {
+
             menuType = MenuType.PARTICLES;
 
             open(particleMenus.get(currentParticlePage));
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Color filter.
         setAction(46, (event, slot) -> {
+
             menuType = MenuType.COLOR;
 
             open(colorFilterMenus.get(currentColorPage));
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Data filter.
         setAction(47, (event, slot) -> {
+
             menuType = MenuType.DATA;
 
             open(dataFilterMenus.get(currentDataPage));
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Recents filter.
         setAction(53, (event, slot) -> {
+
             menuType = MenuType.RECENTS;
 
             open(recentFilterMenu);
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Previous page.
         setAction(48, (event, slot) -> {
+
             switch (menuType) {
+
                 case COLOR:
                     open(colorFilterMenus.get(--currentColorPage));
 
@@ -209,14 +223,18 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     break;
                 default:
                     open(particleMenus.get(--currentParticlePage));
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Next page.
         setAction(50, (event, slot) -> {
+
             switch (menuType) {
+
                 case COLOR:
                     open(colorFilterMenus.get(++currentColorPage));
 
@@ -227,14 +245,17 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     break;
                 default:
                     open(particleMenus.get(++currentParticlePage));
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         for (int i = 0; i < 45; i++) {
 
             setAction(i, particleSelectionAction);
+
         }
 
         ParticleEffect currentEffect = targetHat.getParticle(particleIndex);
@@ -256,6 +277,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
             if (!pe.isSupported()) {
 
                 continue;
+
             }
 
             ItemStack item = pe.getItem().clone();
@@ -267,6 +289,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                 ItemUtil.highlightItem(item);
 
                 isSelected = true;
+
             }
 
             EditorLore.updateParticleItemDescription(item, pe, isSelected);
@@ -275,12 +298,14 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
 
                 colorFilterMenus.get(colorPage).setItem(colorItemIndex++, item);
                 colorParticles.put(colorParticleIndex++, pe);
+
             }
 
             if (pe.hasData()) {
 
                 dataFilterMenus.get(dataPage).setItem(dataItemIndex++, item);
                 dataParticles.put(dataParticleIndex++, pe);
+
             }
 
             particleMenus.get(particlePage).setItem(particleItemIndex++, item);
@@ -291,12 +316,14 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                 particleItemIndex = 0;
 
                 particlePage++;
+
             }
 
             if (colorItemIndex > 0 && colorItemIndex % 45 == 0) {
 
                 colorItemIndex = 0;
                 colorPage = 0;
+
             }
 
             if (dataItemIndex > 0 && dataItemIndex % 45 == 0) {
@@ -304,7 +331,9 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                 dataItemIndex = 0;
 
                 dataPage++;
+
             }
+
         }
 
         // Recently used.
@@ -320,25 +349,33 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                 ItemUtil.highlightItem(item);
 
                 selected = true;
+
             }
 
             EditorLore.updateParticleItemDescription(item, pe, selected);
 
             recentParticles.put(index, pe);
             recentFilterMenu.setItem(getNormalIndex(index++, 10, 2), item);
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     @Override
     public boolean hasInventory(Inventory inventory) {
 
         switch (menuType) {
+
             case COLOR:
                 return colorFilterMenus.containsValue(inventory);
             case DATA:
@@ -347,87 +384,71 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                 return recentFilterMenu.equals(inventory);
             default:
                 return particleMenus.containsValue(inventory);
+
         }
+
     }
 
     private void generateMenus(Map<Integer, Inventory> pages, Message title, int totalPages, MenuType type) {
 
         for (int i = 0; i < totalPages; i++) {
 
-            String menuTitle =
-                    title.replace("{1}", Integer.toString(i + 1)).replace("{2}", Integer.toString(totalPages));
+            String menuTitle = title.replace("{1}", Integer.toString(i + 1)).replace("{2}",
+                    Integer.toString(totalPages));
             Inventory inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(menuTitle));
 
             inventory.setItem(49, backButtonItem);
-            inventory.setItem(
-                    45, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
-            inventory.setItem(
-                    46, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
-            inventory.setItem(
-                    47, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
-            inventory.setItem(
-                    53, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
+            inventory.setItem(45,
+                    ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
+            inventory.setItem(46,
+                    ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
+            inventory.setItem(47,
+                    ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
+            inventory.setItem(53,
+                    ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
 
             if ((i + 1) < totalPages) {
 
-                inventory.setItem(
-                        50,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                inventory.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+
             }
 
             if ((i + 1) > 1) {
 
-                inventory.setItem(
-                        48,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                inventory.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+
             }
 
             switch (type) {
+
                 case COLOR:
-                    inventory.setItem(
-                            46,
-                            ItemUtil.createItem(
-                                    CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                    1,
-                                    Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
+                    inventory.setItem(46, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                            Message.EDITOR_PARTICLE_MENU_COLOUR_FILTER.getValue()));
                     break;
                 case DATA:
-                    inventory.setItem(
-                            47,
-                            ItemUtil.createItem(
-                                    CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                    1,
-                                    Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
+                    inventory.setItem(47, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                            Message.EDITOR_PARTICLE_MENU_DATA_FILTER.getValue()));
 
                     break;
                 case RECENTS:
-                    inventory.setItem(
-                            53,
-                            ItemUtil.createItem(
-                                    CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                    1,
-                                    Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
+                    inventory.setItem(53, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                            Message.EDITOR_PARTICLE_MENU_RECENT_FILTER.getValue()));
 
                     break;
                 default:
-                    inventory.setItem(
-                            45,
-                            ItemUtil.createItem(
-                                    CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                    1,
-                                    Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
+                    inventory.setItem(45, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                            Message.EDITOR_PARTICLE_MENU_NORMAL_FILTER.getValue()));
 
                     break;
+
             }
 
             pages.put(i, inventory);
+
         }
+
     }
 
     private int getParticleCountWithTag(MenuType type) {
@@ -438,13 +459,16 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
             if (!pe.isSupported()) {
 
                 continue;
+
             }
 
             switch (type) {
+
                 case COLOR:
                     if (pe.hasColorData()) {
 
                         count++;
+
                     }
 
                     break;
@@ -452,21 +476,23 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
                     if (pe.hasData()) {
 
                         count++;
+
                     }
 
                     break;
                 default:
                     count++;
+
             }
+
         }
 
         return count;
+
     }
 
     private enum MenuType {
-        PARTICLES,
-        COLOR,
-        DATA,
-        RECENTS;
+        PARTICLES, COLOR, DATA, RECENTS;
     }
+
 }

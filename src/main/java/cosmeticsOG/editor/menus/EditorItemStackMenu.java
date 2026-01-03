@@ -25,8 +25,8 @@ public class EditorItemStackMenu extends AbstractListMenu {
     private final Message iconName = Message.EDITOR_ICON_MENU_ITEM_INFO;
     private final Message iconDescription = Message.EDITOR_ICON_MENU_ITEM_DESCRIPTION;
 
-    private final ItemStack emptyItem =
-            ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_MISC_EMPTY_MENU.getValue());
+    private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+            Message.EDITOR_MISC_EMPTY_MENU.getValue());
 
     private final EditorMenuManager editorManager;
     private final MenuCallback callback;
@@ -37,8 +37,9 @@ public class EditorItemStackMenu extends AbstractListMenu {
     private boolean dataModified = false;
     private boolean itemModified = false;
 
-    public EditorItemStackMenu(
-            CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex, MenuCallback callback) {
+    public EditorItemStackMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex,
+            MenuCallback callback)
+    {
 
         super(core, menuManager, owner, true);
 
@@ -48,15 +49,19 @@ public class EditorItemStackMenu extends AbstractListMenu {
         this.targetHat = menuManager.getTargetHat();
         this.totalPages = 1;
         this.itemAction = (event, slot) -> {
+
             if (event.isLeftClick()) {
 
-                EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(
-                        core, editorManager, owner, iconTitle, iconName, iconDescription, (item) -> {
+                EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(core, editorManager, owner, iconTitle,
+                        iconName, iconDescription, (item) ->
+                        {
+
                             menuManager.closeCurrentMenu();
 
                             if (item == null) {
 
                                 return;
+
                             }
 
                             ItemStack i = (ItemStack) item;
@@ -72,6 +77,7 @@ public class EditorItemStackMenu extends AbstractListMenu {
                                 Damageable meta = (Damageable) i.getItemMeta();
 
                                 damage = meta.getDamage();
+
                             }
 
                             // Set the material and durability for the current item.
@@ -83,10 +89,10 @@ public class EditorItemStackMenu extends AbstractListMenu {
                             ItemUtil.setItemName(currentItem, displayName);
 
                             // Update the item in the target's item data.
-                            ItemStackData itemStackData =
-                                    targetHat.getParticleData(particleIndex).getItemStackData();
+                            ItemStackData itemStackData = targetHat.getParticleData(particleIndex).getItemStackData();
                             itemStackData.updateItem(getClampedIndex(slot, 10, 2), i);
                             itemModified = true;
+
                         });
 
                 menuManager.addMenu(editorItemMenu);
@@ -98,29 +104,32 @@ public class EditorItemStackMenu extends AbstractListMenu {
                 deleteSlot(0, slot);
 
                 return MenuClickResult.NEGATIVE;
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
-        setMenu(
-                0,
-                Bukkit.createInventory(
-                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_ITEMSTACK_MENU_TITLE.getValue())));
+        setMenu(0, Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.EDITOR_ITEMSTACK_MENU_TITLE.getValue())));
 
         build();
+
     }
 
     @Override
     public void insertEmptyItem() {
 
         setButton(0, 22, emptyItem, emptyAction);
+
     }
 
     @Override
     public void removeEmptyItem() {
 
         setButton(0, 22, null, itemAction);
+
     }
 
     @Override
@@ -130,16 +139,20 @@ public class EditorItemStackMenu extends AbstractListMenu {
 
         setButton(0, 46, backButtonItem, backButtonAction);
 
-        ItemStack velocityItem =
-                ItemUtil.createItem(Material.ARROW, 1, Message.EDITOR_ITEMSTACK_MENU_SET_VELOCITY.getValue());
-        EditorLore.updateVectorDescription(
-                velocityItem, itemStackData.getVelocity(), Message.EDITOR_ITEMSTACK_MENU_VELOCITY_DESCRIPTION);
+        ItemStack velocityItem = ItemUtil.createItem(Material.ARROW, 1,
+                Message.EDITOR_ITEMSTACK_MENU_SET_VELOCITY.getValue());
+        EditorLore.updateVectorDescription(velocityItem, itemStackData.getVelocity(),
+                Message.EDITOR_ITEMSTACK_MENU_VELOCITY_DESCRIPTION);
         setButton(0, 48, velocityItem, (event, slot) -> {
+
             if (event.isLeftClick()) {
 
-                EditorVelocityMenu editorVelocityMenu =
-                        new EditorVelocityMenu(core, editorManager, owner, particleIndex, () -> {
+                EditorVelocityMenu editorVelocityMenu = new EditorVelocityMenu(core, editorManager, owner,
+                        particleIndex, () ->
+                        {
+
                             onVelocityChange();
+
                         });
 
                 menuManager.addMenu(editorVelocityMenu);
@@ -152,33 +165,36 @@ public class EditorItemStackMenu extends AbstractListMenu {
                 data.setVelocity(0, 0, 0);
 
                 onVelocityChange();
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
-        ItemStack gravityItem =
-                ItemUtil.createItem(Material.LEATHER_BOOTS, 1, Message.EDITOR_ITEMSTACK_MENU_TOGGLE_GRAVITY.getValue());
-        EditorLore.updateBooleanDescription(
-                gravityItem, itemStackData.hasGravity(), Message.EDITOR_ITEMSTACK_MENU_GRAVITY_DESCRIPTION);
+        ItemStack gravityItem = ItemUtil.createItem(Material.LEATHER_BOOTS, 1,
+                Message.EDITOR_ITEMSTACK_MENU_TOGGLE_GRAVITY.getValue());
+        EditorLore.updateBooleanDescription(gravityItem, itemStackData.hasGravity(),
+                Message.EDITOR_ITEMSTACK_MENU_GRAVITY_DESCRIPTION);
         setButton(0, 49, gravityItem, (event, slot) -> {
+
             ItemStackData data = targetHat.getParticleData(particleIndex).getItemStackData();
             data.setGravity(!data.hasGravity());
             dataModified = true;
 
-            EditorLore.updateBooleanDescription(
-                    getItem(0, 49), data.hasGravity(), Message.EDITOR_ITEMSTACK_MENU_GRAVITY_DESCRIPTION);
+            EditorLore.updateBooleanDescription(getItem(0, 49), data.hasGravity(),
+                    Message.EDITOR_ITEMSTACK_MENU_GRAVITY_DESCRIPTION);
 
             return MenuClickResult.NEUTRAL;
+
         });
 
-        ItemStack durationItem = ItemUtil.createItem(
-                CompatibleMaterial.FIREWORK_STAR.getMaterial(),
-                1,
+        ItemStack durationItem = ItemUtil.createItem(CompatibleMaterial.FIREWORK_STAR.getMaterial(), 1,
                 Message.EDITOR_ITEMSTACK_MENU_SET_DURATION.getValue());
-        EditorLore.updateDurationDescription(
-                durationItem, itemStackData.getDuration(), Message.EDITOR_ITEMSTACK_MENU_DURATION_DESCRIPTION);
+        EditorLore.updateDurationDescription(durationItem, itemStackData.getDuration(),
+                Message.EDITOR_ITEMSTACK_MENU_DURATION_DESCRIPTION);
         setButton(0, 50, durationItem, (event, slot) -> {
+
             int normalClick = event.isLeftClick() ? 20 : -20;
             int shiftClick = event.isShiftClick() ? 30 : 1;
             int modifier = normalClick * shiftClick;
@@ -188,37 +204,45 @@ public class EditorItemStackMenu extends AbstractListMenu {
             data.setDuration(duration);
             dataModified = true;
 
-            EditorLore.updateDurationDescription(
-                    getItem(0, 50), data.getDuration(), Message.EDITOR_ITEMSTACK_MENU_DURATION_DESCRIPTION);
+            EditorLore.updateDurationDescription(getItem(0, 50), data.getDuration(),
+                    Message.EDITOR_ITEMSTACK_MENU_DURATION_DESCRIPTION);
 
             return MenuClickResult.NEUTRAL;
+
         });
 
-        ItemStack addItem = ItemUtil.createItem(
-                CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_ITEMSTACK_MENU_ADD_ITEM.getValue());
+        ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1,
+                Message.EDITOR_ITEMSTACK_MENU_ADD_ITEM.getValue());
         setButton(0, 52, addItem, (event, slot) -> {
-            EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(
-                    core, editorManager, owner, iconTitle, iconName, iconDescription, (item) -> {
+
+            EditorItemPromptMenu editorItemMenu = new EditorItemPromptMenu(core, editorManager, owner, iconTitle,
+                    iconName, iconDescription, (item) ->
+                    {
+
                         menuManager.closeCurrentMenu();
 
                         if (item == null) {
 
                             return;
+
                         }
 
                         ItemStack i = (ItemStack) item;
                         addItem(slot, i);
+
                     });
 
             menuManager.addMenu(editorItemMenu);
             editorItemMenu.open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getClampedIndex(i, 10, 2), itemAction);
+
         }
 
         List<ItemStack> items = itemStackData.getItems();
@@ -227,21 +251,22 @@ public class EditorItemStackMenu extends AbstractListMenu {
             setEmpty(true);
 
             return;
+
         }
 
         for (int i = 0; i < items.size(); i++) {
 
             ItemStack item = items.get(i);
-            String displayName =
-                    Message.EDITOR_ICON_MENU_ITEM_PREFIX.getValue() + StringUtil.getMaterialName(item.getType());
+            String displayName = Message.EDITOR_ICON_MENU_ITEM_PREFIX.getValue()
+                    + StringUtil.getMaterialName(item.getType());
 
-            ItemUtil.setNameAndDescription(
-                    item,
-                    Utils.legacySerializerAnyCase(displayName),
+            ItemUtil.setNameAndDescription(item, Utils.legacySerializerAnyCase(displayName),
                     StringUtil.parseDescription(Message.EDITOR_ICON_MENU_ICON_DESCRIPTION.getValue()));
 
             setItem(0, getNormalIndex(i, 10, 2), item);
+
         }
+
     }
 
     @Override
@@ -252,17 +277,22 @@ public class EditorItemStackMenu extends AbstractListMenu {
         if (dataModified) {
 
             core.getDatabase().saveParticleData(name, targetHat, particleIndex);
+
         }
 
         if (itemModified) {
 
             core.getDatabase().saveMetaData(name, targetHat, DataType.ITEMSTACK, particleIndex);
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     private void addItem(int slot, ItemStack item) {
 
@@ -274,17 +304,18 @@ public class EditorItemStackMenu extends AbstractListMenu {
         if (size > 27) {
 
             return;
+
         }
 
         Material material = item.getType();
-        ItemStack i = ItemUtil.createItem(
-                material,
+        ItemStack i = ItemUtil.createItem(material,
                 Message.EDITOR_ICON_MENU_ITEM_PREFIX.getValue() + StringUtil.getMaterialName(material),
                 StringUtil.parseDescription(Message.EDITOR_ICON_MENU_ICON_DESCRIPTION.getValue()));
 
         itemStackData.addItem(item);
         setItem(0, getNormalIndex(size, 10, 2), i);
         itemModified = true;
+
     }
 
     @Override
@@ -299,7 +330,9 @@ public class EditorItemStackMenu extends AbstractListMenu {
         if (itemStackData.getItems().isEmpty()) {
 
             setEmpty(true);
+
         }
+
     }
 
     private void onVelocityChange() {
@@ -307,7 +340,9 @@ public class EditorItemStackMenu extends AbstractListMenu {
         dataModified = true;
 
         ItemStackData itemStackData = targetHat.getParticleData(particleIndex).getItemStackData();
-        EditorLore.updateVectorDescription(
-                getItem(0, 48), itemStackData.getVelocity(), Message.EDITOR_ITEMSTACK_MENU_VELOCITY_DESCRIPTION);
+        EditorLore.updateVectorDescription(getItem(0, 48), itemStackData.getVelocity(),
+                Message.EDITOR_ITEMSTACK_MENU_VELOCITY_DESCRIPTION);
+
     }
+
 }

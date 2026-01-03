@@ -35,6 +35,7 @@ public abstract class MenuManager {
         this.ownerState = core.getPlayerState(owner);
 
         openMenus = new ArrayDeque<AbstractMenu>();
+
     }
 
     protected void onClick(InventoryClickEvent event, boolean inMenu, AbstractMenu menu) {
@@ -42,6 +43,7 @@ public abstract class MenuManager {
         if (menu == null) {
 
             return;
+
         }
 
         final Inventory inventory = event.getInventory();
@@ -50,6 +52,7 @@ public abstract class MenuManager {
             ownerState.setMenuManager(null);
 
             return;
+
         }
 
         event.setCancelled(true);
@@ -58,64 +61,77 @@ public abstract class MenuManager {
         if (result != MenuClickResult.NONE) {
 
             playSound(result);
+
         }
+
     }
 
     public abstract void onClick(InventoryClickEvent event, boolean inMenu);
 
     /**
      * Returns the owner's PlayerState
+     * 
      * @return
      */
     public PlayerState getOwnerState() {
 
         return ownerState;
+
     }
 
     /**
      * Notifies the manager that this menu will be opened
+     * 
      * @param menu
      */
     public void isOpeningMenu(AbstractMenu menu) {
 
         openingMenu = true;
+
     }
 
     /**
      * Add a new menu to the stack
+     * 
      * @param menu
      */
     public void addMenu(AbstractMenu menu) {
 
         openMenus.add(menu);
+
     }
 
     /**
      * Returns the menu currently being viewed
+     * 
      * @return
      */
     public AbstractMenu getCurrentMenu() {
 
         return openMenus.getLast();
+
     }
 
     /**
-     * Closes the current menu and opens the previous menu.
-     * This method will always make sure there is 1 menu in the stack at all times.
+     * Closes the current menu and opens the previous menu. This method will always
+     * make sure there is 1 menu in the stack at all times.
      */
     public void closeCurrentMenu() {
 
         if (openMenus.size() > 1) {
 
             openMenus.pollLast().onClose(false);
+
         }
 
         openMenus.getLast().open();
+
     }
 
     public void closeInventory() {
 
         PlayerUtil.closeInventory(owner);
+
     }
 
     /**
@@ -126,9 +142,11 @@ public abstract class MenuManager {
         if (openMenus.size() == 0) {
 
             return;
+
         }
 
         getCurrentMenu().open();
+
     }
 
     /**
@@ -139,6 +157,7 @@ public abstract class MenuManager {
         ownerState.setMetaState(MetaState.NONE);
 
         openCurrentMenu();
+
     }
 
     /**
@@ -147,29 +166,34 @@ public abstract class MenuManager {
     public void removeCurrentMenu() {
 
         openMenus.removeLast();
+
     }
 
     /**
      * Check to see if this MenuManager can be unregistered
+     * 
      * @return
      */
     protected boolean canUnregister() {
 
         return !openingMenu;
+
     }
 
     /**
-     * Notifies the MenuManager that it is about to unregister
-     * Use this method to save any changes
+     * Notifies the MenuManager that it is about to unregister Use this method to
+     * save any changes
      */
     public void willUnregister() {
 
         for (AbstractMenu menu : openMenus) {
 
             menu.onClose(true);
+
         }
 
         unregister();
+
     }
 
     /**
@@ -179,6 +203,7 @@ public abstract class MenuManager {
 
         ownerState.setMetaState(MetaState.NONE);
         ownerState.setMenuManager(null);
+
     }
 
     /**
@@ -194,21 +219,25 @@ public abstract class MenuManager {
 
     /**
      * Plays a sound any time a button is clicked inside a menu
+     * 
      * @param result
      */
     public abstract void playSound(MenuClickResult result);
 
     /**
      * Called any time an inventory is opened for this MenuManager
+     * 
      * @param event
      */
     public void onInventoryOpen(InventoryOpenEvent event) {
 
         openingMenu = false;
+
     }
 
     /**
      * Called any time an inventory is closed for this MenuManager
+     * 
      * @param event
      */
     public void onInventoryClose(InventoryCloseEvent event) {
@@ -217,8 +246,11 @@ public abstract class MenuManager {
         if (canUnregister()) {
 
             willUnregister();
+
         }
 
         openingMenu = false;
+
     }
+
 }

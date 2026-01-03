@@ -23,5 +23,5 @@
 ##################################################################
 #
 og-pro:
-  default-menu: particle.yml
+  default-menu: particles.yml
   weight: 1

@@ -1,7 +1,5 @@
 package cosmeticsOG;
 
 public enum BuildType {
-    RELEASE,
-    RELEASE_CANDIDATE,
-    SNAPSHOT;
+    RELEASE, RELEASE_CANDIDATE, SNAPSHOT;
 }

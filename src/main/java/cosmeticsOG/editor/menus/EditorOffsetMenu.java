@@ -25,10 +25,11 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
 
         this.editorManager = menuManager;
         this.callback = callback;
-        this.inventory = Bukkit.createInventory(
-                null, 45, Utils.legacySerializerAnyCase(Message.EDITOR_OFFSET_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 45,
+                Utils.legacySerializerAnyCase(Message.EDITOR_OFFSET_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -36,67 +37,74 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
 
         Hat targetHat = editorManager.getTargetHat();
         // X Offset.
-        ItemStack xItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_OFFSET_MENU_SET_OFFSET_X.getValue());
-        EditorLore.updateVectorDescription(
-                xItem, targetHat.getOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
+        ItemStack xItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_OFFSET_MENU_SET_OFFSET_X.getValue());
+        EditorLore.updateVectorDescription(xItem, targetHat.getOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
         setButton(14, xItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.X, false);
+
         });
 
         // Y Offset.
-        ItemStack yItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_OFFSET_MENU_SET_OFFSET_Y.getValue());
-        EditorLore.updateVectorDescription(
-                yItem, targetHat.getOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
+        ItemStack yItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_OFFSET_MENU_SET_OFFSET_Y.getValue());
+        EditorLore.updateVectorDescription(yItem, targetHat.getOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
         setButton(15, yItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.Y, false);
+
         });
 
         // Z Offset.
-        ItemStack zItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_OFFSET_MENU_SET_OFFSET_Z.getValue());
-        EditorLore.updateVectorDescription(
-                zItem, targetHat.getOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
+        ItemStack zItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_OFFSET_MENU_SET_OFFSET_Z.getValue());
+        EditorLore.updateVectorDescription(zItem, targetHat.getOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
         setButton(16, zItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.Z, false);
+
         });
 
         // Random X Offset.
-        ItemStack rxItem = ItemUtil.createItem(
-                CompatibleMaterial.COMPARATOR.getMaterial(),
-                1,
+        ItemStack rxItem = ItemUtil.createItem(CompatibleMaterial.COMPARATOR.getMaterial(), 1,
                 Message.EDITOR_OFFSET_MENU_SET_RANDOM_OFFSET_X.getValue());
-        EditorLore.updateVectorDescription(
-                rxItem, targetHat.getRandomOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
+        EditorLore.updateVectorDescription(rxItem, targetHat.getRandomOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
         setButton(32, rxItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.X, true);
+
         });
 
         // Random Y Offset.
-        ItemStack ryItem = ItemUtil.createItem(
-                CompatibleMaterial.COMPARATOR.getMaterial(),
-                1,
+        ItemStack ryItem = ItemUtil.createItem(CompatibleMaterial.COMPARATOR.getMaterial(), 1,
                 Message.EDITOR_OFFSET_MENU_SET_RANDOM_OFFSET_Y.getValue());
-        EditorLore.updateVectorDescription(
-                ryItem, targetHat.getRandomOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
+        EditorLore.updateVectorDescription(ryItem, targetHat.getRandomOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
         setButton(33, ryItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.Y, true);
+
         });
 
         // Random Z Offset.
-        ItemStack rzItem = ItemUtil.createItem(
-                CompatibleMaterial.COMPARATOR.getMaterial(),
-                1,
+        ItemStack rzItem = ItemUtil.createItem(CompatibleMaterial.COMPARATOR.getMaterial(), 1,
                 Message.EDITOR_OFFSET_MENU_SET_RANDOM_OFFSET_Z.getValue());
-        EditorLore.updateVectorDescription(
-                rzItem, targetHat.getRandomOffset(), Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
+        EditorLore.updateVectorDescription(rzItem, targetHat.getRandomOffset(),
+                Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
         setButton(34, rzItem, (event, slot) -> {
+
             return updateOffset(event, targetHat, VectorAxis.Z, true);
+
         });
 
         // Back.
         setButton(19, backButtonItem, backButtonAction);
+
     }
 
     @Override
@@ -105,11 +113,15 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
         if (!forced) {
 
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     private MenuClickResult updateOffset(MenuClickEvent event, Hat hat, VectorAxis axis, boolean random) {
 
@@ -125,7 +137,9 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
         int zslot = random ? 34 : 16;
 
         switch (axis) {
+
             case X: {
+
                 double xo = !isMiddleClick ? offset.getX() + modifier : 0;
                 if (random) {
 
@@ -134,11 +148,14 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
                 } else {
 
                     hat.setOffsetX(xo);
+
                 }
 
                 break;
+
             }
             case Y: {
+
                 double yo = !isMiddleClick ? offset.getY() + modifier : 0;
                 if (random) {
 
@@ -147,11 +164,14 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
                 } else {
 
                     hat.setOffsetY(yo);
+
                 }
 
                 break;
+
             }
             case Z: {
+
                 double zo = !isMiddleClick ? offset.getZ() + modifier : 0;
                 if (random) {
 
@@ -160,10 +180,13 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
                 } else {
 
                     hat.setOffsetZ(zo);
+
                 }
 
                 break;
+
             }
+
         }
 
         EditorLore.updateVectorDescription(getItem(xslot), offset, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
@@ -177,12 +200,13 @@ public class EditorOffsetMenu extends AbstractStaticMenu {
         } else {
 
             return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+
         }
+
     }
 
     protected enum VectorAxis {
-        X,
-        Y,
-        Z;
+        X, Y, Z;
     }
+
 }

@@ -30,9 +30,11 @@ public class AddGroupCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(getUsage().getValue());
+
             }
 
             return false;
+
         }
 
         String groupName = args.get(0);
@@ -43,6 +45,7 @@ public class AddGroupCommand extends Command {
         if (args.size() >= 3) {
 
             weight = StringUtil.toInt(args.get(2), 0);
+
         }
 
         boolean found = false;
@@ -54,105 +57,124 @@ public class AddGroupCommand extends Command {
                 found = true;
 
                 break;
+
             }
+
         }
 
         if (found) {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_GROUP_EXISTS.replace("{1}", groupName));
+
             }
 
             return false;
+
         }
 
         core.getDatabase().addGroup(groupName, defaultMenu, weight);
 
         if (sender.isPlayer()) {
 
-            Utils.cosmeticsOGPlaceholderMessage(
-                    (Player) sender, Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                    Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
 
         } else {
 
             Utils.logToConsole(Message.COMMAND_ADD_GROUP_SUCCESS.replace("{1}", groupName));
+
         }
 
         return true;
+
     }
 
     @Override
     public List<String> tabComplete(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
 
         switch (args.size()) {
+
             case 1:
                 return Arrays.asList("name");
             case 2:
                 return new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
             case 3:
                 return Arrays.asList("weight");
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "add group";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "add";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_ADD_GROUP_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_ADD_GROUP_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_GROUP_ADD;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_GROUP_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

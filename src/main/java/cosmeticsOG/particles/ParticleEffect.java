@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public enum ParticleEffect {
+
     NONE(0, 0, (v) -> true, CompatibleMaterial.SCUTE),
     BARRIER(1, 35, (v) -> v >= 8, "barrier", CompatibleMaterial.BARRIER),
     BLOCK_CRACK(2, 37, (v) -> true, "blockcrack", Material.DIAMOND_PICKAXE, ParticleProperty.BLOCK_DATA, "block"),
@@ -34,14 +35,12 @@ public enum ParticleEffect {
     EXPLOSION_NORMAL(19, 0, (v) -> true, "explode", Material.TNT, "poof"),
     FALLING_DUST(20, 46, (v) -> v >= 10, "fallingdust", Material.SAND, ParticleProperty.BLOCK_DATA),
     FIREWORKS_SPARK(21, 3, (v) -> true, "fireworksSpark", CompatibleMaterial.FIREWORK_ROCKET, "firework"),
-    FLAME(22, 26, (v) -> true, "flame", Material.TORCH),
-    HEART(23, 34, (v) -> true, "heart", Material.REDSTONE_BLOCK),
+    FLAME(22, 26, (v) -> true, "flame", Material.TORCH), HEART(23, 34, (v) -> true, "heart", Material.REDSTONE_BLOCK),
     ITEM_CRACK(24, 36, (v) -> true, "iconcrack", Material.APPLE, ParticleProperty.ITEM_DATA, "item"),
     LAVA(25, 27, (v) -> true, "lava", CompatibleMaterial.MAGMA_BLOCK),
     MOB_APPEARANCE(26, 41, (v) -> v >= 8, "mobappearance", CompatibleMaterial.PLAYER_HEAD, "elder_guardian"),
     NAUTILUS(27, -1, (v) -> v >= 13, CompatibleMaterial.CONDUIT),
-    NOTE(28, 23, (v) -> true, "note", Material.NOTE_BLOCK),
-    PORTAL(29, 24, (v) -> true, "portal", Material.SOUL_SAND),
+    NOTE(28, 23, (v) -> true, "note", Material.NOTE_BLOCK), PORTAL(29, 24, (v) -> true, "portal", Material.SOUL_SAND),
     REDSTONE(30, 30, (v) -> true, "reddust", Material.REDSTONE, ParticleProperty.DUST_OPTIONS, "dust"),
     SLIME(31, 33, (v) -> true, "slime", Material.SLIME_BALL, "item_slime"),
     SMOKE_LARGE(32, 12, (v) -> true, "largesmoke", CompatibleMaterial.BONE_MEAL, "large_smoke"),
@@ -124,8 +123,7 @@ public enum ParticleEffect {
 
     // Changes in 1.20.5
     ENTITY_EFFECT(102, -1, (v) -> v >= 20.5, CompatibleMaterial.ZOMBIE_HEAD, ParticleProperty.COLOR),
-    EGG_CRACK(103, -1, (v) -> v >= 20.5, Material.EGG),
-    DUST_PLUME(104, -1, (v) -> v >= 20.5, Material.REDSTONE),
+    EGG_CRACK(103, -1, (v) -> v >= 20.5, Material.EGG), DUST_PLUME(104, -1, (v) -> v >= 20.5, Material.REDSTONE),
     WHITE_SMOKE(105, -1, (v) -> v >= 20.5, CompatibleMaterial.WHITE_DYE),
 
     GUST(106, -1, (v) -> v >= 21, CompatibleMaterial.WIND_CHARGE),
@@ -140,8 +138,7 @@ public enum ParticleEffect {
     DUST_PILLAR(115, -1, (v) -> v >= 21, Material.REDSTONE, ParticleProperty.BLOCK_DATA),
     OMINOUS_SPAWNING(116, -1, (v) -> v >= 21, CompatibleMaterial.OMINOUS_TRIAL_KEY),
     RAID_OMEN(117, -1, (v) -> v >= 21, CompatibleMaterial.OMINOUS_BOTTLE),
-    TRIAL_OMEN(118, -1, (v) -> v >= 21, CompatibleMaterial.TRIAL_KEY),
-    ;
+    TRIAL_OMEN(118, -1, (v) -> v >= 21, CompatibleMaterial.TRIAL_KEY),;
 
     private static final Map<String, ParticleEffect> particleNames = new HashMap<String, ParticleEffect>();
     private static final Map<String, ParticleEffect> particleLegacyNames = new HashMap<String, ParticleEffect>();
@@ -156,21 +153,21 @@ public enum ParticleEffect {
     public final String[] aliases;
 
     static {
+
         for (ParticleEffect pe : values()) {
+
             particleNames.put(pe.toString(), pe);
             particleLegacyNames.put(pe.legacyName, pe);
             particleIDs.put(pe.id, pe);
+
         }
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            String legacyName,
-            final ItemStack item,
-            final ParticleProperty property,
-            String... aliases) {
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, String legacyName,
+            final ItemStack item, final ParticleProperty property, String... aliases)
+    {
+
         this.id = id;
         this.legacyID = legacyID;
         this.predicate = predicate;
@@ -178,314 +175,351 @@ public enum ParticleEffect {
         this.item = item;
         this.property = property;
         this.aliases = aliases;
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            String legacyName,
-            final Material material,
-            final ParticleProperty property,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                legacyName,
-                ItemUtil.createItem(material, 1, 0),
-                property,
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, String legacyName,
+            final Material material, final ParticleProperty property, String... aliases)
+    {
+
+        this(id, legacyID, predicate, legacyName, ItemUtil.createItem(material, 1, 0), property, aliases); // Added
+                                                                                                           // damage
+                                                                                                           // value '0'
+
+    }
+
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, final String legacyName,
+            final CompatibleMaterial material, final ParticleProperty property, String... aliases)
+    {
+
+        this(id, legacyID, predicate, legacyName, material.getItem(1), property, aliases); // CompatibleMaterial.getItem()
+                                                                                           // handles quantity
+
+    }
+
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, final String legacyName,
+            final Material material, String... aliases)
+    {
+
+        this(id, legacyID, predicate, legacyName, ItemUtil.createItem(material, 1, 0), ParticleProperty.NO_DATA,
                 aliases); // Added damage value '0'
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final String legacyName,
-            final CompatibleMaterial material,
-            final ParticleProperty property,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                legacyName,
-                material.getItem(1),
-                property,
-                aliases); // CompatibleMaterial.getItem() handles quantity
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, final String legacyName,
+            final CompatibleMaterial material, String... aliases)
+    {
+
+        this(id, legacyID, predicate, legacyName, material.getItem(1), ParticleProperty.NO_DATA, aliases); // Correct
+                                                                                                           // quantity
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final String legacyName,
-            final Material material,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                legacyName,
-                ItemUtil.createItem(material, 1, 0),
-                ParticleProperty.NO_DATA,
-                aliases); // Added damage value '0'
-    }
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate,
+            final CompatibleMaterial material, final ParticleProperty property, String... aliases)
+    {
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final String legacyName,
-            final CompatibleMaterial material,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                legacyName,
-                material.getItem(1),
-                ParticleProperty.NO_DATA,
-                aliases); // Correct quantity
-    }
-
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final CompatibleMaterial material,
-            final ParticleProperty property,
-            String... aliases) {
         this(id, legacyID, predicate, "", material.getItem(1), property, aliases); // Correct quantity
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final Material material,
-            final ParticleProperty property,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                "",
-                ItemUtil.createItem(material, 1, 0),
-                property,
-                aliases); // Added damage value '0'
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, final Material material,
+            final ParticleProperty property, String... aliases)
+    {
+
+        this(id, legacyID, predicate, "", ItemUtil.createItem(material, 1, 0), property, aliases); // Added damage value
+                                                                                                   // '0'
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final CompatibleMaterial material,
-            String... aliases) {
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate,
+            final CompatibleMaterial material, String... aliases)
+    {
+
         this(id, legacyID, predicate, "", material.getItem(1), ParticleProperty.NO_DATA, aliases); // Correct quantity
+
     }
 
-    private ParticleEffect(
-            final int id,
-            final int legacyID,
-            final Predicate<Double> predicate,
-            final Material material,
-            String... aliases) {
-        this(
-                id,
-                legacyID,
-                predicate,
-                "",
-                ItemUtil.createItem(material, 1, 0),
-                ParticleProperty.NO_DATA,
-                aliases); // Added damage value '0'
+    private ParticleEffect(final int id, final int legacyID, final Predicate<Double> predicate, final Material material,
+            String... aliases)
+    {
+
+        this(id, legacyID, predicate, "", ItemUtil.createItem(material, 1, 0), ParticleProperty.NO_DATA, aliases); // Added
+                                                                                                                   // damage
+                                                                                                                   // value
+                                                                                                                   // '0'
+
     }
 
     /**
      * Check to see if this ParticleEffect uses color data
+     * 
      * @return True if this ParticleEffect uses color data
      */
     public boolean hasColorData() {
-        return property.equals(ParticleProperty.DUST_OPTIONS)
-                || property.equals(ParticleProperty.COLOR_TRANSITION)
+
+        return property.equals(ParticleProperty.DUST_OPTIONS) || property.equals(ParticleProperty.COLOR_TRANSITION)
                 || property.equals(ParticleProperty.COLOR);
+
     }
 
     /**
      * Check to see if this ParticleEffect uses block data
+     * 
      * @return True if this ParticleEffect uses block data
      */
     public boolean hasBlockData() {
+
         return property.equals(ParticleProperty.BLOCK_DATA);
+
     }
 
     /**
      * Check to see if this ParticleEffect uses item data
+     * 
      * @return True if this ParticleEffect uses item data
      */
     public boolean hasItemData() {
+
         return property.equals(ParticleProperty.ITEM_DATA);
+
     }
 
     /**
      * Check to see if this ParticleEffect uses block, item, or itemstack data
+     * 
      * @return True if this ParticleEffect uses block, item, or itemstack data
      */
     public boolean hasData() {
+
         return hasBlockData() || hasItemData() || property.equals(ParticleProperty.ITEMSTACK_DATA);
+
     }
 
     /**
      * Get the id of this ParticleEffect
+     * 
      * @return
      */
     public int getID() {
+
         return id;
+
     }
 
     /**
      * Get the id of this ParticleEffect used on <= 1.12 servers
+     * 
      * @return
      */
     public int getLegacyID() {
+
         return legacyID;
+
     }
 
     /**
      * Get the string name of this enum
+     * 
      * @return
      */
     public String getName() {
+
         return this.toString();
+
     }
 
     /**
      * Get this ParticleEffect's legacy name
+     * 
      * @return
      */
     public String getLegacyName() {
+
         return legacyName;
+
     }
 
     /**
      * Get this ParticleEffect's name
+     * 
      * @return The name of this effect as defined in the current messages.yml file
      */
     public String getDisplayName() {
+
         String key = "PARTICLE_" + this.toString() + "_NAME";
         try {
+
             return Message.valueOf(key).getValue();
+
         } catch (IllegalArgumentException e) {
+
             return "";
+
         }
+
     }
 
     /**
      * Get this ParticleEffect's name without color codes
+     * 
      * @return
      */
     public String getStrippedName() {
+
         return Utils.stripColors(getDisplayName());
+
     }
 
     /**
      * Get this ParticleEffect's description
-     * @return The description of this effect as defined in the current messages.yml file
+     * 
+     * @return The description of this effect as defined in the current messages.yml
+     *         file
      */
     public String getDescription() {
+
         String key = "PARTICLE_" + this.toString() + "_DESCRIPTION";
         try {
+
             return Message.valueOf(key).getValue();
+
         } catch (IllegalArgumentException e) {
+
             return "";
+
         }
+
     }
 
     public ItemStack getItem() {
+
         return item;
+
     }
 
     /**
      * Check to see if this ParticleEffect can display particles
+     * 
      * @return
      */
     public boolean canDisplay() {
+
         return this != NONE && this != EMPTY_SPACE;
+
     }
 
     /**
      * Get this ParticleEffects ParticleProperty
+     * 
      * @return
      */
     public ParticleProperty getProperty() {
+
         return property;
+
     }
 
     public boolean isSupported() {
+
         return predicate.test(CosmeticsOG.serverVersion);
+
     }
 
     /**
      * Get how many particles are supported on this server
+     * 
      * @return
      */
     public static int getParticlesSupported() {
+
         int count = 0;
         for (ParticleEffect pe : values()) {
+
             if (pe.isSupported()) {
+
                 count++;
+
             }
+
         }
+
         return count;
+
     }
 
     /**
-     * Returns the <b>ParticleEffect</b> with the given name, or <b>NONE</b> if there is no match
+     * Returns the <b>ParticleEffect</b> with the given name, or <b>NONE</b> if
+     * there is no match
+     * 
      * @param name
      * @return
      */
     public static ParticleEffect fromName(String name) {
+
         if (name == null) {
+
             return NONE;
+
         }
 
         if (particleNames.containsKey(name)) {
+
             return particleNames.get(name);
+
         }
 
         if (particleLegacyNames.containsKey(name)) {
+
             return particleLegacyNames.get(name);
+
         }
 
         return NONE;
+
     }
 
     /**
-     * Returns the <b>ParticleEffect</b> with the given name, or <b>NONE</b> if there is no match
+     * Returns the <b>ParticleEffect</b> with the given name, or <b>NONE</b> if
+     * there is no match
+     * 
      * @param name
      * @return
      */
     public static ParticleEffect fromDisplayName(String name) {
+
         if (particleNames.containsKey(name)) {
+
             ParticleEffect particle = particleNames.get(name);
             if (particle.isSupported()) {
+
                 return particle;
+
             }
+
         }
+
         return NONE;
+
     }
 
     /**
-     * Returns the <b>ParticleEffect</b> with this id, or <b>NONE</b> if there is no match
+     * Returns the <b>ParticleEffect</b> with this id, or <b>NONE</b> if there is no
+     * match
+     * 
      * @param id
      * @return
      */
     public static ParticleEffect fromID(int id) {
+
         if (particleIDs.containsKey(id)) {
+
             return particleIDs.get(id);
+
         }
+
         return NONE;
+
     }
 
     /**
@@ -494,14 +528,7 @@ public enum ParticleEffect {
      *
      */
     public static enum ParticleProperty {
-        NO_DATA,
-        DUST_OPTIONS,
-        COLOR_TRANSITION,
-        COLOR,
-        BLOCK_DATA,
-        ITEM_DATA,
-        ITEMSTACK_DATA,
-        INTEGER,
-        FLOAT
+        NO_DATA, DUST_OPTIONS, COLOR_TRANSITION, COLOR, BLOCK_DATA, ITEM_DATA, ITEMSTACK_DATA, INTEGER, FLOAT
     }
+
 }

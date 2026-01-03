@@ -29,20 +29,24 @@ public class MenuInventory {
 
         inventory = Bukkit.createInventory(null, rows * 9, displayTitle);
         hats = new HashMap<Integer, Hat>();
+
     }
 
     /**
      * Returns the ItemStack found in this slot
+     * 
      * @param slot
      * @return
      */
     public ItemStack getItem(int slot) {
 
         return inventory.getItem(slot);
+
     }
 
     /**
      * Set the ItemStack that belongs in this slot
+     * 
      * @param slot
      * @param item
      */
@@ -51,70 +55,86 @@ public class MenuInventory {
         if (slot < inventory.getSize()) {
 
             inventory.setItem(slot, item);
+
         }
+
     }
 
     /**
      * Returns this inventory's content;
+     * 
      * @return
      */
     public ItemStack[] getContents() {
 
         return inventory.getContents();
+
     }
 
     /**
      * Get the name used to save this menu
+     * 
      * @return
      */
     public String getName() {
 
         return name;
+
     }
 
     /**
      * Returns the title of the inventory
+     * 
      * @return
      */
     public TextComponent getTitle() {
 
         return title;
+
     }
 
     /**
      * Set this menu's inventory title
+     * 
      * @param title
      */
     public void setTitle(TextComponent title) {
 
         this.title = title;
+
     }
 
     /**
      * Get this MenuInventory's title with color codes translated
+     * 
      * @return
      */
     public TextComponent getDisplayTitle() {
 
         return displayTitle;
+
     }
 
     /**
      * Get this menu's alias
+     * 
      * @return
      */
     public String getAlias() {
 
         return alias;
+
     }
 
     /**
      * Set this menu's alias
+     * 
      * @param alias
      */
     public void setAlias(String alias) {
 
         this.alias = alias;
+
     }
 
     /**
@@ -123,48 +143,58 @@ public class MenuInventory {
     public void resetAlias() {
 
         alias = null;
+
     }
 
     /**
      * Returns the size of this inventory
+     * 
      * @return
      */
     public int getSize() {
 
         return inventory.getSize();
+
     }
 
     /**
      * Returns the hat found in this slot
+     * 
      * @param slot
      * @return
      */
     public Hat getHat(int slot) {
 
         return hats.get(slot);
+
     }
 
     /**
      * Set the hat the belong in this slot
+     * 
      * @param slot
      * @param hat
      */
     public void setHat(int slot, Hat hat) {
 
         hats.put(slot, hat);
+
     }
 
     /**
      * Removes a hat from this slot
+     * 
      * @param slot
      */
     public void removeHat(int slot) {
 
         hats.remove(slot);
+
     }
 
     /**
      * Returns every hat in this menu
+     * 
      * @return
      */
     public Map<Integer, Hat> getHats() {
@@ -172,15 +202,18 @@ public class MenuInventory {
         final Map<Integer, Hat> h = new HashMap<Integer, Hat>(hats);
 
         return h;
+
     }
 
     /**
      * Opens this inventory for the player
+     * 
      * @param player
      */
     public void open(Player player) {
 
         player.openInventory(inventory);
+
     }
 
     /**
@@ -196,8 +229,11 @@ public class MenuInventory {
 
             inventory.setHat(slot, hat);
             inventory.setItem(slot, getItem(slot).clone());
+
         }
 
         return inventory;
+
     }
+
 }

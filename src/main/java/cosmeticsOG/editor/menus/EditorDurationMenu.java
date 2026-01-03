@@ -24,10 +24,11 @@ public class EditorDurationMenu extends AbstractStaticMenu {
 
         this.targetHat = menuManager.getBaseHat();
         this.callback = callback;
-        this.inventory = Bukkit.createInventory(
-                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_DURATION_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 27,
+                Utils.legacySerializerAnyCase(Message.EDITOR_DURATION_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -35,11 +36,12 @@ public class EditorDurationMenu extends AbstractStaticMenu {
 
         setButton(12, backButtonItem, backButtonAction);
 
-        ItemStack durationItem =
-                ItemUtil.createItem(Material.MAP, 1, Message.EDITOR_DURATION_MENU_SET_DURATION.getValue());
-        EditorLore.updateDurationDescription(
-                durationItem, targetHat.getDemoDuration(), Message.EDITOR_DURATION_MENU_DESCRIPTION);
+        ItemStack durationItem = ItemUtil.createItem(Material.MAP, 1,
+                Message.EDITOR_DURATION_MENU_SET_DURATION.getValue());
+        EditorLore.updateDurationDescription(durationItem, targetHat.getDemoDuration(),
+                Message.EDITOR_DURATION_MENU_DESCRIPTION);
         setButton(14, durationItem, (event, slot) -> {
+
             int normalClick = event.isLeftClick() ? 20 : -20;
             int shiftClick = event.isShiftClick() ? 30 : 1;
             int modifier = normalClick * shiftClick;
@@ -47,11 +49,13 @@ public class EditorDurationMenu extends AbstractStaticMenu {
 
             targetHat.setDemoDuration(duration);
 
-            EditorLore.updateDurationDescription(
-                    getItem(14), targetHat.getDemoDuration(), Message.EDITOR_DURATION_MENU_DESCRIPTION);
+            EditorLore.updateDurationDescription(getItem(14), targetHat.getDemoDuration(),
+                    Message.EDITOR_DURATION_MENU_DESCRIPTION);
 
             return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+
         });
+
     }
 
     @Override
@@ -60,9 +64,14 @@ public class EditorDurationMenu extends AbstractStaticMenu {
         if (!forced) {
 
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

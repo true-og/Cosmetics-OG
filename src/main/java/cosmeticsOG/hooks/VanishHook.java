@@ -6,6 +6,7 @@ public interface VanishHook {
 
     /**
      * Checks to see if this player is currently vanished
+     * 
      * @param player
      * @return
      */
@@ -15,4 +16,5 @@ public interface VanishHook {
      * Unregisters this hook
      */
     public void unregister();
+
 }

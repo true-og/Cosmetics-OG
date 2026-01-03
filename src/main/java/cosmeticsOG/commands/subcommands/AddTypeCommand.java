@@ -33,9 +33,11 @@ public class AddTypeCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(getUsage().getValue());
+
             }
 
             return false;
+
         }
 
         if (core.getDatabaseType().equals(DatabaseType.YAML)) {
@@ -47,9 +49,11 @@ public class AddTypeCommand extends Command {
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ADD_TYPE_ERROR.getValue());
+
             }
 
             return false;
+
         }
 
         String imageName = args.get(0);
@@ -57,15 +61,17 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
+
             }
 
             return false;
+
         }
 
         MySQLDatabase database = (MySQLDatabase) core.getDatabase();
@@ -74,18 +80,21 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
+
             }
 
             return true;
+
         }
 
         return false;
+
     }
 
     @Override
@@ -96,72 +105,85 @@ public class AddTypeCommand extends Command {
             List<String> images = new ArrayList<String>();
             Map<String, BufferedImage> imageCache = core.getDatabase().getImages(false);
 
-            for (Entry<String, BufferedImage> entry :
-                    core.getResourceManager().getImages().entrySet()) {
+            for (Entry<String, BufferedImage> entry : core.getResourceManager().getImages().entrySet()) {
 
                 if (!imageCache.containsKey(entry.getKey())) {
 
                     images.add(entry.getKey());
+
                 }
+
             }
 
             return images;
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "add type";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "add";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_ADD_TYPE_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_ADD_TYPE_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_TYPE_ADD;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_TYPE_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

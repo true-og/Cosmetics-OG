@@ -17,6 +17,7 @@ public class TypeCommand extends Command {
 
         register(new AddTypeCommand());
         register(new RemoveTypeCommand());
+
     }
 
     @Override
@@ -30,10 +31,13 @@ public class TypeCommand extends Command {
                 args.remove(0);
 
                 return subCommands.get(argument).onCommand(core, sender, label, args);
+
             }
+
         }
 
         return false;
+
     }
 
     @Override
@@ -47,7 +51,9 @@ public class TypeCommand extends Command {
                 if (sender.hasPermission(entry.getValue().getPermission())) {
 
                     commands.add(entry.getKey());
+
                 }
+
             }
 
             return commands;
@@ -63,70 +69,85 @@ public class TypeCommand extends Command {
                     args.remove(0);
 
                     return subCommand.onTabComplete(core, sender, label, args);
+
                 }
+
             }
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "type";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "type";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.UNKNOWN;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.UNKNOWN;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_TYPE;
+
     }
 
     @Override
     public boolean hasPermission() {
 
         return false;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_TYPE_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return false;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

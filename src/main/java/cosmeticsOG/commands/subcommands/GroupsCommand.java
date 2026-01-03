@@ -19,6 +19,7 @@ public class GroupsCommand extends Command {
         register(new DeleteGroupCommand());
         register(new EditGroupCommand());
         register(new GroupInfoCommand());
+
     }
 
     @Override
@@ -32,10 +33,13 @@ public class GroupsCommand extends Command {
                 args.remove(0);
 
                 return subCommands.get(argument).onCommand(core, sender, label, args);
+
             }
+
         }
 
         return false;
+
     }
 
     @Override
@@ -49,7 +53,9 @@ public class GroupsCommand extends Command {
                 if (entry.getValue().hasPermission(sender)) {
 
                     commands.add(entry.getKey());
+
                 }
+
             }
 
             return commands;
@@ -65,70 +71,85 @@ public class GroupsCommand extends Command {
                     args.remove(0);
 
                     return subCommand.onTabComplete(core, sender, label, args);
+
                 }
+
             }
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "group";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "group";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.UNKNOWN;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.UNKNOWN;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_GROUP;
+
     }
 
     @Override
     public boolean hasPermission() {
 
         return false;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_GROUP_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return false;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

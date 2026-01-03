@@ -36,14 +36,16 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
                         + Utils.stripColors(command.getPermission().getPermission());
 
                 TextComponent hoverText = Utils.legacySerializerAnyCase(commandText);
-                TextComponent commandComponent = Utils.legacySerializerAnyCase(
-                                "&7> &3" + command.getUsage().getValue())
+                TextComponent commandComponent = Utils.legacySerializerAnyCase("&7> &3" + command.getUsage().getValue())
                         .hoverEvent(HoverEvent.showText(hoverText))
                         .clickEvent(ClickEvent.suggestCommand(command.getUsage().getValue()));
 
                 commands.put(command, commandComponent);
+
             }
+
         }
+
     }
 
     @Override
@@ -52,14 +54,14 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
         if (sender.isPlayer()) {
 
             Player player = sender.getPlayer();
-            Utils.cosmeticsOGPlaceholderMessage(
-                    player, "&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
+            Utils.cosmeticsOGPlaceholderMessage(player, "&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
             Utils.cosmeticsOGPlaceholderMessage(player, "&7> " + Message.COMMAND_HELP_TIP.getValue());
 
         } else {
 
             Utils.logToConsole("&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
             Utils.logToConsole("&7> " + Message.COMMAND_HELP_TIP.getValue());
+
         }
 
         for (Entry<Command, TextComponent> entry : commands.entrySet()) {
@@ -75,8 +77,13 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
                 } else {
 
                     Utils.logToConsole(component.content());
+
                 }
+
             }
+
         }
+
     }
+
 }

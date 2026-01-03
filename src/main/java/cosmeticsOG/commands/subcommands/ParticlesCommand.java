@@ -26,11 +26,12 @@ public class ParticlesCommand extends Command {
                 Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                 return false;
+
             }
 
             StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
-            EquippedParticlesMenu particlesMenu =
-                    new EquippedParticlesMenu(core, staticManager, sender.getPlayer(), false);
+            EquippedParticlesMenu particlesMenu = new EquippedParticlesMenu(core, staticManager, sender.getPlayer(),
+                    false);
 
             staticManager.addMenu(particlesMenu);
             particlesMenu.open();
@@ -40,48 +41,58 @@ public class ParticlesCommand extends Command {
         } else {
 
             return false;
+
         }
+
     }
 
     @Override
     public String getName() {
 
         return "particles";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "particles";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_PARTICLE_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_PARTICLE_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_PARTICLES;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return true;
+
     }
+
 }

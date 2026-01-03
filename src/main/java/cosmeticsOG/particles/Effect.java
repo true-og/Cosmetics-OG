@@ -22,11 +22,15 @@ public abstract class Effect {
     protected ParticleRenderer renderer = CosmeticsOG.instance.getParticleRenderer();
 
     public Effect() {
+
         frames = new ArrayList<List<Vector>>();
+
     }
 
     protected void setFrames(List<List<Vector>> frames) {
+
         this.frames = frames;
+
     }
 
     public abstract String getName();
@@ -51,13 +55,17 @@ public abstract class Effect {
 
     /**
      * Creates and returns an empty List for all particle location data
+     * 
      * @return
      */
     protected List<List<Vector>> createEmptyFrames() {
+
         return new ArrayList<List<Vector>>();
+
     }
 
     protected Vector getTrackingPosition(Hat hat, Vector target, Location location, double cos, double sin) {
+
         ParticleTracking trackingMethod = hat.getTrackingMethod();
         double x = 0;
         double y = 0;
@@ -65,14 +73,18 @@ public abstract class Effect {
         double offsetY = hat.getTotalOffset().getY();
 
         switch (trackingMethod) {
+
             case TRACK_NOTHING: {
+
                 x = target.getX();
                 y = target.getY() + offsetY;
                 z = target.getZ();
                 break;
+
             }
 
             case TRACK_BODY_ROTATION: {
+
                 double targetX = target.getX();
                 double targetZ = target.getZ();
 
@@ -80,9 +92,11 @@ public abstract class Effect {
                 y = target.getY() + offsetY;
                 z = ((targetX * sin) + (targetZ * cos));
                 break;
+
             }
 
             case TRACK_HEAD_MOVEMENT: {
+
                 Vector v = new Vector(target.getX(), target.getY() + offsetY, target.getZ());
                 Vector result = MathUtil.rotateVector(v, location);
 
@@ -90,42 +104,58 @@ public abstract class Effect {
                 y = result.getY();
                 z = result.getZ();
                 break;
+
             }
+
         }
 
         return new Vector(x, y, z);
+
     }
 
     protected Vector getAngleVector(double x, double y, double z, Vector target) {
+
         if (Math.abs(z) > 0) {
+
             target = MathUtil.rotateXAxis(target, z);
+
         }
 
         if (Math.abs(y) > 0) {
+
             target = MathUtil.rotateYAxis(target, y);
+
         }
 
         if (Math.abs(x) > 0) {
+
             target = MathUtil.rotateZAxis(target, -x);
+
         }
 
         return target;
+
     }
 
     /**
      * Display this effect for an entity
+     * 
      * @param ticks
      * @param entity
      * @param hat
      */
     public void display(int ticks, Entity entity, Hat hat) {
+
         int loops = 0;
         int particleIndex = 0;
 
         if (ticks % hat.getUpdateFrequency() == 0) {
+
             Location location = entity.getLocation();
             if (hat.getTrackingMethod() == ParticleTracking.TRACK_HEAD_MOVEMENT && entity instanceof Player) {
+
                 location = ((Player) entity).getEyeLocation();
+
             }
 
             double yaw = Math.toRadians(location.getYaw());
@@ -142,10 +172,12 @@ public abstract class Effect {
             double angleZRad = Math.toRadians(angle.getZ());
 
             for (List<Vector> frame : frames) {
+
                 particleIndex = loops++;
 
                 // Display as an animation
                 if (supportsAnimation() && hat.getAnimation() == ParticleAnimation.ANIMATED) {
+
                     int size = frame.size();
                     int frameIndex = frames.indexOf(frame);
                     int index = MathUtil.clamp(hat.getAnimationIndex(frameIndex), 0, size);
@@ -159,11 +191,14 @@ public abstract class Effect {
 
                     displayParticle(clone, hat, particleIndex);
                     hat.setAnimationIndex(frameIndex, MathUtil.wrap(index + 1, size, 0));
+
                 }
 
                 // Display statically
                 else {
+
                     for (Vector target : frame) {
+
                         Vector v = target.clone();
                         v.multiply(hat.getScale());
                         v = getAngleVector(angleXRad, angleYRad, angleZRad, v);
@@ -172,24 +207,33 @@ public abstract class Effect {
 
                         clone.add(getTrackingPosition(hat, v, location, cos, sin));
                         displayParticle(clone, hat, particleIndex);
+
                     }
+
                 }
+
             }
+
         }
+
     }
 
     public void displayParticle(Location location, Hat hat, int index) {
+
         double speed = hat.getSpeed();
         int count = hat.getCount();
         World world = location.getWorld();
 
         ParticleEffect particleEffect = hat.getParticle(index);
         if (particleEffect == ParticleEffect.NONE) {
+
             particleEffect = hat.getParticle(0);
             index = 0;
+
         }
 
         if (particleEffect.canDisplay()) {
+
             Vector randomOffset = hat.getRandomOffset();
             double rxo = randomOffset.getX();
             double ryo = randomOffset.getY();
@@ -198,53 +242,24 @@ public abstract class Effect {
             ParticleData data = hat.getParticleData(index);
 
             switch (particleEffect.getProperty()) {
+
                 case NO_DATA:
                     renderer.spawnParticle(world, particleEffect, location, count, rxo, ryo, rzo, speed);
                     break;
 
                 case DUST_OPTIONS:
-                    renderer.spawnParticleColor(
-                            world,
-                            particleEffect,
-                            location,
-                            count,
-                            rxo,
-                            ryo,
-                            rzo,
-                            speed,
-                            data.getColorData().getColor(),
-                            data.getScale(),
-                            true);
+                    renderer.spawnParticleColor(world, particleEffect, location, count, rxo, ryo, rzo, speed,
+                            data.getColorData().getColor(), data.getScale(), true);
                     break;
 
                 case COLOR_TRANSITION:
-                    renderer.spawnParticleColorTransition(
-                            world,
-                            particleEffect,
-                            location,
-                            count,
-                            rxo,
-                            ryo,
-                            rzo,
-                            speed,
-                            data.getColorData().getColor(),
-                            data.getColorData().getColor(),
-                            data.getScale());
+                    renderer.spawnParticleColorTransition(world, particleEffect, location, count, rxo, ryo, rzo, speed,
+                            data.getColorData().getColor(), data.getColorData().getColor(), data.getScale());
                     break;
 
                 case COLOR:
-                    renderer.spawnParticleColor(
-                            world,
-                            particleEffect,
-                            location,
-                            count,
-                            rxo,
-                            ryo,
-                            rzo,
-                            speed,
-                            data.getColorData().getColor(),
-                            data.getScale(),
-                            false);
+                    renderer.spawnParticleColor(world, particleEffect, location, count, rxo, ryo, rzo, speed,
+                            data.getColorData().getColor(), data.getScale(), false);
                     break;
 
                 case BLOCK_DATA:
@@ -256,11 +271,12 @@ public abstract class Effect {
                     break;
 
                 case ITEMSTACK_DATA: {
+
                     final int i = index;
-                    Bukkit.getScheduler().runTask(CosmeticsOG.instance, () -> hat.getParticleData(i)
-                            .getItemStackData()
-                            .dropItem(world, location, hat));
+                    Bukkit.getScheduler().runTask(CosmeticsOG.instance,
+                            () -> hat.getParticleData(i).getItemStackData().dropItem(world, location, hat));
                     break;
+
                 }
 
                 case FLOAT:
@@ -270,7 +286,11 @@ public abstract class Effect {
                 case INTEGER:
                     renderer.spawnParticle(world, particleEffect, location, count, rxo, ryo, rzo, speed, 0);
                     break;
+
             }
+
         }
+
     }
+
 }

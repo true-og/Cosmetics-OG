@@ -20,29 +20,35 @@ public class HookManager {
         this.core = core;
 
         loadHooks();
+
     }
 
     public void onReload() {
 
         loadHooks();
+
     }
 
     /**
      * Get this plugin's CurrencyHook
+     * 
      * @return
      */
     public CurrencyHook getCurrencyHook() {
 
         return currencyHook;
+
     }
 
     /**
      * Get this plugin's VanishHook
+     * 
      * @return
      */
     public VanishHook getVanishHook() {
 
         return vanishHook;
+
     }
 
     private void loadHooks() {
@@ -55,6 +61,7 @@ public class HookManager {
             if (currencyHook != null && currencyHook instanceof VaultHook) {
 
                 return;
+
             }
 
             if (pluginManager.isPluginEnabled("Vault")) {
@@ -70,6 +77,7 @@ public class HookManager {
                 SettingsManager.FLAG_VAULT.addOverride(false);
 
                 currencyHook = null;
+
             }
 
         }
@@ -80,6 +88,7 @@ public class HookManager {
             if (currencyHook != null && currencyHook instanceof TokenManagerHook) {
 
                 return;
+
             }
 
             if (pluginManager.isPluginEnabled("TokenManager")) {
@@ -95,7 +104,9 @@ public class HookManager {
                 SettingsManager.FLAG_TOKEN_MANAGER.addOverride(false);
 
                 currencyHook = null;
+
             }
+
         }
 
         // Vanish Hooks.
@@ -109,7 +120,11 @@ public class HookManager {
 
                 vanishHook.unregister();
                 vanishHook = null;
+
             }
+
         }
+
     }
+
 }

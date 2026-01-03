@@ -19,16 +19,19 @@ public class YamlUtil {
 
     /**
      * Checks to see if this CustomConfig is updated to the current version
+     * 
      * @param config
      * @return
      */
     public static boolean isUpdated(CustomConfig config) {
 
         return config.getConfig().getDouble("version", 0) >= MENU_VERSION;
+
     }
 
     /**
      * Updates a legacy menu to the current save format
+     * 
      * @param config
      */
     public static void updateMenuSaveFormat(CustomConfig menuConfig) {
@@ -46,6 +49,7 @@ public class YamlUtil {
                 if (key == null) {
 
                     continue;
+
                 }
 
                 String path = "items." + key + ".";
@@ -62,15 +66,20 @@ public class YamlUtil {
                     updateNodeFormat(config, path + "node.", path, 1);
 
                     config.set(path + "node", null);
+
                 }
+
             }
+
         }
 
         menuConfig.save();
+
     }
 
     /**
      * Updates properties that only belong to a base hat
+     * 
      * @param config
      * @param path
      */
@@ -82,11 +91,13 @@ public class YamlUtil {
 
             config.set(path + "no-permission", null);
             config.set(path + "permission-denied", noPermission);
+
         }
 
         if (config.isDouble(path + "offset") || config.isInt(path + "offset")) {
 
             config.set(path + "offset.y", config.getDouble(path + "offset"));
+
         }
 
         if (config.contains(path + "no-permission-lore")) {
@@ -95,15 +106,15 @@ public class YamlUtil {
 
             config.set(path + "no-permission-lore", null);
             config.set(path + "permission-description", noPermissionLore);
+
         }
 
         if (config.contains(path + "action")) {
 
             String action = config.getString(path + "action");
 
-            config.set(
-                    path + "action.left-click.id",
-                    ParticleAction.fromName(action, ParticleAction.DUMMY).getName());
+            config.set(path + "action.left-click.id", ParticleAction.fromName(action, ParticleAction.DUMMY).getName());
+
         }
 
         if (config.contains(path + "command")) {
@@ -112,16 +123,16 @@ public class YamlUtil {
 
             config.set(path + "command", null);
             config.set(path + "action.left-click.argument", command);
+
         }
 
-        config.set(
-                path + "animated",
-                ParticleAnimation.fromBoolean(config.getBoolean(path + "animated"))
-                        .getName());
+        config.set(path + "animated", ParticleAnimation.fromBoolean(config.getBoolean(path + "animated")).getName());
+
     }
 
     /**
      * Updates properties shared between hats & nodes
+     * 
      * @param config
      * @param path
      */
@@ -133,45 +144,50 @@ public class YamlUtil {
 
             config.set(nodePath + "type", config.getString(legacyPath + "type"));
             config.set(legacyPath + "type", null);
+
         }
 
         if (config.contains(legacyPath + "location")) {
 
             config.set(nodePath + "location", config.getString(legacyPath + "location"));
             config.set(legacyPath + "location", null);
+
         }
 
         if (config.contains(legacyPath + "mode")) {
 
             config.set(nodePath + "mode", config.getString(legacyPath + "mode"));
             config.set(legacyPath + "mode", null);
+
         }
 
         if (config.contains(legacyPath + "tracking")) {
 
             config.set(nodePath + "tracking", config.getString(legacyPath + "tracking"));
             config.set(legacyPath + "tracking", null);
+
         }
 
         if (config.contains(legacyPath + "animated")) {
 
-            config.set(
-                    nodePath + "animated",
-                    ParticleAnimation.fromBoolean(config.getBoolean(legacyPath + "animated"))
-                            .getName());
+            config.set(nodePath + "animated",
+                    ParticleAnimation.fromBoolean(config.getBoolean(legacyPath + "animated")).getName());
             config.set(legacyPath + "animated", null);
+
         }
 
         if (config.contains(legacyPath + "count")) {
 
             config.set(nodePath + "count", config.getInt(legacyPath + "count"));
             config.set(legacyPath + "count", null);
+
         }
 
         if (config.contains(legacyPath + "speed")) {
 
             config.set(nodePath + "speed", config.getInt(legacyPath + "speed"));
             config.set(legacyPath + "speed", null);
+
         }
 
         if (config.isDouble(legacyPath + "offset") || config.isInt(legacyPath + "offset")) {
@@ -184,19 +200,23 @@ public class YamlUtil {
 
                 config.set(nodePath + "offset.x", config.getDouble(legacyPath + "offset.x"));
                 config.set(legacyPath + "offset.x", null);
+
             }
 
             if (config.contains(legacyPath + "offset.y")) {
 
                 config.set(nodePath + "offset.y", config.getDouble(legacyPath + "offset.y"));
                 config.set(legacyPath + "offset.y", null);
+
             }
 
             if (config.contains(legacyPath + "offset.z")) {
 
                 config.set(nodePath + "offset.z", config.getDouble(legacyPath + "offset.z"));
                 config.set(legacyPath + "offset.z", null);
+
             }
+
         }
 
         updateParticlesFormat(config, legacyPath, nodePath);
@@ -204,11 +224,14 @@ public class YamlUtil {
         if (config.contains(legacyPath + "node")) {
 
             updateNodeFormat(config, legacyPath + "node.", newPath, index + 1);
+
         }
+
     }
 
     /**
      * Updates legacy particle data
+     * 
      * @param config
      * @param legacyPath
      * @param newPath
@@ -236,6 +259,7 @@ public class YamlUtil {
             } else {
 
                 config.set(newPath + "particles.1.color", "random");
+
             }
 
             if (config.contains(legacyPath + "block-data")) {
@@ -246,12 +270,17 @@ public class YamlUtil {
                 config.set(legacyPath + "block-data", null);
                 config.set(newPath + "particles.1.block-data.id", blockMaterial);
                 config.set(newPath + "particles.1.block-data.damage-value", durability);
+
             }
+
         }
+
     }
 
     /**
-     * Checks this configuration file for updates and returns true if updates are found
+     * Checks this configuration file for updates and returns true if updates are
+     * found
+     * 
      * @param config
      * @return
      */
@@ -260,9 +289,11 @@ public class YamlUtil {
         if (!config.contains("version")) {
 
             return true;
+
         }
 
         return config.getDouble("version") < CONFIG_VERSION;
+
     }
 
     public static void updateConfig(CosmeticsOG core, FileConfiguration config) {
@@ -270,12 +301,14 @@ public class YamlUtil {
         if (config.getDouble("version", 0) >= CONFIG_VERSION) {
 
             return;
+
         }
 
         // Update our legacy config.
         if (config.isConfigurationSection("defaults")) {
 
             updateLegacyConfig(config);
+
         }
 
         // Update any missing values.
@@ -284,12 +317,15 @@ public class YamlUtil {
             if (!config.isSet(setting.getKey())) {
 
                 config.set(setting.getKey(), setting.getDefaultConfigValue());
+
             }
+
         }
 
         config.set("version", CONFIG_VERSION);
 
         core.saveConfig();
+
     }
 
     private static void updateLegacyConfig(FileConfiguration config) {
@@ -298,6 +334,7 @@ public class YamlUtil {
         for (LegacyType type : LegacyType.values()) {
 
             switch (type.dataType) {
+
                 case INT:
                     int i = config.getInt(type.oldKey, (int) type.defaultValue);
                     config.set(type.oldKey, null);
@@ -328,20 +365,23 @@ public class YamlUtil {
                     break;
                 default:
                     break;
+
             }
+
         }
 
         config.set("defaults", null);
+
     }
 
     private enum LegacyType {
+
         DEFAULT_MENU("defaults.default_menu", "default-menu", Type.STRING, "particles.yml"),
         GENERATE_CONFIG_FILES("defaults.generate_config_files", "load-included-menus", Type.BOOLEAN, true),
         GENERATE_CUSTOM_TYPES("defaults.generate_custom_types", "load-included-custom-types", Type.BOOLEAN, true),
         DISABLED_WORLDS("defaults.disabled_worlds", "disabled-worlds", Type.STRING_LIST, new ArrayList<String>()),
         CHECK_WORLD_PERMISSION("defaults.check_world_permission", "check-world-permission", Type.BOOLEAN, false),
-        HALO("defaults.halo", "", Type.DEPRECATED, 0),
-        EFFECT("defaults.effect", "", Type.DEPRECATED, 0),
+        HALO("defaults.halo", "", Type.DEPRECATED, 0), EFFECT("defaults.effect", "", Type.DEPRECATED, 0),
         FLAGS_VAULT("defaults.flags.vault", "flags.vault", Type.BOOLEAN, false),
         FLAGS_EXPERIENCE("defaults.flags.experience", "flags.experience", Type.BOOLEAN, false),
         FLAGS_PERMISSION("defaults.flags.permission", "flags.permission", Type.BOOLEAN, true),
@@ -349,8 +389,8 @@ public class YamlUtil {
         FLAGS_PLAYERPOINTS("defaults.flag.playerpoints", "flags.playerpoints", Type.BOOLEAN, false),
         CURRENCY_TYPE("defaults.currency_type", "currency", Type.STRING, "$"),
         CLOSE_MENU_ON_EQUIP("defaults.close_menu_on_equip", "close-menu-on-equip", Type.BOOLEAN, true),
-        MENU_LOCK_HATS_WITHOUT_PERMISSION(
-                "defaults.menu.lock_hats_without_permission", "menu.lock-hats-without-permission", Type.BOOLEAN, false),
+        MENU_LOCK_HATS_WITHOUT_PERMISSION("defaults.menu.lock_hats_without_permission",
+                "menu.lock-hats-without-permission", Type.BOOLEAN, false),
         MENU_LOCKED_ITEM_ID("defaults.menu.locked_item.id", "menu.locked-item.id", Type.STRING, "LAPIS_LAZULI"),
         MENU_LOCKED_ITEM_TITLE("defaults.menu.locked_item.title", "menu.locked-item.title", Type.STRING, "&8Locked"),
         MENU_SOUND_ENABLED("defaults.menu_sound.enabled", "menu.sound.enabled", Type.BOOLEAN, true),
@@ -367,17 +407,14 @@ public class YamlUtil {
         COMBAT_CHECK_MONSTERS("defaults.combat.check_monsters", "combat.check-monsters", Type.BOOLEAN, true),
         COMBAT_CHECK_ANIMALS("defaults.combat.check_animals", "combat.check-animals", Type.BOOLEAN, false),
         COMBAT_CHECK_NPC("defaults.combat.check_npc", "combat.check-npc", Type.BOOLEAN, false),
-        OPEN_MENU_WITH_ITEM_ENABLED(
-                "defaults.open_menu_with_item.enabled", "menu.open-menu-with-item.enabled", Type.BOOLEAN, false),
-        OPEN_MENU_WITH_ITEM_DEFAULT_MENU(
-                "defaults.open_menu_with_item.default_menu",
-                "menu.open-menu-with-item.default-menu",
-                Type.STRING,
-                "particles.yml"),
-        OPEN_MENU_WITH_ITEM_ID(
-                "defaults.open_menu_with_item.id", "menu.open-menu-with-item.id", Type.STRING, "NETHER_STAR"),
-        OPEN_MENU_WITH_ITEM_DAMAGE_VALUE(
-                "defaults.open_menu_with_item.damage-value", "menu.open-menu-with-item.damage-value", Type.INT, 0),
+        OPEN_MENU_WITH_ITEM_ENABLED("defaults.open_menu_with_item.enabled", "menu.open-menu-with-item.enabled",
+                Type.BOOLEAN, false),
+        OPEN_MENU_WITH_ITEM_DEFAULT_MENU("defaults.open_menu_with_item.default_menu",
+                "menu.open-menu-with-item.default-menu", Type.STRING, "particles.yml"),
+        OPEN_MENU_WITH_ITEM_ID("defaults.open_menu_with_item.id", "menu.open-menu-with-item.id", Type.STRING,
+                "NETHER_STAR"),
+        OPEN_MENU_WITH_ITEM_DAMAGE_VALUE("defaults.open_menu_with_item.damage-value",
+                "menu.open-menu-with-item.damage-value", Type.INT, 0),
         DATABASE_TYPE("defaults.database.type", "database.type", Type.STRING, "yml"),
         DATABASE_USERNAME("defaults.database.username", "database.username", Type.STRING, "username"),
         DATABASE_PASSWORD("defaults.database.password", "database.password", Type.STRING, "password"),
@@ -396,6 +433,9 @@ public class YamlUtil {
             this.newKey = newKey;
             this.dataType = dataType;
             this.defaultValue = defaultValue;
+
         }
+
     }
+
 }

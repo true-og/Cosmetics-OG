@@ -32,10 +32,12 @@ public class ParticleManager {
         this.core = core;
 
         recentParticles = new HashMap<UUID, Deque<ParticleEffect>>();
+
     }
 
     /**
      * Adds this particle to the list of recently used particles
+     * 
      * @param id
      * @param particle
      */
@@ -47,23 +49,28 @@ public class ParticleManager {
             particles = new ArrayDeque<ParticleEffect>();
 
             recentParticles.put(id, particles);
+
         }
 
         // Only add unique particles, no duplicates.
         if (!particles.contains(particle)) {
 
             particles.addFirst(particle);
+
         }
 
         // We're only showing one menu worth of particles, so limit it to 21 slots.
         if (particles.size() > 21) {
 
             particles.removeLast();
+
         }
+
     }
 
     /**
      * Gets all particles recently used by the player
+     * 
      * @param id
      * @return
      */
@@ -72,9 +79,11 @@ public class ParticleManager {
         if (recentParticles.containsKey(id)) {
 
             return recentParticles.get(id);
+
         }
 
         return emptyRecents;
+
     }
 
     public boolean equipHat(Player player, Hat hat) {
@@ -90,13 +99,17 @@ public class ParticleManager {
                 if (menu instanceof StaticMenu) {
 
                     ((StaticMenu) menu).equipHat(hat);
+
                 }
+
             }
 
             return true;
+
         }
 
         return false;
+
     }
 
     public boolean equipHat(Player player, Hat hat, boolean showEquipMessage) {
@@ -111,17 +124,22 @@ public class ParticleManager {
             Utils.cosmeticsOGPlaceholderMessage(player, Message.WORLD_DISABLED.getValue());
 
             return false;
+
         }
 
         // No world permission.
         if (SettingsManager.CHECK_WORLD_PERMISSION.getBoolean()) {
+
             if (!player.hasPermission(Permission.WORLD_ALL.getPermission())
-                    && !player.hasPermission(Permission.WORLD.append(worldName))) {
+                    && !player.hasPermission(Permission.WORLD.append(worldName)))
+            {
 
                 Utils.cosmeticsOGPlaceholderMessage(player, Message.WORLD_NO_PERMISSION.getValue());
 
                 return false;
+
             }
+
         }
 
         // Too many hats equipped.
@@ -132,17 +150,18 @@ public class ParticleManager {
                 if (playerState.isEquipOverflowed()) {
 
                     playerState.removeLastHat();
+
                 }
 
             } else {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        player,
-                        Message.HAT_EQUIPPED_OVERFLOW.replace(
-                                "{1}", Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
+                Utils.cosmeticsOGPlaceholderMessage(player, Message.HAT_EQUIPPED_OVERFLOW.replace("{1}",
+                        Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
 
                 return false;
+
             }
+
         }
 
         if (playerState.canEquip()) {
@@ -154,7 +173,9 @@ public class ParticleManager {
                 if (vanishHook != null) {
 
                     isVanished = vanishHook.isVanished(player);
+
                 }
+
             }
 
             hat.setVanished(isVanished);
@@ -173,10 +194,15 @@ public class ParticleManager {
                     Message defaultMessage = hat.isVanished() ? Message.HAT_EQUIPPED_VANISHED : Message.HAT_EQUIPPED;
 
                     Utils.cosmeticsOGPlaceholderMessage(player, defaultMessage.replace("{1}", hat.getDisplayName()));
+
                 }
+
             }
+
         }
 
         return true;
+
     }
+
 }

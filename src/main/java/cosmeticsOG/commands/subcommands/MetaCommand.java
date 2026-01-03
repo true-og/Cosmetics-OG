@@ -18,6 +18,7 @@ public class MetaCommand extends EditCommand {
     public MetaCommand(final CosmeticsOG core) {
 
         super(core);
+
     }
 
     @Override
@@ -32,17 +33,17 @@ public class MetaCommand extends EditCommand {
                 Utils.cosmeticsOGPlaceholderMessage(player, Message.META_ERROR.getValue());
 
                 return false;
+
             }
 
             if (args.size() == 0) {
 
                 Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage(
-                        player,
-                        Message.COMMAND_META_USAGE.replace(
-                                "{1}", playerState.getMetaState().getSuggestion()));
+                Utils.cosmeticsOGPlaceholderMessage(player,
+                        Message.COMMAND_META_USAGE.replace("{1}", playerState.getMetaState().getSuggestion()));
 
                 return false;
+
             }
 
             EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
@@ -55,14 +56,17 @@ public class MetaCommand extends EditCommand {
             } else {
 
                 metaState.onMetaSet(editorManager, player, args);
+
             }
 
         } else {
 
             Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+
         }
 
         return true;
+
     }
 
     @Override
@@ -79,33 +83,41 @@ public class MetaCommand extends EditCommand {
             } else {
 
                 return Arrays.asList(playerState.getMetaState().getSuggestion());
+
             }
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "meta";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "meta";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_META_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_META_DESCRIPTION;
+
     }
+
 }

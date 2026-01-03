@@ -23,18 +23,20 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
 
     private ActionClickType editingClickType = ActionClickType.NONE;
 
-    public EditorActionMenuOverview(
-            CosmeticsOG core, EditorMenuManager menuManager, Player owner, MenuCallback callback) {
+    public EditorActionMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner,
+            MenuCallback callback)
+    {
 
         super(core, menuManager, owner);
 
         this.editorManager = menuManager;
         this.callback = callback;
         this.targetHat = menuManager.getBaseHat();
-        this.inventory = Bukkit.createInventory(
-                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_ACTION_OVERVIEW_MENU_TITlE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 27,
+                Utils.legacySerializerAnyCase(Message.EDITOR_ACTION_OVERVIEW_MENU_TITlE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -45,9 +47,11 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
             onActionChange(editingClickType == ActionClickType.LEFT ? true : false);
 
             editingClickType = ActionClickType.NONE;
+
         }
 
         super.open();
+
     }
 
     @Override
@@ -55,13 +59,12 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
 
         setButton(10, backButtonItem, backButtonAction);
 
-        ItemStack leftActionItem = ItemUtil.createItem(
-                CompatibleMaterial.GUNPOWDER.getMaterial(),
-                1,
+        ItemStack leftActionItem = ItemUtil.createItem(CompatibleMaterial.GUNPOWDER.getMaterial(), 1,
                 Message.EDITOR_ACTION_OVERVIEW_MENU_SET_LEFT_CLICK.getValue());
-        EditorLore.updateSpecificActionDescription(
-                leftActionItem, targetHat, targetHat.getLeftClickAction(), targetHat.getLeftClickArgument());
+        EditorLore.updateSpecificActionDescription(leftActionItem, targetHat, targetHat.getLeftClickAction(),
+                targetHat.getLeftClickArgument());
         setButton(14, leftActionItem, (event, slot) -> {
+
             if (event.isLeftClick()) {
 
                 openActionMenu(true);
@@ -69,18 +72,19 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
             } else if (event.isRightClick()) {
 
                 openPropertiesMenu(true);
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
-        ItemStack rightActionItem = ItemUtil.createItem(
-                CompatibleMaterial.GUNPOWDER.getMaterial(),
-                1,
+        ItemStack rightActionItem = ItemUtil.createItem(CompatibleMaterial.GUNPOWDER.getMaterial(), 1,
                 Message.EDITOR_ACTION_OVERVIEW_MENU_SET_RIGHT_CLICK.getValue());
-        EditorLore.updateSpecificActionDescription(
-                rightActionItem, targetHat, targetHat.getRightClickAction(), targetHat.getRightClickArgument());
+        EditorLore.updateSpecificActionDescription(rightActionItem, targetHat, targetHat.getRightClickAction(),
+                targetHat.getRightClickArgument());
         setButton(16, rightActionItem, (event, slot) -> {
+
             if (event.isLeftClick()) {
 
                 openActionMenu(false);
@@ -88,24 +92,33 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
             } else if (event.isRightClick()) {
 
                 openPropertiesMenu(false);
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     private void openActionMenu(boolean isLeftClick) {
 
         EditorActionMenu editorActionMenu = new EditorActionMenu(core, editorManager, owner, isLeftClick, (action) -> {
+
             if (action == null) {
 
                 return;
+
             }
 
             ParticleAction pa = (ParticleAction) action;
@@ -116,83 +129,101 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
             } else {
 
                 targetHat.setRightClickAction(pa);
+
             }
 
             onActionChange(isLeftClick);
             menuManager.closeCurrentMenu();
+
         });
 
         menuManager.addMenu(editorActionMenu);
         editorActionMenu.open();
+
     }
 
     private void openPropertiesMenu(boolean isLeftClick) {
 
         ParticleAction action = isLeftClick ? targetHat.getLeftClickAction() : targetHat.getRightClickAction();
         switch (action) {
+
             case OPEN_MENU_PERMISSION:
-            case OPEN_MENU:
-                {
-                    EditorMenuSelectionMenu editorMenuSelectionMenu =
-                            new EditorMenuSelectionMenu(core, editorManager, owner, false, (menuName) -> {
-                                if (menuName == null) {
+            case OPEN_MENU: {
 
-                                    return;
-                                }
+                EditorMenuSelectionMenu editorMenuSelectionMenu = new EditorMenuSelectionMenu(core, editorManager,
+                        owner, false, (menuName) ->
+                        {
 
-                                String argument = (String) menuName;
+                            if (menuName == null) {
 
-                                if (isLeftClick) {
+                                return;
 
-                                    targetHat.setLeftClickArgument(argument);
+                            }
 
-                                } else {
+                            String argument = (String) menuName;
 
-                                    targetHat.setRightClickArgument(argument);
-                                }
+                            if (isLeftClick) {
 
-                                menuManager.closeCurrentMenu();
-                                onActionChange(isLeftClick);
-                            });
+                                targetHat.setLeftClickArgument(argument);
 
-                    menuManager.addMenu(editorMenuSelectionMenu);
-                    editorMenuSelectionMenu.open();
-                }
+                            } else {
+
+                                targetHat.setRightClickArgument(argument);
+
+                            }
+
+                            menuManager.closeCurrentMenu();
+                            onActionChange(isLeftClick);
+
+                        });
+
+                menuManager.addMenu(editorMenuSelectionMenu);
+                editorMenuSelectionMenu.open();
+
+            }
                 break;
-            case COMMAND:
-                {
-                    if (isLeftClick) {
+            case COMMAND: {
 
-                        editingClickType = ActionClickType.LEFT;
+                if (isLeftClick) {
 
-                    } else {
+                    editingClickType = ActionClickType.LEFT;
 
-                        editingClickType = ActionClickType.RIGHT;
-                    }
+                } else {
 
-                    targetHat.setEditingAction(isLeftClick ? 1 : 2);
-                    editorManager.getOwnerState().setMetaState(MetaState.HAT_COMMAND);
-                    core.prompt(owner, MetaState.HAT_COMMAND);
-                    menuManager.closeInventory();
+                    editingClickType = ActionClickType.RIGHT;
+
                 }
+
+                targetHat.setEditingAction(isLeftClick ? 1 : 2);
+                editorManager.getOwnerState().setMetaState(MetaState.HAT_COMMAND);
+                core.prompt(owner, MetaState.HAT_COMMAND);
+                menuManager.closeInventory();
+
+            }
                 break;
-            case DEMO:
-                {
-                    EditorDurationMenu editorDurationMenu = new EditorDurationMenu(core, editorManager, owner, () -> {
-                        onActionChange(isLeftClick);
-                    });
+            case DEMO: {
 
-                    menuManager.addMenu(editorDurationMenu);
-                    editorDurationMenu.open();
-                }
+                EditorDurationMenu editorDurationMenu = new EditorDurationMenu(core, editorManager, owner, () -> {
+
+                    onActionChange(isLeftClick);
+
+                });
+
+                menuManager.addMenu(editorDurationMenu);
+                editorDurationMenu.open();
+
+            }
                 break;
             default:
                 break;
+
         }
+
     }
 
     /**
      * Called any time an action is changed
+     * 
      * @param isLeftClick
      */
     public void onActionChange(boolean isLeftClick) {
@@ -204,11 +235,11 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
         EditorLore.updateSpecificActionDescription(item, targetHat, action, argument);
 
         callback.onCallback();
+
     }
 
     private enum ActionClickType {
-        NONE,
-        LEFT,
-        RIGHT;
+        NONE, LEFT, RIGHT;
     }
+
 }

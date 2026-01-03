@@ -19,18 +19,21 @@ public interface Database {
 
     /**
      * Check to see if this database initialized successfully
+     * 
      * @return
      */
     public boolean isEnabled();
 
     /**
      * Get this databases last exception
+     * 
      * @return
      */
     public Exception getException();
 
     /**
      * Loads this menu and all its hats
+     * 
      * @param menuName
      * @return
      */
@@ -38,6 +41,7 @@ public interface Database {
 
     /**
      * Loads and returns a MenuInventory linked to this alias
+     * 
      * @param alias
      * @return
      */
@@ -45,6 +49,7 @@ public interface Database {
 
     /**
      * Gets the purchase menu
+     * 
      * @param playerState
      * @return
      */
@@ -52,18 +57,21 @@ public interface Database {
 
     /**
      * Creates and inserts an empty menu into our database
+     * 
      * @param menuName
      */
     public void createMenu(String menuName);
 
     /**
      * Deletes a menu and all it's data
+     * 
      * @param menuName
      */
     public void deleteMenu(String menuName);
 
     /**
      * Check to see if this menu exists in our database
+     * 
      * @param menuName
      * @return
      */
@@ -71,6 +79,7 @@ public interface Database {
 
     /**
      * Returns a list of menus that exist in our database
+     * 
      * @param forceUpdate Forces the menu cache to be updated
      * @return
      */
@@ -78,12 +87,14 @@ public interface Database {
 
     /**
      * Gets all stored images on the database
+     * 
      * @return
      */
     public Map<String, BufferedImage> getImages(boolean forceUpdate);
 
     /**
      * Gets a list of unique labels, duplicate labels are discarded
+     * 
      * @param forceUpdate
      * @return
      */
@@ -91,6 +102,7 @@ public interface Database {
 
     /**
      * Gets a list of groups
+     * 
      * @param forceUpdate
      * @return
      */
@@ -98,6 +110,7 @@ public interface Database {
 
     /**
      * Checks to see if this label has already been used in the database
+     * 
      * @param menuName
      * @param label
      * @return
@@ -106,6 +119,7 @@ public interface Database {
 
     /**
      * Loads a hat with the given label
+     * 
      * @param label
      * @return
      */
@@ -113,6 +127,7 @@ public interface Database {
 
     /**
      * Inserts a new hat entry into the database
+     * 
      * @param menuName
      * @param slot
      */
@@ -120,6 +135,7 @@ public interface Database {
 
     /**
      * Loads all data for this hat
+     * 
      * @param menuName
      * @param slot
      * @param hat
@@ -128,6 +144,7 @@ public interface Database {
 
     /**
      * Saves this hats modified values
+     * 
      * @param menuName
      * @param slot
      * @param hat
@@ -136,6 +153,7 @@ public interface Database {
 
     /**
      * Saves this nodes modified values
+     * 
      * @param menuName
      * @param nodeIndex
      * @param hat
@@ -144,6 +162,7 @@ public interface Database {
 
     /**
      * Creates a duplicate copy of this hat in a different slot
+     * 
      * @param menuName
      * @param currentSlot
      * @param newSlot
@@ -152,18 +171,21 @@ public interface Database {
 
     /**
      * Moves this hat and all data to a new menu
+     * 
      * @param hat
      * @param fromMenu Current menu the hat is inside of
-     * @param toMenu Menu we're moving this hat to, leave as <b>NULL</b> if moving slots in the same menu
+     * @param toMenu   Menu we're moving this hat to, leave as <b>NULL</b> if moving
+     *                 slots in the same menu
      * @param fromSlot Current slot the hat is in
-     * @param toSlot New slot the hat will be moved to
+     * @param toSlot   New slot the hat will be moved to
      * @param swapping Swap this hat with the hat existing at the toSlot slot
      */
-    public void moveHat(
-            Hat fromHat, Hat toHat, String fromMenu, String toMenu, int fromSlot, int toSlot, boolean swapping);
+    public void moveHat(Hat fromHat, Hat toHat, String fromMenu, String toMenu, int fromSlot, int toSlot,
+            boolean swapping);
 
     /**
      * Deletes a hat from this menu
+     * 
      * @param menuName
      * @param slot
      */
@@ -171,6 +193,7 @@ public interface Database {
 
     /**
      * Deletes a node from this menu
+     * 
      * @param menuName
      * @param slot
      */
@@ -178,6 +201,7 @@ public interface Database {
 
     /**
      * Save this hats particle data to the menu
+     * 
      * @param menuName
      * @param hat
      */
@@ -185,6 +209,7 @@ public interface Database {
 
     /**
      * Save this hats meta data to the menu
+     * 
      * @param menuName
      * @param hat
      * @param type
@@ -193,6 +218,7 @@ public interface Database {
 
     /**
      * Saves a menu's title
+     * 
      * @param menuName
      * @param title
      */
@@ -200,6 +226,7 @@ public interface Database {
 
     /**
      * Save a menu's alias
+     * 
      * @param menuName
      * @param alias
      */
@@ -207,6 +234,7 @@ public interface Database {
 
     /**
      * Saves a menu's size
+     * 
      * @param menuName
      * @param rows
      */
@@ -214,6 +242,7 @@ public interface Database {
 
     /**
      * Saves the player's equipped hats
+     * 
      * @param id
      * @param hats
      */
@@ -221,6 +250,7 @@ public interface Database {
 
     /**
      * Loads the player's equipped hats
+     * 
      * @param id
      * @param callback
      */
@@ -228,6 +258,7 @@ public interface Database {
 
     /**
      * Saves the player's purchased hat
+     * 
      * @param id
      * @param hat
      */
@@ -235,6 +266,7 @@ public interface Database {
 
     /**
      * Loads all hats the player has purchased
+     * 
      * @param id
      * @param callback
      */
@@ -242,6 +274,7 @@ public interface Database {
 
     /**
      * Adds a new group to the database
+     * 
      * @param groupName
      * @param defaultMenu
      * @param weight
@@ -250,12 +283,14 @@ public interface Database {
 
     /**
      * Deletes a group from the database
+     * 
      * @param groupName
      */
     public void deleteGroup(String groupName);
 
     /**
      * Edits an existing group
+     * 
      * @param groupName
      * @param defaultMenu
      * @param weight
@@ -264,6 +299,7 @@ public interface Database {
 
     /***
      * Removes a custom type image from the database
+     * 
      * @param imageName
      * @return
      */
@@ -271,6 +307,7 @@ public interface Database {
 
     /**
      * Handle label changes
+     * 
      * @param oldLabel
      * @param newLabel
      */
@@ -283,40 +320,53 @@ public interface Database {
 
     @FunctionalInterface
     public interface DatabaseCallback {
+
         public void execute(Object o);
+
     }
 
     public enum DataType {
-        NONE(0),
-        DESCRIPTION(1),
-        PERMISSION_DESCRIPTION(2),
-        ICON(3),
-        TAGS(4),
-        ITEMSTACK(5);
+
+        NONE(0), DESCRIPTION(1), PERMISSION_DESCRIPTION(2), ICON(3), TAGS(4), ITEMSTACK(5);
 
         private static Map<Integer, DataType> dataID = new HashMap<Integer, DataType>();
 
         static {
+
             for (DataType type : values()) {
+
                 dataID.put(type.id, type);
+
             }
+
         }
 
         private final int id;
 
         private DataType(final int id) {
+
             this.id = id;
+
         }
 
         public int getID() {
+
             return id;
+
         }
 
         public static DataType fromID(int id) {
+
             if (dataID.containsKey(id)) {
+
                 return dataID.get(id);
+
             }
+
             return DataType.NONE;
+
         }
+
     }
+
 }

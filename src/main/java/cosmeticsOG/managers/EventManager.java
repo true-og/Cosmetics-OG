@@ -24,6 +24,7 @@ public class EventManager {
     private final PlayerListener playerListener;
 
     public EventManager(final CosmeticsOG core) {
+
         this.core = core;
 
         inventoryListener = new InventoryListener(core);
@@ -33,9 +34,13 @@ public class EventManager {
         interactListener = new InteractListener(core);
         commandListener = new CommandListener(core);
         playerListener = new PlayerListener(core);
+
     }
 
     public void onReload() {
+
         entityListener.onReload();
+
     }
+
 }

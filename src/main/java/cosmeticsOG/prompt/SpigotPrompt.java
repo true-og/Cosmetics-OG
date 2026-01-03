@@ -24,18 +24,23 @@ public class SpigotPrompt extends BukkitPrompt {
             super.prompt(player, message);
 
             success = false;
+
         }
+
     }
 
     @Override
     public void prompt(Player player, MetaState state) {
 
         prompt(player, state.getDescription());
+
     }
 
     @Override
     public boolean canPrompt(int passes) {
 
         return success ? passes % 1 == 0 : super.canPrompt(passes);
+
     }
+
 }

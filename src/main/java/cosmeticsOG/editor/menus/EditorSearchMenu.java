@@ -27,8 +27,9 @@ public class EditorSearchMenu extends AbstractListMenu {
 
     private final String menuTitle;
 
-    public EditorSearchMenu(
-            CosmeticsOG core, MenuManager menuManager, Player owner, String searchQuery, MenuObjectCallback callback) {
+    public EditorSearchMenu(CosmeticsOG core, MenuManager menuManager, Player owner, String searchQuery,
+            MenuObjectCallback callback)
+    {
 
         super(core, menuManager, owner, false);
 
@@ -43,6 +44,7 @@ public class EditorSearchMenu extends AbstractListMenu {
             if (blacklist.contains(material)) {
 
                 continue;
+
             }
 
             String materialName = material.toString().toLowerCase();
@@ -51,36 +53,43 @@ public class EditorSearchMenu extends AbstractListMenu {
                 if (materialName.contains(q)) {
 
                     matchingResults.add(material);
+
                 }
+
             }
+
         }
 
         this.totalPages = MathUtil.calculatePageCount(matchingResults.size(), 45);
         this.selectAction = (event, slot) -> {
+
             int index = slot + (currentPage * 45);
             if (index < matchingResults.size()) {
 
                 callback.onSelect(new ItemStack(matchingResults.get(index)));
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
     @Override
     public void insertEmptyItem() {
 
-        setItem(
-                0,
-                22,
-                ItemUtil.createItem(
-                        CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_SEARCH_MENU_NO_RESULTS.getValue()));
+        setItem(0, 22, ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+                Message.EDITOR_SEARCH_MENU_NO_RESULTS.getValue()));
+
     }
 
     @Override
-    public void removeEmptyItem() {}
+    public void removeEmptyItem() {
+
+    }
 
     @Override
     protected void build() {
@@ -90,25 +99,30 @@ public class EditorSearchMenu extends AbstractListMenu {
 
         // Previous page.
         setAction(48, (event, slot) -> {
+
             currentPage--;
 
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Next page.
         setAction(50, (event, slot) -> {
+
             currentPage++;
 
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         for (int i = 0; i < 45; i++) {
 
             setAction(i, selectAction);
+
         }
 
         for (int i = 0; i < totalPages; i++) {
@@ -119,25 +133,20 @@ public class EditorSearchMenu extends AbstractListMenu {
 
             if ((i + 1) < totalPages) {
 
-                inventory.setItem(
-                        50,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                inventory.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+
             }
 
             if ((i + 1) > 1) {
 
-                inventory.setItem(
-                        48,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                inventory.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+
             }
 
             setMenu(i, inventory);
+
         }
 
         if (matchingResults.isEmpty()) {
@@ -145,6 +154,7 @@ public class EditorSearchMenu extends AbstractListMenu {
             setEmpty(true);
 
             return;
+
         }
 
         int index = 0;
@@ -158,13 +168,21 @@ public class EditorSearchMenu extends AbstractListMenu {
                 index = 0;
 
                 page++;
+
             }
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

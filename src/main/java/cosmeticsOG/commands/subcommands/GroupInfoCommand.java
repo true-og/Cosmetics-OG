@@ -27,14 +27,13 @@ public class GroupInfoCommand extends Command {
         } else {
 
             Utils.logToConsole(Message.COMMAND_GROUP_INFO_TIP.getValue());
+
         }
 
         for (Group g : groups) {
 
-            String info = infoTemplate
-                    .replace("{1}", g.getName())
-                    .replace("{2}", g.getDefaultMenu())
-                    .replace("{3}", Integer.toString(g.getWeight()));
+            String info = infoTemplate.replace("{1}", g.getName()).replace("{2}", g.getDefaultMenu()).replace("{3}",
+                    Integer.toString(g.getWeight()));
 
             if (sender.isPlayer()) {
 
@@ -43,63 +42,76 @@ public class GroupInfoCommand extends Command {
             } else {
 
                 Utils.logToConsole("> " + info);
+
             }
+
         }
 
         return false;
+
     }
 
     @Override
     public String getName() {
 
         return "group info";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "info";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_GROUP_INFO_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_GROUP_INFO_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_GROUP_INFO;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_GROUP_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

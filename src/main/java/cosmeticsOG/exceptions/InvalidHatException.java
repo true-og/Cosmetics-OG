@@ -7,5 +7,7 @@ public class InvalidHatException extends Exception {
     public InvalidHatException(String s) {
 
         super(s);
+
     }
+
 }

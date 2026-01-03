@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Menu that only has one inventory
+ * 
  * @author MediusEcho
  *
  */
@@ -17,6 +18,7 @@ public abstract class AbstractStaticMenu extends AbstractMenu {
     public AbstractStaticMenu(CosmeticsOG core, MenuManager menuManager, Player owner) {
 
         super(core, menuManager, owner);
+
     }
 
     @Override
@@ -24,42 +26,50 @@ public abstract class AbstractStaticMenu extends AbstractMenu {
 
         menuManager.isOpeningMenu(this);
         owner.openInventory(inventory);
+
     }
 
     @Override
     public boolean hasInventory(Inventory inventory) {
 
         return this.inventory.equals(inventory);
+
     }
 
     @Override
     public String getName() {
 
         return "";
+
     }
 
     /**
      * Get the item at this slot
+     * 
      * @param slot
      * @return
      */
     protected ItemStack getItem(int slot) {
 
         return inventory.getItem(slot);
+
     }
 
     /**
      * Place an item into this inventory
+     * 
      * @param slot
      * @param item
      */
     protected void setItem(int slot, ItemStack item) {
 
         inventory.setItem(slot, item);
+
     }
 
     /**
      * Set the ItemStack and MenuAction for the given slot
+     * 
      * @param slot
      * @param item
      * @param action
@@ -68,15 +78,19 @@ public abstract class AbstractStaticMenu extends AbstractMenu {
 
         setItem(slot, item);
         setAction(slot, action);
+
     }
 
     /**
      * Set the MenuButton for the given slot
+     * 
      * @param button
      */
     protected void setButton(int slot, MenuButton button) {
 
         setItem(slot, button.getItem());
         setAction(slot, button.getAction());
+
     }
+
 }

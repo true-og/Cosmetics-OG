@@ -26,10 +26,11 @@ public class EditorAngleMenu extends AbstractStaticMenu {
 
         this.editorManager = menuManager;
         this.callback = callback;
-        this.inventory = Bukkit.createInventory(
-                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_ANGLE_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 27,
+                Utils.legacySerializerAnyCase(Message.EDITOR_ANGLE_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -38,31 +39,38 @@ public class EditorAngleMenu extends AbstractStaticMenu {
         Hat targetHat = editorManager.getTargetHat();
 
         // X Angle.
-        ItemStack xItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_ANGLE_MENU_SET_ANGLE_X.getValue());
+        ItemStack xItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_ANGLE_MENU_SET_ANGLE_X.getValue());
         EditorLore.updateVectorDescription(xItem, targetHat.getAngle(), Message.EDITOR_ANGLE_MENU_ANGLE_X_DESCRIPTION);
         setButton(14, xItem, (event, slot) -> {
+
             return updateAngle(event, targetHat, VectorAxis.X);
+
         });
 
         // Y Angle.
-        ItemStack yItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_ANGLE_MENU_SET_ANGLE_Y.getValue());
+        ItemStack yItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_ANGLE_MENU_SET_ANGLE_Y.getValue());
         EditorLore.updateVectorDescription(yItem, targetHat.getAngle(), Message.EDITOR_ANGLE_MENU_ANGLE_Y_DESCRIPTION);
         setButton(15, yItem, (event, slot) -> {
+
             return updateAngle(event, targetHat, VectorAxis.Y);
+
         });
 
         // Z Angle.
-        ItemStack zItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_ANGLE_MENU_SET_ANGLE_Z.getValue());
+        ItemStack zItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_ANGLE_MENU_SET_ANGLE_Z.getValue());
         EditorLore.updateVectorDescription(zItem, targetHat.getAngle(), Message.EDITOR_ANGLE_MENU_ANGLE_Z_DESCRIPTION);
         setButton(16, zItem, (event, slot) -> {
+
             return updateAngle(event, targetHat, VectorAxis.Z);
+
         });
 
         // Back.
         setButton(10, backButtonItem, backButtonAction);
+
     }
 
     @Override
@@ -71,11 +79,15 @@ public class EditorAngleMenu extends AbstractStaticMenu {
         if (!forced) {
 
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     private MenuClickResult updateAngle(MenuClickEvent event, Hat hat, VectorAxis axis) {
 
@@ -86,6 +98,7 @@ public class EditorAngleMenu extends AbstractStaticMenu {
 
         Vector angle = hat.getAngle();
         switch (axis) {
+
             case X:
                 double xa = !isMiddleClick ? angle.getX() + modifier : 0;
 
@@ -104,6 +117,7 @@ public class EditorAngleMenu extends AbstractStaticMenu {
                 hat.setAngleZ(za);
 
                 break;
+
         }
 
         EditorLore.updateVectorDescription(getItem(14), angle, Message.EDITOR_ANGLE_MENU_ANGLE_X_DESCRIPTION);
@@ -117,6 +131,9 @@ public class EditorAngleMenu extends AbstractStaticMenu {
         } else {
 
             return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+
         }
+
     }
+
 }

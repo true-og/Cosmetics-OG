@@ -24,6 +24,7 @@ public class ItemUtil {
         Material originalMaterial = Material.getMaterial(material);
 
         return originalMaterial != null ? originalMaterial : fallback;
+
     }
 
     public static Material getMaterial(String material, String fallback) {
@@ -31,6 +32,7 @@ public class ItemUtil {
         Material originalMaterial = Material.getMaterial(material);
 
         return originalMaterial != null ? originalMaterial : Material.getMaterial(fallback);
+
     }
 
     @SuppressWarnings("deprecation")
@@ -46,19 +48,23 @@ public class ItemUtil {
                 // Set damage for versions >= 1.13.
                 ((Damageable) meta).setDamage(damage);
                 item.setItemMeta(meta);
+
             }
 
         } else {
 
             // Legacy method for versions < 1.13.
             item.setDurability((short) damage);
+
         }
 
         return item;
+
     }
 
-    public static ItemStack createItem(
-            Material material, int quantity, String titleString, List<TextComponent> description) {
+    public static ItemStack createItem(Material material, int quantity, String titleString,
+            List<TextComponent> description)
+    {
 
         TextComponent title = Utils.legacySerializerAnyCase(titleString);
 
@@ -69,14 +75,14 @@ public class ItemUtil {
         itemMeta.displayName((Component) title);
 
         // Convert List<TextComponent> to List<Component>.
-        List<Component> components =
-                description.stream().map(text -> (Component) text).collect(Collectors.toList());
+        List<Component> components = description.stream().map(text -> (Component) text).collect(Collectors.toList());
         itemMeta.lore(components);
 
         addItemFlags(itemMeta);
         item.setItemMeta(itemMeta);
 
         return item;
+
     }
 
     public static ItemStack createItem(Material material, int quantity, String title) {
@@ -90,6 +96,7 @@ public class ItemUtil {
         item.setItemMeta(itemMeta);
 
         return item;
+
     }
 
     public static ItemStack createItem(Material material, String displayNameString, List<Component> description) {
@@ -112,6 +119,7 @@ public class ItemUtil {
         item.setItemMeta(itemMeta);
 
         return item;
+
     }
 
     public static void setItemDescription(ItemStack item, List<? extends Component> description) {
@@ -119,33 +127,37 @@ public class ItemUtil {
         if (item == null || description == null) {
 
             return;
+
         }
 
         ItemMeta itemMeta = item.getItemMeta();
         if (itemMeta == null) {
 
             return;
+
         }
 
         // Process the list, handling both TextComponent and generic Component
-        List<Component> components = description.stream()
-                .map(component -> {
-                    if (component instanceof TextComponent) {
+        List<Component> components = description.stream().map(component -> {
 
-                        // Process color codes for TextComponent
-                        return Utils.legacySerializerAnyCase(((TextComponent) component).content());
+            if (component instanceof TextComponent) {
 
-                    } else {
+                // Process color codes for TextComponent
+                return Utils.legacySerializerAnyCase(((TextComponent) component).content());
 
-                        // For other Component types, simply return them as-is.
-                        return component;
-                    }
-                })
-                .collect(Collectors.toList());
+            } else {
+
+                // For other Component types, simply return them as-is.
+                return component;
+
+            }
+
+        }).collect(Collectors.toList());
 
         // Set the lore (description) of the item
         itemMeta.lore(components);
         item.setItemMeta(itemMeta);
+
     }
 
     public static void setItemDescription(ItemStack item, TextComponent... description) {
@@ -153,6 +165,7 @@ public class ItemUtil {
         if (item == null || description == null) {
 
             return;
+
         }
 
         // Convert TextComponent array to List<Component> for color code processing.
@@ -164,12 +177,14 @@ public class ItemUtil {
 
         itemMeta.lore(components);
         item.setItemMeta(itemMeta);
+
     }
 
     // Set item description using Message object.
     public static void setItemDescription(ItemStack item, Message description) {
 
         setItemDescription(item, StringUtil.parseDescription(description.getValue()));
+
     }
 
     public static void setItemName(ItemStack item, String name) {
@@ -177,6 +192,7 @@ public class ItemUtil {
         if (item == null || name == null) {
 
             return;
+
         }
 
         // Get the item's metadata.
@@ -184,6 +200,7 @@ public class ItemUtil {
         if (meta == null) {
 
             return;
+
         }
 
         // Set the display name of the item using the legacy formatted string.
@@ -191,11 +208,13 @@ public class ItemUtil {
 
         // Apply the modified meta back to the item.
         item.setItemMeta(meta);
+
     }
 
     public static void setItemName(ItemStack item, Message name) {
 
         setItemName(item, name.getValue());
+
     }
 
     public static void setNameAndDescription(ItemStack item, Component name, List<Component> description) {
@@ -207,12 +226,14 @@ public class ItemUtil {
 
         addItemFlags(itemMeta);
         item.setItemMeta(itemMeta);
+
     }
 
     public static void setNameAndDescription(ItemStack item, Message name, Message description) {
 
-        setNameAndDescription(
-                item, Component.text(name.getValue()), StringUtil.parseDescription(description.getValue()));
+        setNameAndDescription(item, Component.text(name.getValue()),
+                StringUtil.parseDescription(description.getValue()));
+
     }
 
     public static void highlightItem(ItemStack item) {
@@ -226,7 +247,9 @@ public class ItemUtil {
             // Add fake enchant for glow.
             itemMeta.addEnchant(Enchantment.ARROW_DAMAGE, 0, true);
             item.setItemMeta(itemMeta);
+
         }
+
     }
 
     public static void stripHighlight(ItemStack item) {
@@ -235,6 +258,7 @@ public class ItemUtil {
 
         itemMeta.removeEnchant(Enchantment.ARROW_DAMAGE);
         item.setItemMeta(itemMeta);
+
     }
 
     @SuppressWarnings("deprecation")
@@ -249,18 +273,22 @@ public class ItemUtil {
                 ((Damageable) meta).setDamage(damage);
 
                 item.setItemMeta(meta);
+
             }
 
         } else {
 
             // Legacy method for versions < 1.13.
             item.setDurability((short) damage);
+
         }
+
     }
 
     public static void setItemType(ItemStack item, CompatibleMaterial material) {
 
         setItemType(item, material.getMaterial(), material.getDurability());
+
     }
 
     private static void addItemFlags(ItemMeta itemMeta) {
@@ -270,6 +298,9 @@ public class ItemUtil {
             itemMeta.addItemFlags(ItemFlag.values());
 
         } catch (NoClassDefFoundError ignored) {
+
         }
+
     }
+
 }

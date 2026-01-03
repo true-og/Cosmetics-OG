@@ -31,10 +31,11 @@ public class PurchaseEditorSettingsMenu extends AbstractStaticMenu {
         this.purchaseManager = menuManager;
         this.editorBaseMenu = menuManager.getEditingMenu();
         this.menuInventory = editorBaseMenu.getMenuInventory();
-        this.inventory = Bukkit.createInventory(
-                null, 36, Utils.legacySerializerAnyCase(Message.EDITOR_SETTINGS_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 36,
+                Utils.legacySerializerAnyCase(Message.EDITOR_SETTINGS_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -44,54 +45,64 @@ public class PurchaseEditorSettingsMenu extends AbstractStaticMenu {
         setButton(31, backButtonItem, backButtonAction);
 
         // Set Title.
-        ItemStack titleItem = ItemUtil.createItem(
-                CompatibleMaterial.SIGN.getMaterial(), 1, Message.EDITOR_SETTINGS_MENU_SET_TITLE.getValue());
+        ItemStack titleItem = ItemUtil.createItem(CompatibleMaterial.SIGN.getMaterial(), 1,
+                Message.EDITOR_SETTINGS_MENU_SET_TITLE.getValue());
         setButton(10, titleItem, (event, slot) -> {
+
             purchaseManager.getOwnerState().setMetaState(MetaState.MENU_TITLE);
             core.prompt(owner, MetaState.MENU_TITLE);
             menuManager.closeInventory();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Set Size.
-        ItemStack sizeItem = ItemUtil.createItem(
-                CompatibleMaterial.COMPARATOR.getMaterial(), 1, Message.EDITOR_SETTINGS_MENU_SET_SIZE.getValue());
+        ItemStack sizeItem = ItemUtil.createItem(CompatibleMaterial.COMPARATOR.getMaterial(), 1,
+                Message.EDITOR_SETTINGS_MENU_SET_SIZE.getValue());
         setButton(12, sizeItem, (event, slot) -> {
+
             EditorResizeMenu editorResizeMenu = new EditorResizeMenu(core, purchaseManager, owner, editorBaseMenu);
             menuManager.addMenu(editorResizeMenu);
             editorResizeMenu.open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Toggle Live Updates.
-        ItemStack liveItem =
-                ItemUtil.createItem(Material.LEVER, 1, Message.EDITOR_SETTINGS_MENU_TOGGLE_LIVE_MENU.getValue());
-        EditorLore.updateBooleanDescription(
-                liveItem, editorBaseMenu.canUpdate(), Message.EDITOR_SETTINGS_MENU_ANIMATION_DESCRIPTION);
+        ItemStack liveItem = ItemUtil.createItem(Material.LEVER, 1,
+                Message.EDITOR_SETTINGS_MENU_TOGGLE_LIVE_MENU.getValue());
+        EditorLore.updateBooleanDescription(liveItem, editorBaseMenu.canUpdate(),
+                Message.EDITOR_SETTINGS_MENU_ANIMATION_DESCRIPTION);
         setButton(14, liveItem, (event, slot) -> {
+
             editorBaseMenu.toggleUpdates();
-            EditorLore.updateBooleanDescription(
-                    getItem(14), editorBaseMenu.canUpdate(), Message.EDITOR_SETTINGS_MENU_ANIMATION_DESCRIPTION);
+            EditorLore.updateBooleanDescription(getItem(14), editorBaseMenu.canUpdate(),
+                    Message.EDITOR_SETTINGS_MENU_ANIMATION_DESCRIPTION);
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Sync Icons.
-        ItemStack syncItem = ItemUtil.createItem(
-                CompatibleMaterial.CONDUIT.getMaterial(),
+        ItemStack syncItem = ItemUtil.createItem(CompatibleMaterial.CONDUIT.getMaterial(),
                 Message.EDITOR_SETTINGS_MENU_SYNC_ICONS.getValue(),
                 StringUtil.parseDescription(Message.EDITOR_SETTINGS_SYNC_DESCRIPTION.getValue()));
         setButton(16, syncItem, (event, slot) -> {
+
             editorBaseMenu.syncItems();
 
             return MenuClickResult.NEUTRAL;
+
         });
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
     public void open() {
@@ -103,11 +114,16 @@ public class PurchaseEditorSettingsMenu extends AbstractStaticMenu {
         if (titleItem != null) {
 
             ItemUtil.setItemDescription(titleItem, StringUtil.parseDescription(title));
+
         }
 
         super.open();
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

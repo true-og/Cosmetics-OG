@@ -22,18 +22,20 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
     private final int particleIndex;
     private final MenuCallback callback;
 
-    public EditorVelocityMenu(
-            CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex, MenuCallback callback) {
+    public EditorVelocityMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, int particleIndex,
+            MenuCallback callback)
+    {
 
         super(core, menuManager, owner);
 
         this.editorManager = menuManager;
         this.particleIndex = particleIndex;
         this.callback = callback;
-        this.inventory = Bukkit.createInventory(
-                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_VELOCITY_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 27,
+                Utils.legacySerializerAnyCase(Message.EDITOR_VELOCITY_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -44,31 +46,38 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
         Vector velocity = itemStackData.getVelocity();
 
         // X Offset.
-        ItemStack xItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_X.getValue());
+        ItemStack xItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_X.getValue());
         EditorLore.updateVectorDescription(xItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
         setButton(14, xItem, (event, slot) -> {
+
             return updateVelocity(event, targetHat, VectorAxis.X);
+
         });
 
         // Y Offset.
-        ItemStack yItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Y.getValue());
+        ItemStack yItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Y.getValue());
         EditorLore.updateVectorDescription(yItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Y_DESCRIPTION);
         setButton(15, yItem, (event, slot) -> {
+
             return updateVelocity(event, targetHat, VectorAxis.Y);
+
         });
 
         // Z Offset.
-        ItemStack zItem = ItemUtil.createItem(
-                CompatibleMaterial.REPEATER.getMaterial(), 1, Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Z.getValue());
+        ItemStack zItem = ItemUtil.createItem(CompatibleMaterial.REPEATER.getMaterial(), 1,
+                Message.EDITOR_VELOCITY_MENU_SET_VELOCITY_Z.getValue());
         EditorLore.updateVectorDescription(zItem, velocity, Message.EDITOR_OFFSET_MENU_OFFSET_Z_DESCRIPTION);
         setButton(16, zItem, (event, slot) -> {
+
             return updateVelocity(event, targetHat, VectorAxis.Z);
+
         });
 
         // Back.
         setButton(10, backButtonItem, backButtonAction);
+
     }
 
     @Override
@@ -77,11 +86,15 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
         if (!forced) {
 
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     public MenuClickResult updateVelocity(MenuClickEvent event, Hat hat, VectorAxis axis) {
 
@@ -94,6 +107,7 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
         Vector velocity = data.getVelocity();
 
         switch (axis) {
+
             case X:
                 double vx = !isMiddleClick ? velocity.getX() + modifier : 0;
 
@@ -112,6 +126,7 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
                 data.setVelocityZ(vz);
 
                 break;
+
         }
 
         EditorLore.updateVectorDescription(getItem(14), velocity, Message.EDITOR_OFFSET_MENU_OFFSET_X_DESCRIPTION);
@@ -125,6 +140,9 @@ public class EditorVelocityMenu extends AbstractStaticMenu {
         } else {
 
             return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+
         }
+
     }
+
 }

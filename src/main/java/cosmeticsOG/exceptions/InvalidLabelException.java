@@ -7,5 +7,7 @@ public class InvalidLabelException extends Exception {
     public InvalidLabelException(String s) {
 
         super(s);
+
     }
+
 }

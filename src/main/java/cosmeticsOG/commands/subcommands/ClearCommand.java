@@ -22,6 +22,7 @@ public class ClearCommand extends Command {
         clearPlayerCommand = new ClearPlayerCommand();
 
         register(clearPlayerCommand);
+
     }
 
     @Override
@@ -36,6 +37,7 @@ public class ClearCommand extends Command {
                 Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_USAGE.getValue());
 
                 return false;
+
             }
 
             core.getPlayerState(sender.getPlayer()).clearActiveHats();
@@ -47,6 +49,7 @@ public class ClearCommand extends Command {
             } else {
 
                 Utils.logToConsole(Message.COMMAND_CLEAR_SUCCESS.getValue());
+
             }
 
             return true;
@@ -54,7 +57,9 @@ public class ClearCommand extends Command {
         } else {
 
             return clearPlayerCommand.onCommand(core, sender, label, args);
+
         }
+
     }
 
     @Override
@@ -68,72 +73,87 @@ public class ClearCommand extends Command {
                 for (Player p : Bukkit.getOnlinePlayers()) {
 
                     players.add(p.getName());
+
                 }
 
                 if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
                     players.add("@p");
                     players.add("@r");
+
                 }
 
                 return players;
+
             }
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "clear";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "clear";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_CLEAR_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_CLEAR_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_CLEAR;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_CLEAR_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

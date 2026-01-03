@@ -16,30 +16,43 @@ public class HatEquipEvent extends Event implements Cancellable {
     private boolean cancelled = false;
 
     public HatEquipEvent(final Player player, final Hat hat) {
+
         this.player = player;
         this.hat = hat;
+
     }
 
     public Player getPlayer() {
+
         return player;
+
     }
 
     public Hat getHat() {
+
         return hat;
+
     }
 
     @Override
     public HandlerList getHandlers() {
+
         return handlers;
+
     }
 
     @Override
     public boolean isCancelled() {
+
         return cancelled;
+
     }
 
     @Override
     public void setCancelled(boolean cancelled) {
+
         this.cancelled = cancelled;
+
     }
+
 }

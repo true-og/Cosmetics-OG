@@ -24,6 +24,7 @@ public class EditCommand extends Command {
     public EditCommand(final CosmeticsOG core) {
 
         this.core = core;
+
     }
 
     @Override
@@ -31,8 +32,7 @@ public class EditCommand extends Command {
 
         if (args.size() == 1) {
 
-            List<String> menus =
-                    new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+            List<String> menus = new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
             List<String> result = new ArrayList<String>();
 
             menus.add("purchase");
@@ -42,13 +42,17 @@ public class EditCommand extends Command {
                 if (hasPermission(sender, menu)) {
 
                     result.add(menu);
+
                 }
+
             }
 
             return result;
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
@@ -65,9 +69,11 @@ public class EditCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(Message.COMMAND_EDIT_USAGE.getValue());
+
             }
 
             return false;
+
         }
 
         PlayerState playerState = core.getPlayerState(sender.getPlayer());
@@ -77,6 +83,7 @@ public class EditCommand extends Command {
             Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
             return false;
+
         }
 
         String menuName = (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
@@ -85,28 +92,31 @@ public class EditCommand extends Command {
             MenuInventory inventory = database.getPurchaseMenu(playerState);
             if (inventory != null) {
 
-                PurchaseMenuManager purchaseManager =
-                        core.getMenuManagerFactory().getPurchaseMenuManager(playerState);
+                PurchaseMenuManager purchaseManager = core.getMenuManagerFactory().getPurchaseMenuManager(playerState);
 
                 purchaseManager.setEditingMenu(inventory);
                 purchaseManager.open();
+
             }
 
             return false;
+
         }
 
         if (!database.menuExists(menuName)) {
 
-            Utils.cosmeticsOGPlaceholderMessage(
-                    (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                    Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
             return false;
+
         }
 
         MenuInventory inventory = database.loadInventory(menuName, playerState);
         if (inventory == null) {
 
             return false;
+
         }
 
         EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
@@ -115,60 +125,70 @@ public class EditCommand extends Command {
         editorManager.open();
 
         return true;
+
     }
 
     @Override
     public String getName() {
 
         return "edit menu";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "edit";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_EDIT_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_EDIT_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_EDIT;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_EDIT_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return true;
+
     }
 
     @Override
@@ -177,12 +197,14 @@ public class EditCommand extends Command {
         if (!sender.isPlayer()) {
 
             return true;
+
         }
 
         // /h wild card check.
         if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
             return true;
+
         }
 
         // Specific command wild card check.
@@ -191,12 +213,13 @@ public class EditCommand extends Command {
             if (getWildcardPermission().hasPermission(sender)) {
 
                 return true;
+
             }
+
         }
 
         // Check for individual menu permissions.
-        List<String> menus =
-                new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
+        List<String> menus = new ArrayList<String>(core.getDatabase().getMenus(false).keySet());
         menus.add("purchase");
 
         for (String menu : menus) {
@@ -204,10 +227,13 @@ public class EditCommand extends Command {
             if (sender.hasPermission(getPermission().append(menu))) {
 
                 return true;
+
             }
+
         }
 
         return false;
+
     }
 
     @Override
@@ -216,12 +242,14 @@ public class EditCommand extends Command {
         if (!sender.isPlayer()) {
 
             return true;
+
         }
 
         // /h wild card check.
         if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
             return true;
+
         }
 
         // Specific command wild card check.
@@ -230,7 +258,9 @@ public class EditCommand extends Command {
             if (getWildcardPermission().hasPermission(sender)) {
 
                 return true;
+
             }
+
         }
 
         if (arg != null && !arg.equals("")) {
@@ -238,9 +268,13 @@ public class EditCommand extends Command {
             if (sender.hasPermission(getPermission().append(arg))) {
 
                 return true;
+
             }
+
         }
 
         return false;
+
     }
+
 }

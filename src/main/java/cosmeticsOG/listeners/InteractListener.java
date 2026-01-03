@@ -25,24 +25,33 @@ public class InteractListener implements Listener {
     private final CosmeticsOG core;
 
     public InteractListener(final CosmeticsOG core) {
+
         this.core = core;
         core.getServer().getPluginManager().registerEvents(this, core);
+
     }
 
     @SuppressWarnings("deprecation")
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+
         if (!SettingsManager.MENU_OPEN_WITH_ITEM.getBoolean()) {
+
             return;
+
         }
 
         ItemStack item = event.getItem();
         if (item != null) {
+
             Material checkAgainst = SettingsManager.MENU_OPEN_WITH_ITEM_MATERIAL.getMaterial();
             if (item.getType().equals(checkAgainst)) {
+
                 short durability = (short) SettingsManager.MENU_OPEN_WITH_ITEM_DAMAGE.getInt();
                 if (CosmeticsOG.serverVersion < 13 && item.getDurability() != durability) {
+
                     return;
+
                 }
 
                 Database database = core.getDatabase();
@@ -50,18 +59,28 @@ public class InteractListener implements Listener {
                 String menuName = "";
 
                 if (SettingsManager.MENU_OPEN_WITH_GROUP.getBoolean()) {
+
                     List<Group> groups = database.getGroups(true);
                     for (Group g : groups) {
+
                         if (player.hasPermission(Permission.GROUP.append(g.getName()))) {
+
                             menuName = g.getDefaultMenu();
+
                         }
+
                     }
+
                 } else {
+
                     menuName = SettingsManager.MENU_OPEN_DEFAULT_MENU.getString();
+
                 }
 
                 if (menuName.equals("")) {
+
                     return;
+
                 }
 
                 menuName = ResourceUtil.removeExtension(menuName);
@@ -69,9 +88,10 @@ public class InteractListener implements Listener {
                 MenuInventory inventory = database.loadInventory(menuName, playerState);
 
                 if (inventory == null) {
-                    player.sendMessage(
-                            Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
+
+                    player.sendMessage(Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
                     return;
+
                 }
 
                 StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
@@ -79,7 +99,11 @@ public class InteractListener implements Listener {
 
                 staticManager.addMenu(menu);
                 menu.open();
+
             }
+
         }
+
     }
+
 }

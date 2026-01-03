@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 
 /**
  * Listens for a player editing meta properties through the menu editor
+ * 
  * @author MediusEcho
  *
  */
@@ -31,6 +32,7 @@ public class ChatListener implements Listener {
         this.core = core;
 
         core.getServer().getPluginManager().registerEvents(this, core);
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -47,12 +49,14 @@ public class ChatListener implements Listener {
                 if (metaState.equals(MetaState.NONE)) {
 
                     return;
+
                 }
 
                 MenuManager menuManager = playerState.getMenuManager();
                 if (!(menuManager instanceof EditorMenuManager)) {
 
                     return;
+
                 }
 
                 EditorMenuManager editorManager = (EditorMenuManager) menuManager;
@@ -62,22 +66,26 @@ public class ChatListener implements Listener {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(CosmeticsOG.instance, () -> {
 
                     // Convert the Component to a plain string
-                    String messageString =
-                            PlainTextComponentSerializer.plainText().serialize(event.message());
+                    String messageString = PlainTextComponentSerializer.plainText().serialize(event.message());
 
                     if (Utils.stripColors(messageString).equals("cancel")) {
 
                         editorManager.reopen();
 
                         return;
+
                     }
 
                     List<String> arguments = Arrays.asList(messageString.split(" "));
 
                     metaState.onMetaSet(editorManager, player, arguments);
+
                 });
+
             }
+
         }
+
     }
 
     /**
@@ -86,5 +94,7 @@ public class ChatListener implements Listener {
     public void unregister() {
 
         AsyncChatEvent.getHandlerList().unregister(this);
+
     }
+
 }

@@ -38,6 +38,7 @@ public class CustomConfig {
         } else if (logOutput) {
 
             Utils.logToConsole("Loading " + path + File.separator + fileName);
+
         }
 
         try {
@@ -46,9 +47,10 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: "
-                    + error.getClass().getSimpleName());
+            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+
         }
+
     }
 
     public CustomConfig(final CosmeticsOG core, final String path, File file, boolean logOutput) {
@@ -67,9 +69,10 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: "
-                    + error.getClass().getSimpleName());
+            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+
         }
+
     }
 
     /**
@@ -84,7 +87,9 @@ public class CustomConfig {
         } catch (Exception error) {
 
             Utils.logToConsole("There was an error saving the config file: " + error.getMessage());
+
         }
+
     }
 
     /**
@@ -98,51 +103,61 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: "
-                    + error.getClass().getSimpleName());
+            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+
         }
+
     }
 
     /**
      * Tries to delete this Configuration File.
+     * 
      * @return
      */
     public boolean delete() {
 
         return file.delete();
+
     }
 
     public String getFileName() {
 
         return fileName;
+
     }
 
     /**
      * Returns the name of this file.
+     * 
      * @return
      */
     public String getName() {
 
         return name;
+
     }
 
     public void set(String path, Object value) {
 
         config.set(path, value);
+
     }
 
     /**
      * Get this CustomConfig configuration file.
+     * 
      * @return
      */
     public FileConfiguration getConfig() {
 
         return config;
+
     }
 
     /**
-     * Creates a file.
-     * will try to load from an existing file first before creating a blank file.
+     * Creates a file. will try to load from an existing file first before creating
+     * a blank file.
+     * 
      * @param logOutput
      * @return
      */
@@ -162,6 +177,7 @@ public class CustomConfig {
 
                 Utils.logToConsole("ERROR: Failed to copy resource: " + core.getResource(fileName) + "into file: "
                         + file.getAbsolutePath());
+
             }
 
         } else {
@@ -175,15 +191,21 @@ public class CustomConfig {
                 } catch (IOException error) {
 
                     Utils.logToConsole("ERROR: Failed to create file: " + file.getAbsolutePath());
+
                 }
+
             }
+
         }
 
         if (logOutput) {
 
             Utils.logToConsole("Creating " + path + File.separator + fileName);
+
         }
 
         return file;
+
     }
+
 }

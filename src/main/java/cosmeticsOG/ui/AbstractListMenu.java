@@ -12,13 +12,14 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Menu that will have multiple pages of inventories
+ * 
  * @author MediusEcho
  *
  */
 public abstract class AbstractListMenu extends AbstractMenu {
 
-    protected final ItemStack emptyItem =
-            ItemUtil.createItem(Material.BARRIER, 1, Message.EDITOR_MISC_EMPTY_MENU.getValue());
+    protected final ItemStack emptyItem = ItemUtil.createItem(Material.BARRIER, 1,
+            Message.EDITOR_MISC_EMPTY_MENU.getValue());
     protected final boolean canEdit;
 
     protected Map<Integer, Inventory> menus;
@@ -34,6 +35,7 @@ public abstract class AbstractListMenu extends AbstractMenu {
 
         this.canEdit = canEdit;
         this.menus = new HashMap<Integer, Inventory>();
+
     }
 
     public abstract void insertEmptyItem();
@@ -47,26 +49,31 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (inventory == null) {
 
             return;
+
         }
 
         menuManager.isOpeningMenu(this);
         owner.openInventory(inventory);
+
     }
 
     @Override
     public boolean hasInventory(Inventory inventory) {
 
         return menus.containsValue(inventory);
+
     }
 
     @Override
     public String getName() {
 
         return "";
+
     }
 
     /**
      * Set whether this menu's content is empty
+     * 
      * @param isEmpty
      */
     public void setEmpty(boolean isEmpty) {
@@ -74,6 +81,7 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (this.isEmpty == isEmpty) {
 
             return;
+
         }
 
         this.isEmpty = isEmpty;
@@ -85,11 +93,14 @@ public abstract class AbstractListMenu extends AbstractMenu {
         } else {
 
             removeEmptyItem();
+
         }
+
     }
 
     /**
      * Get the ItemStack at the current slot
+     * 
      * @param page
      * @param slot
      * @return
@@ -100,13 +111,16 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (inventory == null) {
 
             return null;
+
         }
 
         return inventory.getItem(slot);
+
     }
 
     /**
      * Place an item into the inventory at the given page
+     * 
      * @param slot
      * @param item
      */
@@ -116,13 +130,16 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (inventory == null) {
 
             return;
+
         }
 
         inventory.setItem(slot, item);
+
     }
 
     /**
      * Set the ItemStack and MenuAction for the given slot in the given menu
+     * 
      * @param page
      * @param slot
      * @param item
@@ -132,10 +149,12 @@ public abstract class AbstractListMenu extends AbstractMenu {
 
         setItem(page, slot, item);
         setAction(slot, action);
+
     }
 
     /**
      * Set the MenuButton for the given slot in the given menu
+     * 
      * @param page
      * @param slot
      * @param button
@@ -144,20 +163,24 @@ public abstract class AbstractListMenu extends AbstractMenu {
 
         setItem(page, slot, button.getItem());
         setAction(slot, button.getAction());
+
     }
 
     /**
      * Set the inventory at the given page
+     * 
      * @param page
      * @param inventory
      */
     protected void setMenu(int page, Inventory inventory) {
 
         menus.put(page, inventory);
+
     }
 
     /**
      * Deletes the content at the given slot and shifts all other content over
+     * 
      * @param page
      * @param slot
      */
@@ -166,11 +189,13 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (!canEdit) {
 
             return;
+
         }
 
         if (page >= this.totalPages) {
 
             return;
+
         }
 
         setItem(page, slot, null);
@@ -189,7 +214,9 @@ public abstract class AbstractListMenu extends AbstractMenu {
 
             setItem(currentPage, currentIndex, null);
             setItem(shiftedPage, shiftedIndex, item);
+
         }
+
     }
 
     /**
@@ -200,6 +227,7 @@ public abstract class AbstractListMenu extends AbstractMenu {
         if (!canEdit) {
 
             return;
+
         }
 
         int totalSlots = 28 * totalPages;
@@ -209,11 +237,15 @@ public abstract class AbstractListMenu extends AbstractMenu {
             int currentIndex = getNormalIndex(i - (currentPage * 28), 10, 2);
 
             menus.get(currentPage).setItem(currentIndex, null);
+
         }
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), null);
+
         }
+
     }
+
 }

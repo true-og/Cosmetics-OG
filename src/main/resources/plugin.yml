@@ -6,6 +6,6 @@ authors: [MediusEcho, NotAlexNoyle]
 softdepend: [Vault, SuperVanish, PremiumVanish, VanishNoPacket, PlayerPoints, Citizens, TokenManager]
 commands:
   h:
-    description: Main command for CosmeticsOG
+    description: Main command for Cosmetics-OG
     aliases: cosmetics
     

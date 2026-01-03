@@ -23,22 +23,25 @@ public class EditorResizeMenu extends AbstractStaticMenu {
         super(core, menuManager, owner);
 
         this.editorBaseMenu = editorBaseMenu;
-        this.inventory = Bukkit.createInventory(
-                null, 27, Utils.legacySerializerAnyCase(Message.EDITOR_RESIZE_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 27,
+                Utils.legacySerializerAnyCase(Message.EDITOR_RESIZE_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
     protected void build() {
 
         final MenuAction resizeAction = (event, slot) -> {
+
             int size = (slot - 10) + (slot < 13 ? 1 : 0);
 
             editorBaseMenu.resizeTo(size);
             menuManager.closeCurrentMenu();
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         String title = Message.EDITOR_RESIZE_MENU_SET_ROW_SIZE.getValue();
@@ -50,10 +53,11 @@ public class EditorResizeMenu extends AbstractStaticMenu {
             if (i == 3) {
 
                 continue;
+
             }
 
-            String t = title.replace("{1}", Integer.toString((i + 1) - (i > 3 ? 1 : 0)))
-                    .replace(suffixInfo[0], i == 0 ? "" : suffixInfo[1]);
+            String t = title.replace("{1}", Integer.toString((i + 1) - (i > 3 ? 1 : 0))).replace(suffixInfo[0],
+                    i == 0 ? "" : suffixInfo[1]);
             String description = Message.EDITOR_RESIZE_MENU_SET_ROW_DESCRIPTION.getValue();
 
             List<TextComponent> descriptionList = List.of(Utils.legacySerializerAnyCase(description));
@@ -61,6 +65,7 @@ public class EditorResizeMenu extends AbstractStaticMenu {
             ItemStack row = ItemUtil.createItem(CompatibleMaterial.GRAY_DYE.getMaterial(), 1, t, descriptionList);
 
             setButton(i + 10, row, resizeAction);
+
         }
 
         int currentRows = editorBaseMenu.rows();
@@ -69,11 +74,17 @@ public class EditorResizeMenu extends AbstractStaticMenu {
 
         ItemUtil.setItemType(row, CompatibleMaterial.LIME_DYE);
         ItemUtil.highlightItem(row);
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

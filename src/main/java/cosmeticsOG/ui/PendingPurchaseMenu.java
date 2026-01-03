@@ -12,8 +12,9 @@ public class PendingPurchaseMenu {
     public static MenuInventory defaultPendingPurchaseInventory;
 
     static {
-        defaultPendingPurchaseInventory =
-                new MenuInventory("", Component.text(Message.PURCHASE_MENU_TITLE.getValue()), 5, null);
+
+        defaultPendingPurchaseInventory = new MenuInventory("", Component.text(Message.PURCHASE_MENU_TITLE.getValue()),
+                5, null);
 
         // Confirm Hat.
         Hat confirm = new Hat();
@@ -21,8 +22,8 @@ public class PendingPurchaseMenu {
         confirm.setLoaded(true);
         defaultPendingPurchaseInventory.setHat(30, confirm);
 
-        defaultPendingPurchaseInventory.setItem(
-                30, ItemUtil.createItem(Material.DIAMOND, 1, Message.PURCHASE_MENU_CONFIRM.getValue()));
+        defaultPendingPurchaseInventory.setItem(30,
+                ItemUtil.createItem(Material.DIAMOND, 1, Message.PURCHASE_MENU_CONFIRM.getValue()));
 
         // Cancel Hat.
         Hat cancel = new Hat();
@@ -30,8 +31,8 @@ public class PendingPurchaseMenu {
         cancel.setLoaded(true);
         defaultPendingPurchaseInventory.setHat(32, cancel);
 
-        defaultPendingPurchaseInventory.setItem(
-                32, ItemUtil.createItem(Material.COAL, 1, Message.PURCHASE_MENU_CANCEL.getValue()));
+        defaultPendingPurchaseInventory.setItem(32,
+                ItemUtil.createItem(Material.COAL, 1, Message.PURCHASE_MENU_CANCEL.getValue()));
 
         // Pending Hat.
         Hat pending = new Hat();
@@ -40,5 +41,7 @@ public class PendingPurchaseMenu {
 
         // Set pending item directly from the Hat.
         defaultPendingPurchaseInventory.setItem(13, pending.getMenuItem());
+
     }
+
 }

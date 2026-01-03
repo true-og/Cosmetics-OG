@@ -6,6 +6,7 @@ public interface CurrencyHook {
 
     /**
      * Gets the players current economy balance
+     * 
      * @param id
      * @return
      */
@@ -13,6 +14,7 @@ public interface CurrencyHook {
 
     /**
      * Withdraws the provided amount from the players economy balance
+     * 
      * @param id
      * @param amount
      * @return
@@ -21,7 +23,9 @@ public interface CurrencyHook {
 
     /**
      * Checks to see if this hook has been loaded
+     * 
      * @return
      */
     public boolean isEnabled();
+
 }

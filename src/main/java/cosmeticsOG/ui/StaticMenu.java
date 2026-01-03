@@ -40,21 +40,25 @@ public class StaticMenu extends AbstractStaticMenu {
         this.inventory = Bukkit.createInventory(null, menuInventory.getSize(), menuInventory.getDisplayTitle());
 
         hatAction = (event, slot) -> {
+
             Hat hat = menuInventory.getHat(slot);
             MenuClickResult result = MenuClickResult.NEUTRAL;
             if (hat == null) {
 
                 return MenuClickResult.NONE;
+
             }
 
             if (!hat.isLoaded()) {
 
                 core.getDatabase().loadHat(getName(), slot, hat);
+
             }
 
             if (hat.playSound(owner)) {
 
                 result = MenuClickResult.NONE;
+
             }
 
             if (event.isLeftClick()) {
@@ -71,21 +75,25 @@ public class StaticMenu extends AbstractStaticMenu {
                 } else {
 
                     action.onClick(owner, hat, slot, inventory, hat.getRightClickArgument());
+
                 }
+
             }
 
             return result;
+
         };
 
         build();
+
     }
 
-    //	@Override
-    //	public void open ()
-    //	{
-    //		menuManager.isOpeningMenu(this);
-    //		menuInventory.open(owner);
-    //	}
+    // @Override
+    // public void open ()
+    // {
+    // menuManager.isOpeningMenu(this);
+    // menuInventory.open(owner);
+    // }
 
     @Override
     protected void build() {
@@ -102,6 +110,7 @@ public class StaticMenu extends AbstractStaticMenu {
             if (item == null || hat == null) {
 
                 continue;
+
             }
 
             // Check for PURCHASE_ITEM action.
@@ -111,9 +120,11 @@ public class StaticMenu extends AbstractStaticMenu {
                 if (pendingPurchase != null) {
 
                     inventory.setItem(i, pendingPurchase.getMenuItem());
+
                 }
 
                 continue;
+
             }
 
             // Highlight equipped hats.
@@ -126,6 +137,7 @@ public class StaticMenu extends AbstractStaticMenu {
                 if (lore == null) {
 
                     lore = new ArrayList<Component>();
+
                 }
 
                 String equippedLore = Message.HAT_EQUIPPED_DESCRIPTION.getValue();
@@ -137,6 +149,7 @@ public class StaticMenu extends AbstractStaticMenu {
                 } else {
 
                     equippedLore = equippedLore.replace(lineInfo[0], "");
+
                 }
 
                 lore.addAll(StringUtil.parseDescription(equippedLore));
@@ -152,20 +165,27 @@ public class StaticMenu extends AbstractStaticMenu {
 
                     ItemUtil.setItemType(item, lockedMaterial, lockedMaterialDurability);
                     ItemUtil.setItemName(item, lockedTitle.content());
+
                 }
+
             }
 
             inventory.setItem(i, item);
+
         }
 
         for (int i = 0; i < inventory.getSize(); i++) {
 
             setAction(i, hatAction);
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
     public void onTick(int ticks) {
@@ -177,6 +197,7 @@ public class StaticMenu extends AbstractStaticMenu {
             if (hat == null || hat.isLocked()) {
 
                 continue;
+
             }
 
             IconData iconData = hat.getIconData();
@@ -184,23 +205,29 @@ public class StaticMenu extends AbstractStaticMenu {
 
                 ItemStackTemplate itemTemplate = iconData.getNextItem(ticks);
                 ItemUtil.setItemType(inventory.getItem(slot), itemTemplate.getMaterial(), itemTemplate.getDurability());
+
             }
+
         }
+
     }
 
     @Override
     public String getName() {
 
         return menuInventory.getName();
+
     }
 
     /**
      * Get all hats in this menu
+     * 
      * @return
      */
     public Map<Integer, Hat> getHats() {
 
         return menuInventory.getHats();
+
     }
 
     public void equipHat(Hat hat) {
@@ -218,6 +245,7 @@ public class StaticMenu extends AbstractStaticMenu {
         for (String line : cachedDescription) {
 
             lore.add(Component.text(line));
+
         }
 
         TextComponent equippedLore = Utils.legacySerializerAnyCase(Message.HAT_EQUIPPED_DESCRIPTION.getValue());
@@ -225,8 +253,7 @@ public class StaticMenu extends AbstractStaticMenu {
         String[] lineInfo = StringUtil.parseValue(equippedLore.content(), "1");
 
         // Replace content based on existing lore size.
-        String updatedLoreContent = lore.size() > 0
-                ? equippedLore.content().replace(lineInfo[0], lineInfo[1])
+        String updatedLoreContent = lore.size() > 0 ? equippedLore.content().replace(lineInfo[0], lineInfo[1])
                 : equippedLore.content().replace(lineInfo[0], "");
 
         // Update the TextComponent with the new content.
@@ -243,6 +270,7 @@ public class StaticMenu extends AbstractStaticMenu {
 
         // Update the inventory with the modified item.
         inventory.setItem(hat.getSlot(), item);
+
     }
 
     public void unequipHat(Hat hat) {
@@ -263,5 +291,7 @@ public class StaticMenu extends AbstractStaticMenu {
 
         // Update the inventory with the modified ItemStack.
         inventory.setItem(hat.getSlot(), item);
+
     }
+
 }

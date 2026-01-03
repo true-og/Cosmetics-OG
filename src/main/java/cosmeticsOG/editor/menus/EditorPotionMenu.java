@@ -34,8 +34,8 @@ public class EditorPotionMenu extends AbstractListMenu {
     private final String potionTitle = Message.EDITOR_POTION_MENU_POTION_TITLE.getValue();
     private final String potionSelected = Message.EDITOR_POTION_MENU_POTION_DESCRIPTION.getValue();
 
-    private final List<String> potionBlacklist =
-            Arrays.asList("CONFUSION", "HARM", "POISON", "WEAKNESS", "WITHER", "UNLUCK", "HUNGER", "BAD_OMEN");
+    private final List<String> potionBlacklist = Arrays.asList("CONFUSION", "HARM", "POISON", "WEAKNESS", "WITHER",
+            "UNLUCK", "HUNGER", "BAD_OMEN");
 
     private List<PotionEffectType> supportedPotions;
     private Map<Integer, PotionEffectType> potions;
@@ -55,34 +55,42 @@ public class EditorPotionMenu extends AbstractListMenu {
             if (potion == null) {
 
                 continue;
+
             }
 
             if (!useBlacklist && potionBlacklist.contains(potion.getName())) {
 
                 continue;
+
             }
 
             supportedPotions.add(potion);
+
         }
 
         this.totalPages = MathUtil.calculatePageCount(supportedPotions.size(), 28);
 
         build();
+
     }
 
     @Override
-    public void insertEmptyItem() {}
+    public void insertEmptyItem() {
+
+    }
 
     @Override
-    public void removeEmptyItem() {}
+    public void removeEmptyItem() {
+
+    }
 
     @Override
     protected void build() {
 
         for (int i = 0; i < totalPages; i++) {
 
-            String title =
-                    menuTitle.replace("{1}", Integer.toString(i + 1)).replace("{2}", Integer.toString(totalPages));
+            String title = menuTitle.replace("{1}", Integer.toString(i + 1)).replace("{2}",
+                    Integer.toString(totalPages));
             Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
 
             menu.setItem(49, backButtonItem);
@@ -90,74 +98,77 @@ public class EditorPotionMenu extends AbstractListMenu {
             // Next page.
             if ((i + 1) < totalPages) {
 
-                menu.setItem(
-                        50,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+
             }
 
             // Previous page.
 
             if ((i + 1) > 1) {
 
-                menu.setItem(
-                        48,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+
             }
 
             // Potion strength.
-            menu.setItem(
-                    52,
+            menu.setItem(52,
                     ItemUtil.createItem(Material.GHAST_TEAR, 1, Message.EDITOR_POTION_MENU_SET_STRENGTH.getValue()));
 
             EditorLore.updatePotionStrengthDescription(menu.getItem(52), targetHat.getPotion());
 
             setMenu(i, menu);
+
         }
 
         MenuAction selectAction = (event, slot) -> {
+
             int index = getClampedIndex(slot, 10, 2) + (currentPage * 28);
             if (potions.containsKey(index)) {
 
                 targetHat.setPotion(potions.get(index), targetHat.getPotionAmplifier());
 
                 menuManager.closeCurrentMenu();
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), selectAction);
+
         }
 
         setAction(49, backButtonAction);
 
         // Previous page.
         setAction(48, (clickEvent, slot) -> {
+
             currentPage--;
 
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Next page.
         setAction(50, (clickEvent, slot) -> {
+
             currentPage++;
 
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         setAction(52, (event, slot) -> {
+
             int strength = 1;
             PotionEffect pe = targetHat.getPotion();
             if (pe != null) {
@@ -166,12 +177,14 @@ public class EditorPotionMenu extends AbstractListMenu {
                 strength += event.isLeftClick() ? 1 : -1;
 
                 targetHat.setPotionAmplifier(strength);
+
             }
 
             ItemStack item = menus.get(currentPage).getItem(52);
             EditorLore.updatePotionStrengthDescription(item, targetHat.getPotion());
 
             return event.isLeftClick() ? MenuClickResult.POSITIVE : MenuClickResult.NEGATIVE;
+
         });
 
         PotionEffect currentPotion = targetHat.getPotion();
@@ -180,6 +193,7 @@ public class EditorPotionMenu extends AbstractListMenu {
         if (currentPotion != null) {
 
             currentType = currentPotion.getType();
+
         }
 
         String[] selectInfo = StringUtil.parseValue(potionSelected, "1");
@@ -198,17 +212,17 @@ public class EditorPotionMenu extends AbstractListMenu {
 
                 ItemUtil.highlightItem(item);
 
-                String description =
-                        potionSelected.replace(selectInfo[0], "").replace(selectedInfo[0], selectedInfo[1]);
+                String description = potionSelected.replace(selectInfo[0], "").replace(selectedInfo[0],
+                        selectedInfo[1]);
 
                 ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
 
             } else {
 
-                String description =
-                        potionSelected.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
+                String description = potionSelected.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
 
                 ItemUtil.setItemDescription(item, StringUtil.parseDescription(description));
+
             }
 
             menus.get(page).setItem(getNormalIndex(index, 10, 2), item);
@@ -221,8 +235,11 @@ public class EditorPotionMenu extends AbstractListMenu {
                 index = 0;
 
                 page++;
+
             }
+
         }
+
     }
 
     @Override
@@ -231,9 +248,14 @@ public class EditorPotionMenu extends AbstractListMenu {
         if (!forced) {
 
             callback.onCallback();
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

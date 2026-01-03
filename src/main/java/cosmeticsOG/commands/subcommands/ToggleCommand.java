@@ -21,6 +21,7 @@ public class ToggleCommand extends Command {
 
         togglePlayerCommand = new TogglePlayerCommand();
         register(togglePlayerCommand);
+
     }
 
     @Override
@@ -37,14 +38,17 @@ public class ToggleCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(getUsage().getValue());
+
             }
 
             return false;
+
         }
 
         if (args.size() > 1) {
 
             return togglePlayerCommand.onCommand(core, sender, label, args);
+
         }
 
         if (sender.isPlayer()) {
@@ -58,10 +62,13 @@ public class ToggleCommand extends Command {
             } else {
 
                 Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_TOGGLE_OFF.getValue());
+
             }
+
         }
 
         return true;
+
     }
 
     @Override
@@ -70,9 +77,11 @@ public class ToggleCommand extends Command {
         if (args.size() == 2) {
 
             return togglePlayerCommand.onTabComplete(core, sender, label, args);
+
         }
 
         return Arrays.asList("on", "off");
+
     }
 
     @Override
@@ -81,50 +90,60 @@ public class ToggleCommand extends Command {
         if (args.size() == 2) {
 
             return togglePlayerCommand.onCommand(core, sender, label, args);
+
         }
 
         return super.onCommand(core, sender, label, args);
+
     }
 
     @Override
     public String getName() {
 
         return "Toggle";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "toggle";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_TOGGLE_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_TOGGLE_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_TOGGLE;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return true;
+
     }
+
 }

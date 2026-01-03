@@ -18,16 +18,13 @@ public enum SettingsManager {
      * General Properties
      */
     CONFIG_AUTO_UPDATE("config-auto-update", Type.BOOLEAN, true),
-    DEFAULT_MENU("default-menu", Type.STRING, "particles.yml"),
-    LANG("lang", Type.STRING, "en_US.lang"),
+    DEFAULT_MENU("default-menu", Type.STRING, "particles.yml"), LANG("lang", Type.STRING, "en_US.lang"),
     LOAD_INCLUDED_MENUS("load-included-menus", Type.BOOLEAN, true),
     LOAD_INCLUDED_CUSTOM_TYPES("load-included-custom-types", Type.BOOLEAN, true),
     DISABLED_WORLDS("disabled-worlds", Type.STRING_LIST, new ArrayList<String>()),
     CHECK_WORLD_PERMISSION("check-world-permission", Type.BOOLEAN, true),
-    CLOSE_MENU_ON_EQUIP("close-menu-on-equip", Type.BOOLEAN, true),
-    CURRENCY("currency", Type.STRING, "$"),
-    LIVE_MENUS("live-menus", Type.BOOLEAN, true),
-    LIVE_MENU_UPDATE_FREQUENCY("live-menu-update-frequency", Type.INT, 5),
+    CLOSE_MENU_ON_EQUIP("close-menu-on-equip", Type.BOOLEAN, true), CURRENCY("currency", Type.STRING, "$"),
+    LIVE_MENUS("live-menus", Type.BOOLEAN, true), LIVE_MENU_UPDATE_FREQUENCY("live-menu-update-frequency", Type.INT, 5),
     MAXIMUM_HAT_LIMIT("max-hats", Type.INT_CLAMPED, 7, 28),
     UNEQUIP_OVERFLOW_HATS("unequip-overflow-hats", Type.BOOLEAN, false),
     CHECK_AGAINST_LEGACY_PURCHASES("check-against-legacy-purchases", Type.BOOLEAN, false),
@@ -46,19 +43,16 @@ public enum SettingsManager {
     /**
      * Flags
      */
-    FLAG_VAULT("flags.vault", Type.BOOLEAN, false),
-    FLAG_PLAYERPOINTS("flags.playerpoints", Type.BOOLEAN, false),
+    FLAG_VAULT("flags.vault", Type.BOOLEAN, false), FLAG_PLAYERPOINTS("flags.playerpoints", Type.BOOLEAN, false),
     FLAG_TOKEN_MANAGER("flags.token-manager", Type.BOOLEAN, false),
-    FLAG_EXPERIENCE("flags.experience", Type.BOOLEAN, false),
-    FLAG_PERMISSION("flags.permission", Type.BOOLEAN, true),
+    FLAG_EXPERIENCE("flags.experience", Type.BOOLEAN, false), FLAG_PERMISSION("flags.permission", Type.BOOLEAN, true),
     FLAG_VANISH("flags.vanish", Type.BOOLEAN, false),
     FLAG_ESSENTIALS_VANISH("flags.essentials-vanish", Type.BOOLEAN, false),
 
     /**
      * Afk / Combat cooldown and flags
      */
-    AFK_COOLDOWN("afk.cooldown", Type.INT, 7),
-    COMBAT_COOLDOWN("combat.cooldown", Type.INT, 5),
+    AFK_COOLDOWN("afk.cooldown", Type.INT, 7), COMBAT_COOLDOWN("combat.cooldown", Type.INT, 5),
     COMBAT_CHECK_PLAYERS("combat.check-players", Type.BOOLEAN, true),
     COMBAT_CHECK_MONSTERS("combat.check-monsters", Type.BOOLEAN, true),
     COMBAT_CHECK_ANIMALS("combat.check-animals", Type.BOOLEAN, false),
@@ -81,8 +75,7 @@ public enum SettingsManager {
 
     MENU_SOUND_ENABLED("menu.sound.enabled", Type.BOOLEAN, true),
     MENU_SOUND_ID("menu.sound.id", Type.SOUND, ResourceUtil.getSound("UI_BUTTON_CLICK", "CLICK")),
-    MENU_SOUND_VOLUME("menu.sound.volume", Type.DOUBLE, 1.0),
-    MENU_SOUND_PITCH("menu.sound.pitch", Type.DOUBLE, 1.0),
+    MENU_SOUND_VOLUME("menu.sound.volume", Type.DOUBLE, 1.0), MENU_SOUND_PITCH("menu.sound.pitch", Type.DOUBLE, 1.0),
 
     /**
      * Editor Properties
@@ -107,159 +100,223 @@ public enum SettingsManager {
     private static final CosmeticsOG plugin = CosmeticsOG.instance;
 
     static {
+
         loadData();
+
     }
 
     private SettingsManager(final String key, final Type dataType, Object defaultData, int range) {
+
         this.key = key;
         this.dataType = dataType;
         this.defaultData = defaultData;
         this.range = range;
+
     }
 
     private SettingsManager(final String key, final Type dataType, Object defaultData) {
+
         this(key, dataType, defaultData, -1);
+
     }
 
     public String getKey() {
+
         return key;
+
     }
 
     public Type getType() {
+
         return dataType;
+
     }
 
     public Object getDefaultData() {
+
         return defaultData;
+
     }
 
     /**
      * Returns the data that belongs to this key, or the default data
+     * 
      * @return
      */
     public Object getData() {
+
         if (data.containsKey(key)) {
+
             return data.get(key);
+
         }
+
         return defaultData;
+
     }
 
     public static boolean isEconomyEnabled() {
+
         return FLAG_VAULT.getBoolean() || FLAG_PLAYERPOINTS.getBoolean() || FLAG_TOKEN_MANAGER.getBoolean();
+
     }
 
     /**
      * Override the current value
+     * 
      * @param o
      */
     @SuppressWarnings("incomplete-switch")
     public void addOverride(Object o) {
+
         switch (dataType) {
+
             case INT:
                 if (o instanceof Integer) {
+
                     data.put(key, (int) o);
+
                 }
                 break;
 
             case DOUBLE:
                 if (o instanceof Double) {
+
                     data.put(key, (double) o);
+
                 }
                 break;
 
             case STRING:
                 if (o instanceof String) {
+
                     data.put(key, (String) o);
+
                 }
                 break;
 
             case BOOLEAN:
                 if (o instanceof Boolean) {
+
                     data.put(key, (boolean) o);
+
                 }
                 break;
 
             case MATERIAL:
                 if (o instanceof Material) {
+
                     data.put(key, (Material) o);
+
                 }
                 break;
 
             case SOUND:
                 if (o instanceof Sound) {
+
                     data.put(key, (Sound) o);
+
                 }
                 break;
+
         }
+
     }
 
     /**
      * Returns the Integer value of this enum, or -1
+     * 
      * @return
      */
     public int getInt() {
+
         if (dataType.equals(Type.INT)) {
+
             return (int) getData();
+
         }
 
         if (dataType.equals(Type.INT_CLAMPED)) {
+
             return MathUtil.clamp((int) getData(), 0, range);
+
         }
 
         return -1;
+
     }
 
     /**
      * Returns the Float value of this enum, or -1.0
+     * 
      * @return
      */
     public double getDouble() {
+
         return dataType.equals(Type.DOUBLE) ? (double) getData() : -1.0f;
+
     }
 
     /**
      * Returns the String value of this enum
+     * 
      * @return
      */
     public String getString() {
+
         return dataType.equals(Type.STRING) ? (String) getData() : "";
+
     }
 
     /**
      * Returns the Boolean value of this enum
+     * 
      * @return
      */
     public Boolean getBoolean() {
+
         return dataType.equals(Type.BOOLEAN) ? (Boolean) getData() : false;
+
     }
 
     /**
      * Returns the Sound value of this enum
+     * 
      * @return
      */
     public Sound getSound() {
+
         return dataType.equals(Type.SOUND) ? (Sound) getData() : Sound.UI_BUTTON_CLICK;
+
     }
 
     @SuppressWarnings("unchecked")
     public ArrayList<String> getList() {
+
         return dataType.equals(Type.STRING_LIST) ? (ArrayList<String>) getData() : new ArrayList<String>();
+
     }
 
     /**
      * Returns the Material value of this enum
+     * 
      * @return
      */
     public Material getMaterial() {
+
         return dataType.equals(Type.MATERIAL) ? (Material) getData() : (Material) defaultData;
+
     }
 
     /**
      * Forces this enum's data to be returned as a String
+     * 
      * @return
      */
     public String asString() {
+
         return String.valueOf(getData());
+
     }
 
     /**
@@ -267,7 +324,9 @@ public enum SettingsManager {
      */
     @SuppressWarnings("unchecked")
     public Object getDefaultConfigValue() {
+
         switch (dataType) {
+
             case INT:
                 return (Integer) defaultData;
 
@@ -291,16 +350,22 @@ public enum SettingsManager {
 
             default:
                 return defaultData;
+
         }
+
     }
 
     private static void loadData() {
+
         FileConfiguration config = plugin.getConfig();
         if (config != null) {
+
             for (SettingsManager entry : values()) {
+
                 Object value;
 
                 switch (entry.dataType) {
+
                     case INT:
                         value = config.getInt(entry.key, (Integer) entry.defaultData);
                         break;
@@ -331,31 +396,34 @@ public enum SettingsManager {
 
                     default:
                         value = config.get(entry.key);
+
                 }
 
                 if (value != null) {
+
                     data.put(entry.key, value);
+
                 } else {
+
                     data.put(entry.key, entry.defaultData);
+
                 }
+
             }
+
         }
+
     }
 
     public static void onReload() {
+
         data.clear();
         loadData();
+
     }
 
     public enum Type {
-        INT,
-        INT_CLAMPED,
-        DOUBLE,
-        STRING,
-        BOOLEAN,
-        MATERIAL,
-        STRING_LIST,
-        SOUND,
-        DEPRECATED;
+        INT, INT_CLAMPED, DOUBLE, STRING, BOOLEAN, MATERIAL, STRING_LIST, SOUND, DEPRECATED;
     }
+
 }

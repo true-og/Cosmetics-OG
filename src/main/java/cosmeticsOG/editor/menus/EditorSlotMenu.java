@@ -22,12 +22,9 @@ public class EditorSlotMenu extends AbstractStaticMenu {
     private final boolean cloning;
     private final int size;
 
-    public EditorSlotMenu(
-            CosmeticsOG core,
-            EditorMenuManager menuManager,
-            Player owner,
-            EditorBaseMenu editorBaseMenu,
-            boolean cloning) {
+    public EditorSlotMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, EditorBaseMenu editorBaseMenu,
+            boolean cloning)
+    {
 
         super(core, menuManager, owner);
 
@@ -35,10 +32,11 @@ public class EditorSlotMenu extends AbstractStaticMenu {
         this.editorBaseMenu = editorBaseMenu;
         this.cloning = cloning;
         this.size = editorBaseMenu.getMenuInventory().getSize();
-        this.inventory = Bukkit.createInventory(
-                null, size, Utils.legacySerializerAnyCase(Message.EDITOR_SLOT_MENU_TITlE.getValue()));
+        this.inventory = Bukkit.createInventory(null, size,
+                Utils.legacySerializerAnyCase(Message.EDITOR_SLOT_MENU_TITlE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -46,6 +44,7 @@ public class EditorSlotMenu extends AbstractStaticMenu {
 
         int targetSlot = editorManager.getTargetSlot();
         final MenuAction selectAction = (event, slot) -> {
+
             if (cloning) {
 
                 editorBaseMenu.cloneHat(targetSlot, slot);
@@ -53,6 +52,7 @@ public class EditorSlotMenu extends AbstractStaticMenu {
                 editorManager.returnToBaseMenu();
 
                 return MenuClickResult.NEUTRAL;
+
             }
 
             editorBaseMenu.changeSlots(targetSlot, slot, false);
@@ -60,20 +60,25 @@ public class EditorSlotMenu extends AbstractStaticMenu {
             menuManager.closeCurrentMenu();
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         final MenuAction swapAction = (event, slot) -> {
+
             editorBaseMenu.changeSlots(targetSlot, slot, true);
 
             editorManager.returnToBaseMenu();
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         final MenuAction secretAction = (event, slot) -> {
+
             CompatibleSound.ENTITY_VILLAGER_NO.play(owner, 0.5f, 1.0f);
 
             return MenuClickResult.NONE;
+
         };
 
         for (int i = 0; i < size; i++) {
@@ -86,10 +91,9 @@ public class EditorSlotMenu extends AbstractStaticMenu {
 
             } else {
 
-                item = ItemUtil.createItem(
-                        CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(),
-                        1,
+                item = ItemUtil.createItem(CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(), 1,
                         Message.EDITOR_SLOT_MENU_SELECT.getValue());
+
             }
 
             String displayName = Message.EDITOR_SLOT_MENU_SELECT.getValue();
@@ -102,6 +106,7 @@ public class EditorSlotMenu extends AbstractStaticMenu {
                 setAction(i, backButtonAction);
 
             } else if (editorBaseMenu.getMenuInventory().getHat(i) != null) {
+
                 if (!cloning) {
 
                     displayName = Message.EDITOR_SLOT_MENU_SWAP.getValue();
@@ -113,23 +118,32 @@ public class EditorSlotMenu extends AbstractStaticMenu {
                     displayName = Message.EDITOR_SLOT_MENU_OCCUPIED.getValue();
 
                     setAction(i, secretAction);
+
                 }
 
             } else {
 
                 setAction(i, selectAction);
+
             }
 
             ItemUtil.setItemName(item, displayName);
             ItemUtil.setItemDescription(item, Arrays.asList());
 
             inventory.setItem(i, item);
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

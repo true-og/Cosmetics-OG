@@ -29,9 +29,11 @@ public class DeleteGroupCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(getUsage().getValue());
+
             }
 
             return false;
+
         }
 
         String groupName = args.get(0);
@@ -45,37 +47,43 @@ public class DeleteGroupCommand extends Command {
 
                 found = true;
                 break;
+
             }
+
         }
 
         if (!found) {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+
             }
 
             return false;
+
         }
 
         core.getDatabase().deleteGroup(groupName);
 
         if (sender.isPlayer()) {
 
-            Utils.cosmeticsOGPlaceholderMessage(
-                    (Player) sender, Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                    Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
 
         } else {
 
             Utils.logToConsole(Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+
         }
 
         return true;
+
     }
 
     @Override
@@ -87,65 +95,78 @@ public class DeleteGroupCommand extends Command {
             for (Group g : core.getDatabase().getGroups(false)) {
 
                 groups.add(g.getName());
+
             }
 
             return groups;
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "remove group";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "remove";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_REMOVE_GROUP_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_REMOVE_GROUP_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_GROUP_REMOVE;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_GROUP_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

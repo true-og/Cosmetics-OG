@@ -2,8 +2,8 @@
 plugins {
     id("java") // Import Java plugin.
     id("java-library") // Import Java Library plugin.
-    id("com.diffplug.spotless") version "7.0.4" // Import Spotless plugin.
-    id("com.gradleup.shadow") version "8.3.6" // Import Shadow plugin.
+    id("com.diffplug.spotless") version "8.1.0" // Import Spotless plugin.
+    id("com.gradleup.shadow") version "8.3.9" // Import Shadow plugin.
     id("checkstyle") // Import Checkstyle plugin.
     eclipse // Import Eclipse plugin.
     kotlin("jvm") version "2.1.21" // Import Kotlin JVM plugin.
@@ -40,7 +40,7 @@ repositories {
     mavenCentral() // Import the Maven Central Maven Repository.
     gradlePluginPortal() // Import the Gradle Plugin Portal Maven Repository.
     maven { url = uri("https://repo.purpurmc.org/snapshots") } // Import the PurpurMC Maven Repository.
-    maven { url = uri("https://jitpack.io") } // Import Jitpack Maven Repository.
+    maven { url = uri("https://jitpack.io") } // Import the Jitpack Maven Repository.
 }
 
 /* ---------------------- Java project deps ---------------------------- */
@@ -62,6 +62,8 @@ tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .ja
 tasks.shadowJar {
     exclude("org.bstats.*") // Exclude the bStats package from being shadowed.
     exclude("io.github.miniplaceholders.*") // Exclude the MiniPlaceholders package from being shadowed.
+    isEnableRelocation = true
+    relocationPrefix = "${project.group}.shadow"
     archiveClassifier.set("") // Use empty string instead of null.
     minimize()
 }
@@ -78,7 +80,19 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8" // Use UTF-8 file encoding.
 }
 
-/* ------------------------------- Checkstyle --------------------------- */
+/* ----------------------------- Auto Formatting ------------------------ */
+spotless {
+    java {
+        eclipse().configFile("config/formatter/eclipse-java-formatter.xml") // Eclipse java formatting.
+        leadingTabsToSpaces() // Convert leftover leading tabs to spaces.
+        removeUnusedImports() // Remove imports that aren't being called.
+    }
+    kotlinGradle {
+        ktfmt().kotlinlangStyle().configure { it.setMaxWidth(120) } // JetBrains Kotlin formatting.
+        target("build.gradle.kts", "settings.gradle.kts") // Gradle files to format.
+    }
+}
+
 checkstyle {
     toolVersion = "10.18.1" // Declare checkstyle version to use.
     configFile = file("config/checkstyle/checkstyle.xml") // Point checkstyle to config file.

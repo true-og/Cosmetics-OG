@@ -24,50 +24,60 @@ public class ReloadCommand extends Command {
         } else {
 
             Utils.logToConsole(Message.COMMAND_RELOAD_SUCCESS.getValue());
+
         }
 
         return true;
+
     }
 
     @Override
     public String getName() {
 
         return "reload";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "reload";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_RELOAD_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_RELOAD_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_RELOAD;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

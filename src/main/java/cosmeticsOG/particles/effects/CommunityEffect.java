@@ -19,59 +19,70 @@ public abstract class CommunityEffect extends PixelEffect {
 
         this.displayName = displayName;
         this.credit = credit.append(Component.text("&8by "));
+
     }
 
     @Override
     public String getName() {
 
         return name;
+
     }
 
     @Override
     public String getDisplayName() {
 
         return displayName.content();
+
     }
 
     @Override
     public String getDescription() {
 
         return credit.content();
+
     }
 
     @Override
     public int getParticlesSupported() {
 
         return 1;
+
     }
 
     @Override
     public ParticleLocation getDefaultLocation() {
 
         return ParticleLocation.FEET;
+
     }
 
     @Override
     public List<ParticleTracking> getSupportedTrackingMethods() {
 
         return Arrays.asList(ParticleTracking.values());
+
     }
 
     @Override
     public ParticleTracking getDefaultTrackingMethod() {
 
         return ParticleTracking.TRACK_NOTHING;
+
     }
 
     @Override
     public boolean supportsAnimation() {
 
         return false;
+
     }
 
     @Override
     public boolean isCustom() {
 
         return false;
+
     }
+
 }

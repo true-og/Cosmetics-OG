@@ -27,15 +27,16 @@ public class CreateCommand extends Command {
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 if (playerState.hasEditorOpen()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            (Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                            Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                     return false;
+
                 }
+
             }
 
-            String unsanitizedMenuName =
-                    (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
+            String unsanitizedMenuName = (args.get(0).contains(".") ? args.get(0).split("\\.")[0] : args.get(0));
             String menuName = StringUtil.sanitizeString(unsanitizedMenuName);
             if (menuName.isEmpty()) {
 
@@ -46,9 +47,11 @@ public class CreateCommand extends Command {
                 } else {
 
                     Utils.logToConsole(Message.COMMAND_CREATE_INVALID.getValue());
+
                 }
 
                 return false;
+
             }
 
             Database database = core.getDatabase();
@@ -58,17 +61,17 @@ public class CreateCommand extends Command {
 
                 if (sender.isPlayer()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            (Player) sender,
+                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
                             Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
 
                 } else {
 
-                    Utils.logToConsole(
-                            Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+                    Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+
                 }
 
                 return false;
+
             }
 
             database.createMenu(menuName);
@@ -81,8 +84,8 @@ public class CreateCommand extends Command {
 
             } else {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
 
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
@@ -90,53 +93,64 @@ public class CreateCommand extends Command {
 
                 editorManager.setEditingMenu(inventory);
                 editorManager.open();
+
             }
 
             return true;
+
         }
 
         return false;
+
     }
 
     @Override
     public String getName() {
 
         return "create menu";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "create";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_CREATE_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_CREATE_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_CREATE;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

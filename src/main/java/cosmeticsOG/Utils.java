@@ -17,6 +17,7 @@ public class Utils {
     public static void cosmeticsOGPlaceholderMessage(Player p, String message) {
 
         p.sendMessage(legacySerializerAnyCase((message)));
+
     }
 
     public static void logToConsole(Component component) {
@@ -25,6 +26,7 @@ public class Utils {
         String stripped = stripColors(serialized);
 
         CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+
     }
 
     public static void logToConsole(String message) {
@@ -35,6 +37,7 @@ public class Utils {
         String stripped = stripColors(serialized);
 
         CosmeticsOG.getInstance().getLogger().info("Cosmetics-OG " + stripped);
+
     }
 
     public static TextComponent legacySerializerAnyCase(String subject) {
@@ -46,7 +49,9 @@ public class Utils {
             if (c == '&') {
 
                 count++;
+
             }
+
         }
 
         // Create an array to store the positions of '&' characters
@@ -60,30 +65,38 @@ public class Utils {
                 if (isUpperBukkitCode(subject.charAt(i + 1))) {
 
                     subject = replaceCharAtIndex(subject, (i + 1), Character.toLowerCase(subject.charAt(i + 1)));
+
                 }
 
                 positions[index++] = i;
+
             }
+
         }
 
         return LegacyComponentSerializer.legacyAmpersand().deserialize(subject);
+
     }
 
     private static boolean isUpperBukkitCode(char input) {
 
-        char[] bukkitColorCodes = {'A', 'B', 'C', 'D', 'E', 'F', 'K', 'L', 'M', 'N', 'O', 'R'};
+        char[] bukkitColorCodes = { 'A', 'B', 'C', 'D', 'E', 'F', 'K', 'L', 'M', 'N', 'O', 'R' };
         boolean match = false;
 
         // Loop through each character in the array.
         for (char c : bukkitColorCodes) {
+
             // Check if the current character in the array is equal to the input character.
             if (c == input) {
 
                 match = true;
+
             }
+
         }
 
         return match;
+
     }
 
     private static String replaceCharAtIndex(String original, int index, char newChar) {
@@ -93,14 +106,18 @@ public class Utils {
 
             // Create a new string with the replaced character
             return original.substring(0, index) + newChar + original.substring(index + 1);
+
         }
 
         // If the index is invalid, return the original string
         return original;
+
     }
 
     public static String stripColors(String input) {
-        if (input == null) return null;
+
+        if (input == null)
+            return null;
 
         // Remove MiniMessage tags
         String stripped = MINIMESSAGE_TAG_PATTERN.matcher(input).replaceAll("");
@@ -109,5 +126,7 @@ public class Utils {
         stripped = LEGACY_COLOR_PATTERN.matcher(stripped).replaceAll("");
 
         return stripped;
+
     }
+
 }

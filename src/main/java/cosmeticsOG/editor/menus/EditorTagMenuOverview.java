@@ -23,8 +23,8 @@ public class EditorTagMenuOverview extends AbstractListMenu {
     private final EditorMenuManager editorManager;
     private final Hat targetHat;
     private final String tagTitle = Message.EDITOR_TAG_OVERVIEW_MENU_TAG_TITLE.getValue();
-    private final ItemStack emptyItem = ItemUtil.createItem(
-            CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_EMPTY.getValue());
+    private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+            Message.EDITOR_TAG_OVERVIEW_MENU_EMPTY.getValue());
 
     private boolean isModified = false;
 
@@ -36,24 +36,25 @@ public class EditorTagMenuOverview extends AbstractListMenu {
         this.targetHat = menuManager.getBaseHat();
         this.totalPages = 1;
 
-        setMenu(
-                0,
-                Bukkit.createInventory(
-                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_TAG_OVERVIEW_MENU_TITLE.getValue())));
+        setMenu(0, Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.EDITOR_TAG_OVERVIEW_MENU_TITLE.getValue())));
 
         build();
+
     }
 
     @Override
     public void insertEmptyItem() {
 
         setItem(0, 22, emptyItem);
+
     }
 
     @Override
     public void removeEmptyItem() {
 
         setItem(0, 22, null);
+
     }
 
     @Override
@@ -61,29 +62,25 @@ public class EditorTagMenuOverview extends AbstractListMenu {
 
         setButton(0, 46, backButtonItem, backButtonAction);
 
-        List<TextComponent> overviewTitleTextComponents =
-                StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_INFO.getValue()).stream()
-                        .map(component ->
-                                (TextComponent) component) // Convert list of Components to list of TextComponents.
-                        .collect(Collectors.toList());
+        List<TextComponent> overviewTitleTextComponents = StringUtil
+                .parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_INFO.getValue()).stream()
+                .map(component -> (TextComponent) component) // Convert list of Components to list of TextComponents.
+                .collect(Collectors.toList());
 
-        setItem(
-                0,
-                49,
-                ItemUtil.createItem(
-                        CompatibleMaterial.REDSTONE_TORCH.getMaterial(),
-                        1,
-                        Message.EDITOR_TAG_OVERVIEW_MENU_INFO_TITLE.getValue(),
-                        overviewTitleTextComponents));
+        setItem(0, 49, ItemUtil.createItem(CompatibleMaterial.REDSTONE_TORCH.getMaterial(), 1,
+                Message.EDITOR_TAG_OVERVIEW_MENU_INFO_TITLE.getValue(), overviewTitleTextComponents));
 
         // Add tag.
-        ItemStack addItem = ItemUtil.createItem(
-                CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_TAG_OVERVIEW_MENU_ADD_TAG.getValue());
+        ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1,
+                Message.EDITOR_TAG_OVERVIEW_MENU_ADD_TAG.getValue());
         setButton(0, 52, addItem, (event, slot) -> {
+
             EditorTagMenu editorTagMenu = new EditorTagMenu(core, editorManager, owner, (tagName) -> {
+
                 if (tagName == null) {
 
                     return;
+
                 }
 
                 ParticleTag tag = (ParticleTag) tagName;
@@ -93,36 +90,35 @@ public class EditorTagMenuOverview extends AbstractListMenu {
                     menuManager.closeCurrentMenu();
 
                     return;
+
                 }
 
                 int size = tags.size();
                 if (size < 28) {
 
-                    List<TextComponent> overviewDescriptionTextComponents =
-                            StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue())
-                                    .stream()
-                                    .map(component -> (TextComponent) component)
-                                    .collect(Collectors.toList());
+                    List<TextComponent> overviewDescriptionTextComponents = StringUtil
+                            .parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue()).stream()
+                            .map(component -> (TextComponent) component).collect(Collectors.toList());
 
-                    ItemStack tagItem = ItemUtil.createItem(
-                            CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                            1,
-                            tagTitle.replace("{1}", tag.getDisplayName()),
-                            overviewDescriptionTextComponents);
+                    ItemStack tagItem = ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                            tagTitle.replace("{1}", tag.getDisplayName()), overviewDescriptionTextComponents);
 
                     setItem(0, getNormalIndex(size, 10, 2), tagItem);
 
                     tags.add(tag);
+
                 }
 
                 if (isEmpty) {
 
                     setEmpty(false);
+
                 }
 
                 isModified = true;
 
                 menuManager.closeCurrentMenu();
+
             });
 
             menuManager.addMenu(editorTagMenu);
@@ -130,23 +126,28 @@ public class EditorTagMenuOverview extends AbstractListMenu {
             editorTagMenu.open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Edit action.
         final MenuAction editAction = (event, slot) -> {
+
             if (event.isShiftRightClick()) {
 
                 deleteSlot(0, slot);
 
                 return MenuClickResult.NEGATIVE;
+
             }
 
             return MenuClickResult.NONE;
+
         };
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), editAction);
+
         }
 
         // Tags.
@@ -157,23 +158,24 @@ public class EditorTagMenuOverview extends AbstractListMenu {
             setEmpty(true);
 
             return;
+
         }
 
         for (int i = 0; i < tags.size(); i++) {
 
             ParticleTag tag = tags.get(i);
-            String titleString = Utils.legacySerializerAnyCase(tagTitle.replace("{1}", tag.getDisplayName()))
-                    .content();
-            List<TextComponent> textComponents =
-                    StringUtil.parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue()).stream()
-                            .map(component -> (TextComponent) component)
-                            .collect(Collectors.toList());
+            String titleString = Utils.legacySerializerAnyCase(tagTitle.replace("{1}", tag.getDisplayName())).content();
+            List<TextComponent> textComponents = StringUtil
+                    .parseDescription(Message.EDITOR_TAG_OVERVIEW_MENU_TAG_DESCRIPTION.getValue()).stream()
+                    .map(component -> (TextComponent) component).collect(Collectors.toList());
 
-            ItemStack tagItem =
-                    ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1, titleString, textComponents);
+            ItemStack tagItem = ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1, titleString,
+                    textComponents);
 
             setItem(0, getNormalIndex(i, 10, 2), tagItem);
+
         }
+
     }
 
     @Override
@@ -182,11 +184,15 @@ public class EditorTagMenuOverview extends AbstractListMenu {
         if (isModified) {
 
             core.getDatabase().saveMetaData(editorManager.getMenuName(), targetHat, DataType.TAGS, -1);
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     @Override
     public void deleteSlot(int page, int slot) {
@@ -201,8 +207,11 @@ public class EditorTagMenuOverview extends AbstractListMenu {
         if (tags.isEmpty()) {
 
             setEmpty(true);
+
         }
 
         isModified = true;
+
     }
+
 }

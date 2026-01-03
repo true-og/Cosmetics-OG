@@ -23,6 +23,7 @@ public class OpenPlayerCommand extends Command {
     public OpenPlayerCommand(final OpenCommand parent) {
 
         this.parent = parent;
+
     }
 
     @Override
@@ -37,9 +38,11 @@ public class OpenPlayerCommand extends Command {
             } else {
 
                 Utils.logToConsole(getUsage().getValue());
+
             }
 
             return false;
+
         }
 
         Player targetPlayer = getPlayer(sender, args.get(1));
@@ -47,34 +50,35 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender,
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
                         Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
             } else {
 
-                Utils.logToConsole(
-                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+
             }
 
             return false;
+
         }
 
         if (!targetPlayer.isOnline()) {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender,
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
 
             } else {
 
                 Utils.logToConsole(
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
+
             }
 
             return false;
+
         }
 
         PlayerState playerState = core.getPlayerState(targetPlayer.getPlayer());
@@ -82,21 +86,24 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+
             }
 
             return false;
+
         }
 
         AbstractMenu menu = parent.getRequestedMenu(playerState, args.get(0), sender, targetPlayer);
         if (menu == null) {
 
             return false;
+
         }
 
         StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
@@ -105,6 +112,7 @@ public class OpenPlayerCommand extends Command {
         menu.open();
 
         return true;
+
     }
 
     @Override
@@ -116,59 +124,71 @@ public class OpenPlayerCommand extends Command {
             for (Player p : Bukkit.getOnlinePlayers()) {
 
                 players.add(p.getName());
+
             }
 
             if (Permission.COMMAND_SELECTORS.hasPermission(sender)) {
 
                 players.add("@p");
                 players.add("@r");
+
             }
 
             return players;
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "open menu for player";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "player";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_OPEN_PLAYER_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_OPEN_PLAYER_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_OPEN_PLAYER;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

@@ -41,10 +41,13 @@ public class BukkitHelpCommand extends Command {
 
                 // Store the component in the map
                 commands.put(commandIndex++, component);
+
             }
+
         }
 
         pages = (int) Math.ceil((double) commandIndex / 9D);
+
     }
 
     /***
@@ -59,16 +62,15 @@ public class BukkitHelpCommand extends Command {
 
             Player player = sender.getPlayer();
 
-            Utils.cosmeticsOGPlaceholderMessage(
-                    player,
-                    "<white>> <light_purple>Cosmetics<red>-OG <yellow>v"
-                            + core.getPluginMeta().getVersion());
+            Utils.cosmeticsOGPlaceholderMessage(player,
+                    "<white>> <light_purple>Cosmetics<red>-OG <yellow>v" + core.getPluginMeta().getVersion());
             Utils.cosmeticsOGPlaceholderMessage(player, "<gray>> " + Message.COMMAND_HELP_TIP.getValue());
 
         } else {
 
             Utils.logToConsole("&r&2Cosmetics&c-OG &ev" + core.getPluginMeta().getVersion());
             Utils.logToConsole("&7 " + Message.COMMAND_HELP_TIP.getValue());
+
         }
 
         for (Entry<Integer, Component> entry : commands.entrySet()) {
@@ -81,8 +83,11 @@ public class BukkitHelpCommand extends Command {
             } else {
 
                 Utils.logToConsole(MiniMessage.miniMessage().serialize(component));
+
             }
+
         }
+
     }
 
     /**
@@ -93,12 +98,13 @@ public class BukkitHelpCommand extends Command {
     protected void readPage(CommandSender sender) {
 
         sender.sendMessage(MiniMessage.miniMessage()
-                .deserialize(
-                        "<white>> <gold>ParticleHats v" + core.getPluginMeta().getVersion()));
+                .deserialize("<white>> <gold>ParticleHats v" + core.getPluginMeta().getVersion()));
         for (Entry<Integer, Component> cmd : commands.entrySet()) {
 
             sender.sendMessage(cmd.getValue());
+
         }
+
     }
 
     @Override
@@ -113,15 +119,18 @@ public class BukkitHelpCommand extends Command {
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+
             }
 
             return false;
+
         }
 
         int targetPage = 0;
         if (args.size() >= 1) {
 
             targetPage = MathUtil.valueOf(args.get(0));
+
         }
 
         if (sender.isPlayer()) {
@@ -131,50 +140,60 @@ public class BukkitHelpCommand extends Command {
         } else {
 
             readPage(sender.getCommandSender());
+
         }
 
         return true;
+
     }
 
     @Override
     public String getName() {
 
         return "help";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "help";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_HELP_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_HELP_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_HELP;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return false;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

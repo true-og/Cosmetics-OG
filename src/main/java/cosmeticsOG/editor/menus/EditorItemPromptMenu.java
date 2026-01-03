@@ -25,14 +25,9 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
 
     private boolean isSearching = false;
 
-    public EditorItemPromptMenu(
-            CosmeticsOG core,
-            EditorMenuManager menuManager,
-            Player owner,
-            Message title,
-            Message itemName,
-            Message itemDescription,
-            MenuObjectCallback callback) {
+    public EditorItemPromptMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, Message title,
+            Message itemName, Message itemDescription, MenuObjectCallback callback)
+    {
 
         super(core, menuManager, owner);
 
@@ -43,6 +38,7 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
         this.inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title.getValue()));
 
         build();
+
     }
 
     @Override
@@ -52,6 +48,7 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
         if (item == null) {
 
             return MenuClickResult.NONE;
+
         }
 
         ItemStack i = new ItemStack(item.getType(), 1);
@@ -60,29 +57,32 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
         callback.onSelect(i);
 
         return MenuClickResult.NEUTRAL;
+
     }
 
     @Override
     protected void build() {
 
-        ItemStack info = ItemUtil.createItem(
-                CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(), 1, itemName.getValue());
+        ItemStack info = ItemUtil.createItem(CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(), 1,
+                itemName.getValue());
 
         ItemUtil.setItemDescription(info, StringUtil.parseDescription(itemDescription.getValue()));
 
         for (int i = 0; i < inventory.getSize(); i++) {
 
             setItem(i, info);
+
         }
 
         // Back Button.
         setButton(10, backButtonItem, backButtonAction);
 
         // Search Button.
-        setButton(
-                37,
+        setButton(37,
                 ItemUtil.createItem(CompatibleMaterial.SIGN.getMaterial(), 1, Message.EDITOR_MISC_SEARCH.getValue()),
-                (event, slot) -> {
+                (event, slot) ->
+                {
+
                     isSearching = true;
 
                     core.getPlayerState(owner).setMetaState(MetaState.BLOCK_SEARCH);
@@ -91,14 +91,17 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
                     menuManager.closeInventory();
 
                     return MenuClickResult.NEUTRAL;
+
                 });
 
         // Recents.
         MenuAction selectRecentAction = (event, slot) -> {
+
             ItemStack item = event.getEvent().getCurrentItem();
             if (item == null) {
 
                 return MenuClickResult.NONE;
+
             }
 
             ItemStack i = new ItemStack(item.getType(), 1);
@@ -107,17 +110,19 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
             callback.onSelect(i);
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         List<ItemStack> recentItems = editorManager.getOwnerState().getRecentItems();
-        List<Component> description =
-                StringUtil.parseDescription(Message.EDITOR_ICON_MENU_RECENTS_DESCRIPTION.getValue());
+        List<Component> description = StringUtil
+                .parseDescription(Message.EDITOR_ICON_MENU_RECENTS_DESCRIPTION.getValue());
         int index = 0;
         for (ItemStack item : recentItems) {
 
             if (index >= 20) {
 
                 return;
+
             }
 
             ItemStack i = item.clone();
@@ -125,7 +130,9 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
             ItemUtil.setItemDescription(i, description);
 
             setButton(getNormalIndex(index++, 12, 4), i, selectRecentAction);
+
         }
+
     }
 
     @Override
@@ -142,29 +149,41 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
 
                 editorManager.resetMetaArgument();
 
-                EditorSearchMenu editorSearchMenu =
-                        new EditorSearchMenu(core, menuManager, owner, searchQuery, (item) -> {
+                EditorSearchMenu editorSearchMenu = new EditorSearchMenu(core, menuManager, owner, searchQuery,
+                        (item) ->
+                        {
+
                             ItemStack i = (ItemStack) item;
                             if (i == null) {
 
                                 return;
+
                             }
 
                             menuManager.closeCurrentMenu();
                             editorManager.getOwnerState().addRecentItem(i);
                             callback.onSelect(i);
+
                         });
 
                 menuManager.addMenu(editorSearchMenu);
 
                 editorSearchMenu.open();
+
             }
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

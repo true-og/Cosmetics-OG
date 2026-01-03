@@ -28,13 +28,9 @@ public class EditorActionMenu extends AbstractListMenu {
 
     private final List<ParticleAction> actions;
 
-    public EditorActionMenu(
-            CosmeticsOG core,
-            EditorMenuManager menuManager,
-            Player owner,
-            boolean isLeftClickAction,
-            boolean showHiddenActions,
-            MenuObjectCallback callback) {
+    public EditorActionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isLeftClickAction,
+            boolean showHiddenActions, MenuObjectCallback callback)
+    {
 
         super(core, menuManager, owner, false);
 
@@ -45,37 +41,43 @@ public class EditorActionMenu extends AbstractListMenu {
         this.totalPages = MathUtil.calculatePageCount(ParticleAction.values().length, 28);
 
         this.selectAction = (event, slot) -> {
+
             int index = getClampedIndex(slot, 10, 2);
             ParticleAction action = actions.get(index);
 
             if (action == null) {
 
                 action = ParticleAction.EQUIP;
+
             }
 
             callback.onSelect(action);
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
-    public EditorActionMenu(
-            CosmeticsOG core,
-            EditorMenuManager menuManager,
-            Player owner,
-            boolean isLeftClickAction,
-            MenuObjectCallback callback) {
+    public EditorActionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isLeftClickAction,
+            MenuObjectCallback callback)
+    {
 
         this(core, menuManager, owner, isLeftClickAction, false, callback);
+
     }
 
     @Override
-    public void insertEmptyItem() {}
+    public void insertEmptyItem() {
+
+    }
 
     @Override
-    public void removeEmptyItem() {}
+    public void removeEmptyItem() {
+
+    }
 
     @Override
     protected void build() {
@@ -84,24 +86,29 @@ public class EditorActionMenu extends AbstractListMenu {
 
         // Previous Page.
         setAction(48, (event, slot) -> {
+
             currentPage--;
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Next Page.
         setAction(50, (event, slot) -> {
+
             currentPage++;
             open();
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Fill in the actions.
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), selectAction);
+
         }
 
         // Create the pages.
@@ -112,11 +119,8 @@ public class EditorActionMenu extends AbstractListMenu {
         String rightClick = !isLeftClickAction ? rightClickInfo[1] : "";
         for (int i = 0; i < totalPages; i++) {
 
-            String titleStr = menuTitle
-                    .replace(leftClickInfo[0], leftClick)
-                    .replace(rightClickInfo[0], rightClick)
-                    .replace("{3}", Integer.toString(i + 1))
-                    .replace("{4}", Integer.toString(totalPages));
+            String titleStr = menuTitle.replace(leftClickInfo[0], leftClick).replace(rightClickInfo[0], rightClick)
+                    .replace("{3}", Integer.toString(i + 1)).replace("{4}", Integer.toString(totalPages));
 
             // Convert the title string to a colorized TextComponent using TrueOG Utils.
             Component title = Utils.legacySerializerAnyCase(titleStr);
@@ -129,26 +133,21 @@ public class EditorActionMenu extends AbstractListMenu {
             // Next Page.
             if ((i + 1) < totalPages) {
 
-                menu.setItem(
-                        50,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+
             }
 
             // Previous Page.
             if ((i + 1) > 1) {
 
-                menu.setItem(
-                        48,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+
             }
 
             setMenu(i, menu);
+
         }
 
         // Insert the actions.
@@ -161,6 +160,7 @@ public class EditorActionMenu extends AbstractListMenu {
             if (action == ParticleAction.MIMIC && isLeftClickAction) {
 
                 continue;
+
             }
 
             if (showHiddenActions) {
@@ -168,6 +168,7 @@ public class EditorActionMenu extends AbstractListMenu {
                 if (!action.isHidden() && action != ParticleAction.DUMMY) {
 
                     continue;
+
                 }
 
             } else {
@@ -175,27 +176,29 @@ public class EditorActionMenu extends AbstractListMenu {
                 if (action.isHidden()) {
 
                     continue;
+
                 }
+
             }
 
-            ItemStack item =
-                    ItemUtil.createItem(CompatibleMaterial.FIREWORK_STAR.getMaterial(), 1, action.getDisplayName());
+            ItemStack item = ItemUtil.createItem(CompatibleMaterial.FIREWORK_STAR.getMaterial(), 1,
+                    action.getDisplayName());
             String description = Message.EDITOR_ACTION_MENU_ACTION_DESCRIPTION.getValue();
             String[] selectedInfo = StringUtil.parseValue(description, "2");
             String[] selectInfo = StringUtil.parseValue(description, "3");
-            ParticleAction currentAction =
-                    isLeftClickAction ? targetHat.getLeftClickAction() : targetHat.getRightClickAction();
+            ParticleAction currentAction = isLeftClickAction ? targetHat.getLeftClickAction()
+                    : targetHat.getRightClickAction();
             if (currentAction.equals(action)) {
 
                 ItemUtil.setItemType(item, CompatibleMaterial.GUNPOWDER);
                 ItemUtil.highlightItem(item);
 
-                description =
-                        description.replace(selectedInfo[0], selectedInfo[1]).replace(selectInfo[0], "");
+                description = description.replace(selectedInfo[0], selectedInfo[1]).replace(selectInfo[0], "");
 
             } else {
 
                 description = description.replace(selectInfo[0], selectInfo[1]).replace(selectedInfo[0], "");
+
             }
 
             description = description.replace("{1}", action.getDescription());
@@ -208,13 +211,21 @@ public class EditorActionMenu extends AbstractListMenu {
 
                 index = 0;
                 page++;
+
             }
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

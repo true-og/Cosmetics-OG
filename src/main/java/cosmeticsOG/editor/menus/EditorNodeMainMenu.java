@@ -12,13 +12,14 @@ public class EditorNodeMainMenu extends EditorMainMenu {
     public EditorNodeMainMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner) {
 
         super(core, menuManager, owner);
+
     }
 
     @Override
     public void build() {
 
-        this.inventory = Bukkit.createInventory(
-                null, 45, Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 45,
+                Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
         this.particleButtonSlot = 13;
         this.trackingButtonSlot = 19;
         this.countButtonSlot = 15;
@@ -27,5 +28,7 @@ public class EditorNodeMainMenu extends EditorMainMenu {
         buildSection();
 
         setButton(38, backButtonItem, backButtonAction);
+
     }
+
 }

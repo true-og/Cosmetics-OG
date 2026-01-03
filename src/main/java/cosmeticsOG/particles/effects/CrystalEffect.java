@@ -13,51 +13,70 @@ public class CrystalEffect extends Effect {
 
     @Override
     public String getName() {
+
         return "crystal";
+
     }
 
     @Override
     public String getDisplayName() {
+
         return Message.TYPE_CRYSTAL_NAME.getValue();
+
     }
 
     @Override
     public String getDescription() {
+
         return Message.TYPE_CRYSTAL_DESCRIPTION.getValue();
+
     }
 
     @Override
     public int getParticlesSupported() {
+
         return 1;
+
     }
 
     @Override
     public ParticleLocation getDefaultLocation() {
+
         return ParticleLocation.HEAD;
+
     }
 
     @Override
     public List<ParticleTracking> getSupportedTrackingMethods() {
+
         return Arrays.asList(ParticleTracking.values());
+
     }
 
     @Override
     public ParticleTracking getDefaultTrackingMethod() {
+
         return ParticleTracking.TRACK_HEAD_MOVEMENT;
+
     }
 
     @Override
     public boolean supportsAnimation() {
+
         return false;
+
     }
 
     @Override
     public boolean isCustom() {
+
         return false;
+
     }
 
     @Override
     public void build() {
+
         List<Vector> list = new ArrayList<Vector>();
 
         // Center
@@ -103,5 +122,7 @@ public class CrystalEffect extends Effect {
         frames.add(list);
 
         setFrames(frames);
+
     }
+
 }

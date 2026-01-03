@@ -23,8 +23,10 @@ public interface Prompt {
 
     /**
      * Checks to see if we can prompt this player
+     * 
      * @param passes
      * @return
      */
     public boolean canPrompt(int passes);
+
 }

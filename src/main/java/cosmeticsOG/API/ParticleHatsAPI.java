@@ -11,7 +11,9 @@ public abstract class ParticleHatsAPI {
     protected final CosmeticsOG core;
 
     public ParticleHatsAPI(final CosmeticsOG core) {
+
         this.core = core;
+
     }
 
     /**
@@ -25,11 +27,12 @@ public abstract class ParticleHatsAPI {
     /**
      * Creates a new hat from the given label and equips it
      *
-     * @param player The player this new hat will be given to
-     * @param label The unique label that defines this hat
+     * @param player     The player this new hat will be given to
+     * @param label      The unique label that defines this hat
      * @param tellPlayer Shows the player the HAT_EQUIPPED message
-     * @param permanent You can decide whether to equip this hat temporarily or permanently
-     * @throws InvalidLabelException If label doesn't not exist
+     * @param permanent  You can decide whether to equip this hat temporarily or
+     *                   permanently
+     * @throws InvalidLabelException    If label doesn't not exist
      * @throws IllegalArgumentException If any arguments are invalid
      */
     public abstract void equipHatFromLabel(Player player, String label, boolean tellPlayer, boolean permanent)
@@ -38,10 +41,10 @@ public abstract class ParticleHatsAPI {
     /**
      * Creates a new hat from the given label and equips it
      *
-     * @param player The player this new hat will be given to
-     * @param label The unique label that defines this hat
+     * @param player     The player this new hat will be given to
+     * @param label      The unique label that defines this hat
      * @param tellPlayer Shows the player the HAT_EQUIPPED message
-     * @throws InvalidLabelException If label doesn't not exist
+     * @throws InvalidLabelException    If label doesn't not exist
      * @throws IllegalArgumentException If any arguments are invalid
      */
     public abstract void equipHatFromLabel(Player player, String label, boolean tellPlayer)
@@ -51,8 +54,8 @@ public abstract class ParticleHatsAPI {
      * Creates a new hat from the given label and equips it
      *
      * @param player The player this new hat will be given to
-     * @param label The unique label that defines this hat
-     * @throws InvalidLabelException If label doesn't not exist
+     * @param label  The unique label that defines this hat
+     * @throws InvalidLabelException    If label doesn't not exist
      * @throws IllegalArgumentException If any arguments are invalid
      */
     public abstract void equipHatFromLabel(Player player, String label)
@@ -69,8 +72,8 @@ public abstract class ParticleHatsAPI {
     /**
      * Toggles a players active hat
      *
-     * @param player The player we want to toggle hats for
-     * @param index The hat
+     * @param player       The player we want to toggle hats for
+     * @param index        The hat
      * @param toggleStatus
      * @throws InvalidHatException
      */
@@ -134,4 +137,5 @@ public abstract class ParticleHatsAPI {
      */
     @Deprecated
     public abstract boolean isWearingHat(UUID playerID);
+
 }

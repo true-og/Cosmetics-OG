@@ -12,10 +12,13 @@ public class MenuManagerFactory {
     public MenuManagerFactory(final CosmeticsOG core) {
 
         this.core = core;
+
     }
 
     /**
-     * Returns a new StaticMenuManager class, unregisters any existing menu manager classes
+     * Returns a new StaticMenuManager class, unregisters any existing menu manager
+     * classes
+     * 
      * @param playerState
      * @return
      */
@@ -37,13 +40,17 @@ public class MenuManagerFactory {
             playerState.setMenuManager(staticMenuManager);
 
             return staticMenuManager;
+
         }
 
         return (StaticMenuManager) menuManager;
+
     }
 
     /**
-     * Returns a new EditorMenuManager class, unregisters any existing menu manager classes
+     * Returns a new EditorMenuManager class, unregisters any existing menu manager
+     * classes
+     * 
      * @param playerState
      * @return
      */
@@ -65,13 +72,17 @@ public class MenuManagerFactory {
             playerState.setMenuManager(editorManager);
 
             return editorManager;
+
         }
 
         return (EditorMenuManager) menuManager;
+
     }
 
     /**
-     * Returns a new PurchaseMenuManager class, unregistering any existing menu manager classes
+     * Returns a new PurchaseMenuManager class, unregistering any existing menu
+     * manager classes
+     * 
      * @param playerState
      * @return
      */
@@ -93,8 +104,11 @@ public class MenuManagerFactory {
             playerState.setMenuManager(purchaseManager);
 
             return purchaseManager;
+
         }
 
         return (PurchaseMenuManager) menuManager;
+
     }
+
 }

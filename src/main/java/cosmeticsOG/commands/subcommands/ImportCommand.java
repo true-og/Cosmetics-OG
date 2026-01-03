@@ -31,9 +31,11 @@ public class ImportCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(Message.COMMAND_IMPORT_USAGE.getValue());
+
             }
 
             return false;
+
         }
 
         if (core.getDatabaseType().equals(DatabaseType.YAML)) {
@@ -45,9 +47,11 @@ public class ImportCommand extends Command {
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ADD_TYPE_ERROR.getValue());
+
             }
 
             return false;
+
         }
 
         String menuName = args.get(0);
@@ -55,15 +59,17 @@ public class ImportCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.replace("{1}", menuName));
+
             }
 
             return false;
+
         }
 
         MySQLDatabase database = (MySQLDatabase) core.getDatabase();
@@ -73,30 +79,34 @@ public class ImportCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
             } else {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+
             }
 
             return false;
+
         }
 
         database.importMenu(sender, config);
 
         if (sender.isPlayer()) {
 
-            Utils.cosmeticsOGPlaceholderMessage(
-                    (Player) sender, Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
+            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                    Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
 
         } else {
 
             Utils.logToConsole(Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuName));
+
         }
 
         return true;
+
     }
 
     @Override
@@ -108,53 +118,64 @@ public class ImportCommand extends Command {
             for (String menu : core.getResourceManager().getMenus()) {
 
                 menus.add(menu);
+
             }
 
             return menus;
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
     public String getName() {
 
         return "import menu";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "import";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_IMPORT_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_IMPORT_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_IMPORT;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
+
 }

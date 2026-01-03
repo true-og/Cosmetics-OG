@@ -75,6 +75,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
         customTypeCurrentPage = 0;
 
         setTypeAction = (event, slot) -> {
+
             int index = getClampedIndex(slot, 10, 2);
             if (selectingFromIncludedTypes) {
 
@@ -84,6 +85,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                     targetHat.setType(includedTypeData.get(typeIndex));
 
                     menuManager.closeCurrentMenu();
+
                 }
 
             } else {
@@ -98,19 +100,24 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                     targetHat.setCustomType(new PixelEffect(image, name));
 
                     menuManager.closeCurrentMenu();
+
                 }
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
     @Override
     public void open() {
 
         open(includedTypeMenus.get(includedTypeCurrentPage));
+
     }
 
     private void open(Inventory inventory) {
@@ -118,6 +125,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
         menuManager.isOpeningMenu(this);
 
         owner.openInventory(inventory);
+
     }
 
     @Override
@@ -128,10 +136,12 @@ public class EditorTypeMenu extends AbstractStaticMenu {
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), setTypeAction);
+
         }
 
         // Previous page.
         setAction(48, (event, slot) -> {
+
             if (selectingFromIncludedTypes) {
 
                 includedTypeCurrentPage--;
@@ -143,13 +153,16 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 customTypeCurrentPage--;
 
                 open(customTypeMenus.get(customTypeCurrentPage));
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Next page.
         setAction(50, (event, slot) -> {
+
             if (selectingFromIncludedTypes) {
 
                 includedTypeCurrentPage++;
@@ -161,27 +174,33 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 customTypeCurrentPage++;
 
                 open(customTypeMenus.get(customTypeCurrentPage));
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Included types filter.
         setAction(46, (event, slot) -> {
+
             selectingFromIncludedTypes = true;
 
             open(includedTypeMenus.get(includedTypeCurrentPage));
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Custom types filter.
         setAction(47, (event, slot) -> {
+
             selectingFromIncludedTypes = false;
 
             open(customTypeMenus.get(customTypeCurrentPage));
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         // Create included type menus.
@@ -189,6 +208,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
 
         // Create custom type menus.
         generateCustomTypeMenus();
+
     }
 
     @Override
@@ -197,11 +217,15 @@ public class EditorTypeMenu extends AbstractStaticMenu {
         if (!forced) {
 
             callback.onSelect(null);
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     @Override
     public boolean hasInventory(Inventory inventory) {
@@ -209,9 +233,11 @@ public class EditorTypeMenu extends AbstractStaticMenu {
         if (selectingFromIncludedTypes) {
 
             return includedTypeMenus.get(includedTypeCurrentPage).equals(inventory);
+
         }
 
         return customTypeMenus.get(customTypeCurrentPage).equals(inventory);
+
     }
 
     private void generateIncludedTypeMenus() {
@@ -228,6 +254,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
             if (type.isCustom()) {
 
                 continue;
+
             }
 
             if (type.isDebug()) {
@@ -235,7 +262,9 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 if (!CosmeticsOG.debugging) {
 
                     continue;
+
                 }
+
             }
 
             boolean selected = currentType.equals(type);
@@ -249,6 +278,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
 
                 ItemUtil.setItemType(item, CompatibleMaterial.CYAN_DYE);
                 ItemUtil.highlightItem(item);
+
             }
 
             includedTypeMenus.get(page).setItem(getNormalIndex(index++, 10, 2), item);
@@ -259,8 +289,11 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 index = 0;
 
                 page++;
+
             }
+
         }
+
     }
 
     private void generateCustomTypeMenus() {
@@ -273,14 +306,8 @@ public class EditorTypeMenu extends AbstractStaticMenu {
 
         if (customTypes.size() == 0) {
 
-            customTypeMenus
-                    .get(0)
-                    .setItem(
-                            22,
-                            ItemUtil.createItem(
-                                    CompatibleMaterial.BARRIER.getMaterial(),
-                                    1,
-                                    Message.EDITOR_TYPE_MENU_NO_CUSTOM_TYPES.getValue()));
+            customTypeMenus.get(0).setItem(22, ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+                    Message.EDITOR_TYPE_MENU_NO_CUSTOM_TYPES.getValue()));
 
         } else {
 
@@ -291,7 +318,9 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 if (customEffect != null) {
 
                     currentEffectName = customEffect.getImageName();
+
                 }
+
             }
 
             int page = 0;
@@ -314,6 +343,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                 if (isSelected) {
 
                     ItemUtil.highlightItem(item);
+
                 }
 
                 customTypeMenus.get(page).setItem(getNormalIndex(index++, 10, 2), item);
@@ -328,9 +358,13 @@ public class EditorTypeMenu extends AbstractStaticMenu {
                     index = 0;
 
                     page++;
+
                 }
+
             }
+
         }
+
     }
 
     private void generateMenus(Map<Integer, Inventory> menus, int pages, int category) {
@@ -345,49 +379,39 @@ public class EditorTypeMenu extends AbstractStaticMenu {
             // Next page.
             if ((i + 1) < pages) {
 
-                menu.setItem(
-                        50,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+                menu.setItem(50, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_NEXT_PAGE.getValue()));
+
             }
 
             // Previous page.
             if ((i + 1) > 1) {
 
-                menu.setItem(
-                        48,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.LIME_DYE.getMaterial(),
-                                1,
-                                Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+                menu.setItem(48, ItemUtil.createItem(CompatibleMaterial.LIME_DYE.getMaterial(), 1,
+                        Message.EDITOR_MISC_PREVIOUS_PAGE.getValue()));
+
             }
 
             if (category == 0) {
 
-                menu.setItem(
-                        46,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                1,
-                                Message.EDITOR_TYPE_MENU_INCLUDED_FILTER.getValue()));
-                menu.setItem(
-                        47, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_TYPE_MENU_CUSTOM_FILTER.getValue()));
+                menu.setItem(46, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                        Message.EDITOR_TYPE_MENU_INCLUDED_FILTER.getValue()));
+                menu.setItem(47,
+                        ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_TYPE_MENU_CUSTOM_FILTER.getValue()));
 
             } else {
 
-                menu.setItem(
-                        46, ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_TYPE_MENU_INCLUDED_FILTER.getValue()));
-                menu.setItem(
-                        47,
-                        ItemUtil.createItem(
-                                CompatibleMaterial.MUSHROOM_STEW.getMaterial(),
-                                1,
-                                Message.EDITOR_TYPE_MENU_CUSTOM_FILTER.getValue()));
+                menu.setItem(46,
+                        ItemUtil.createItem(Material.BOWL, 1, Message.EDITOR_TYPE_MENU_INCLUDED_FILTER.getValue()));
+                menu.setItem(47, ItemUtil.createItem(CompatibleMaterial.MUSHROOM_STEW.getMaterial(), 1,
+                        Message.EDITOR_TYPE_MENU_CUSTOM_FILTER.getValue()));
+
             }
 
             menus.put(i, menu);
+
         }
+
     }
+
 }

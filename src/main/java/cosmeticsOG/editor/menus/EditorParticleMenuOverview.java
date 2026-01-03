@@ -27,8 +27,9 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
     private Map<Integer, ParticleEffect> particles;
     private Map<Integer, Boolean> modifiedParticles;
 
-    public EditorParticleMenuOverview(
-            CosmeticsOG core, EditorMenuManager menuManager, Player owner, EditorMainMenu editorMainMenu) {
+    public EditorParticleMenuOverview(CosmeticsOG core, EditorMenuManager menuManager, Player owner,
+            EditorMainMenu editorMainMenu)
+    {
 
         super(core, menuManager, owner);
 
@@ -37,10 +38,11 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
         this.targetHat = menuManager.getTargetHat();
         this.particles = new HashMap<Integer, ParticleEffect>();
         this.modifiedParticles = new HashMap<Integer, Boolean>();
-        this.inventory = Bukkit.createInventory(
-                null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_OVERVIEW_MENU_TITLE.getValue()));
+        this.inventory = Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_OVERVIEW_MENU_TITLE.getValue()));
 
         build();
+
     }
 
     @Override
@@ -49,16 +51,20 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
         setButton(49, backButtonItem, backButtonAction);
 
         MenuAction editAction = (event, slot) -> {
+
             int particleIndex = getClampedIndex(slot, 10, 2);
             if (event.isLeftClick()) {
 
-                EditorParticleSelectionMenu editorParticleSelectionMenu =
-                        new EditorParticleSelectionMenu(core, editorManager, owner, particleIndex, (particle) -> {
+                EditorParticleSelectionMenu editorParticleSelectionMenu = new EditorParticleSelectionMenu(core,
+                        editorManager, owner, particleIndex, (particle) ->
+                        {
+
                             menuManager.closeCurrentMenu();
 
                             if (particle == null) {
 
                                 return;
+
                             }
 
                             ParticleEffect pe = (ParticleEffect) particle;
@@ -77,6 +83,7 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
                             EditorLore.updateParticleDescription(item, targetHat, particleIndex);
 
                             modifiedParticles.put(particleIndex, true);
+
                         });
 
                 menuManager.addMenu(editorParticleSelectionMenu);
@@ -86,14 +93,17 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
             } else if (event.isRightClick()) {
 
                 editorMainMenu.onParticleEdit(getItem(slot), particleIndex);
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), editAction);
+
         }
 
         String itemTitle = Message.EDITOR_PARTICLE_OVERVIEW_PARTICLE_NAME.getValue();
@@ -111,7 +121,9 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
             EditorLore.updateParticleDescription(item, targetHat, i);
 
             setItem(getNormalIndex(i, 10, 2), item);
+
         }
+
     }
 
     @Override
@@ -124,7 +136,9 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
             if (entry.getValue()) {
 
                 database.saveParticleData(menuName, targetHat, entry.getKey());
+
             }
+
         }
 
         for (int i = 0; i < targetHat.getType().getParticlesSupported(); i++) {
@@ -132,10 +146,16 @@ public class EditorParticleMenuOverview extends AbstractStaticMenu {
             if (targetHat.getParticleData(i).hasPropertyChanges()) {
 
                 database.saveParticleData(menuName, targetHat, i);
+
             }
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
+
 }

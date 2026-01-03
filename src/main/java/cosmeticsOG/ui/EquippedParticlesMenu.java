@@ -20,8 +20,8 @@ public class EquippedParticlesMenu extends AbstractListMenu {
     final PlayerState playerState;
     final MenuAction hatAction;
 
-    private final ItemStack emptyItem =
-            ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1, Message.ACTIVE_PARTICLES_EMPTY.getValue());
+    private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+            Message.ACTIVE_PARTICLES_EMPTY.getValue());
 
     public EquippedParticlesMenu(CosmeticsOG core, MenuManager menuManager, Player owner, boolean fromMenu) {
 
@@ -31,22 +31,23 @@ public class EquippedParticlesMenu extends AbstractListMenu {
         this.playerState = core.getPlayerState(owner);
         this.totalPages = 1;
 
-        this.setMenu(
-                0,
-                Bukkit.createInventory(
-                        null, 54, Utils.legacySerializerAnyCase(Message.ACTIVE_PARTICLES_MENU_TITLE.getValue())));
+        this.setMenu(0, Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.ACTIVE_PARTICLES_MENU_TITLE.getValue())));
 
         hatAction = (event, slot) -> {
+
             int index = getClampedIndex(slot, 10, 2);
             if (index >= playerState.getHatCount()) {
 
                 return MenuClickResult.NONE;
+
             }
 
             Hat hat = playerState.getActiveHats().get(index);
             if (hat == null) {
 
                 return MenuClickResult.NONE;
+
             }
 
             if (event.isLeftClick()) {
@@ -65,6 +66,7 @@ public class EquippedParticlesMenu extends AbstractListMenu {
                 } else {
 
                     ItemUtil.highlightItem(item);
+
                 }
 
             } else if (event.isShiftRightClick()) {
@@ -78,32 +80,40 @@ public class EquippedParticlesMenu extends AbstractListMenu {
                     if (staticManager == null) {
 
                         return MenuClickResult.NEUTRAL;
+
                     }
 
                     AbstractMenu menu = staticManager.getMenuFromCache(hat.getMenu());
                     if (menu instanceof StaticMenu) {
 
                         ((StaticMenu) menu).unequipHat(hat);
+
                     }
+
                 }
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
     @Override
     public void insertEmptyItem() {
 
         setButton(0, 22, emptyItem, emptyAction);
+
     }
 
     @Override
     public void removeEmptyItem() {
 
         setButton(0, 22, null, hatAction);
+
     }
 
     @Override
@@ -112,42 +122,46 @@ public class EquippedParticlesMenu extends AbstractListMenu {
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), hatAction);
+
         }
 
         if (fromMenu) {
 
-            setButton(
-                    0,
-                    49,
-                    ItemUtil.createItem(Material.NETHER_STAR, 1, Message.EDITOR_MISC_GO_BACK.getValue()),
-                    (event, slot) -> {
+            setButton(0, 49, ItemUtil.createItem(Material.NETHER_STAR, 1, Message.EDITOR_MISC_GO_BACK.getValue()),
+                    (event, slot) ->
+                    {
+
                         StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
                         if (staticManager == null) {
 
                             return MenuClickResult.NONE;
+
                         }
 
                         AbstractMenu previousMenu = staticManager.getPreviousOpenMenu();
                         if (previousMenu == null) {
 
                             return MenuClickResult.NONE;
+
                         }
 
                         previousMenu.open();
 
                         return MenuClickResult.NEUTRAL;
+
                     });
 
         } else {
 
-            setButton(
-                    0,
-                    49,
-                    ItemUtil.createItem(Material.NETHER_STAR, 1, Message.EDITOR_MISC_CLOSE.getValue()),
-                    (event, slot) -> {
+            setButton(0, 49, ItemUtil.createItem(Material.NETHER_STAR, 1, Message.EDITOR_MISC_CLOSE.getValue()),
+                    (event, slot) ->
+                    {
+
                         menuManager.closeInventory();
                         return MenuClickResult.NEUTRAL;
+
                     });
+
         }
 
         List<Hat> equippedHats = playerState.getActiveHats();
@@ -156,6 +170,7 @@ public class EquippedParticlesMenu extends AbstractListMenu {
             setEmpty(true);
 
             return;
+
         }
 
         int index = 0;
@@ -171,22 +186,30 @@ public class EquippedParticlesMenu extends AbstractListMenu {
             } else {
 
                 ItemUtil.stripHighlight(item);
+
             }
 
             setItem(0, getNormalIndex(index++, 10, 2), item);
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     @Override
     public String getName() {
 
         return "EquippedParticles";
+
     }
 
     @Override
@@ -197,6 +220,9 @@ public class EquippedParticlesMenu extends AbstractListMenu {
         if (playerState.getActiveHats().size() == 0) {
 
             setEmpty(true);
+
         }
+
     }
+
 }

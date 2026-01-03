@@ -20,6 +20,7 @@ public class MainCommand extends Command {
 
     @Override
     public boolean execute(CosmeticsOG core, Sender sender, String label, ArrayList<String> args) {
+
         // Execute this command
         if (args.size() == 0) {
 
@@ -27,6 +28,7 @@ public class MainCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
                 return false;
+
             }
 
             List<Group> groups = core.getDatabase().getGroups(true);
@@ -40,13 +42,16 @@ public class MainCommand extends Command {
 
                     usingGroupMenu = true;
                     defaultMenu = g.getDefaultMenu();
+
                 }
+
             }
 
             // Use default menu if nothing was found
             if (defaultMenu.equals("")) {
 
                 defaultMenu = SettingsManager.DEFAULT_MENU.getString();
+
             }
 
             String menuName = defaultMenu.contains(".") ? defaultMenu.split("\\.")[0] : defaultMenu;
@@ -58,23 +63,22 @@ public class MainCommand extends Command {
 
                 if (usingGroupMenu) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            sender.getPlayer(),
+                    Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(),
                             Message.COMMAND_ERROR_UNKNOWN_GROUP_MENU.getValue().replace("{1}", menuName));
 
                 } else {
 
                     // TODO: Figure out why the menu isn't in the database.
                     Player player = sender.getPlayer();
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            player,
+                    Utils.cosmeticsOGPlaceholderMessage(player,
                             "Does the menu exist in the database?: " + String.valueOf(database.menuExists(menuName)));
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            player,
+                    Utils.cosmeticsOGPlaceholderMessage(player,
                             Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
+
                 }
 
                 return false;
+
             }
 
             StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
@@ -99,48 +103,67 @@ public class MainCommand extends Command {
                 } else {
 
                     Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN.getValue());
+
                 }
 
                 return false;
+
             }
 
             args.remove(0);
             return subCommands.get(cmd).onCommand(core, sender, label, args);
+
         }
+
     }
 
     @Override
     public String getName() {
+
         return "main";
+
     }
 
     @Override
     public String getArgumentName() {
+
         return "h";
+
     }
 
     @Override
     public Message getUsage() {
+
         return Message.COMMAND_MAIN_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
+
         return Message.COMMAND_MAIN_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
+
         return Permission.COMMAND_MAIN;
+
     }
 
     @Override
     public boolean showInHelp() {
+
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
+
         return false;
+
     }
+
 }

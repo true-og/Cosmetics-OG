@@ -44,16 +44,16 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         this.editorManager = (EditorMenuManager) menuManager;
         this.menuInventory = menuInventory;
         this.rows = menuInventory.getSize() / 9;
-        this.emptyItem = ItemUtil.createItem(
-                CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(),
+        this.emptyItem = ItemUtil.createItem(CompatibleMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getMaterial(),
                 Message.EDITOR_EMPTY_SLOT_TITLE.getValue(),
                 StringUtil.parseDescription(Message.EDITOR_SLOT_DESCRIPTION.getValue()));
         this.editingTitle = EditorLore.getTrimmedMenuTitle(menuInventory.getName(), Message.EDITOR_BASE_MENU_TITLE);
-        this.inventory =
-                Bukkit.createInventory(null, menuInventory.getSize(), Utils.legacySerializerAnyCase(editingTitle));
+        this.inventory = Bukkit.createInventory(null, menuInventory.getSize(),
+                Utils.legacySerializerAnyCase(editingTitle));
         this.inventory.setContents(menuInventory.getContents());
 
         emptyParticleAction = (event, slot) -> {
+
             if (event.isLeftClick()) {
 
                 editorManager.setTargetHat(createHat(slot));
@@ -63,12 +63,15 @@ public class EditorBaseMenu extends AbstractStaticMenu {
             } else if (event.isRightClick()) {
 
                 editorManager.openSettingsMenu();
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         existingParticleAction = (event, slot) -> {
+
             if (event.isLeftClick()) {
 
                 editorManager.setTargetHat(menuInventory.getHat(slot));
@@ -84,12 +87,15 @@ public class EditorBaseMenu extends AbstractStaticMenu {
             } else if (event.isRightClick()) {
 
                 editorManager.openSettingsMenu();
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         build();
+
     }
 
     @Override
@@ -101,15 +107,18 @@ public class EditorBaseMenu extends AbstractStaticMenu {
             super.open();
 
             return;
+
         }
 
         Hat hat = menuInventory.getHat(slot);
         if (hat != null) {
 
             EditorLore.updateHatDescription(getItem(slot), hat, true);
+
         }
 
         super.open();
+
     }
 
     @Override
@@ -124,20 +133,26 @@ public class EditorBaseMenu extends AbstractStaticMenu {
             } else {
 
                 setAction(i, existingParticleAction);
+
             }
 
             Hat hat = menuInventory.getHat(i);
             if (hat == null) {
 
                 continue;
+
             }
 
             EditorLore.updateHatDescription(inventory.getItem(i), hat, true);
+
         }
+
     }
 
     @Override
-    public void onClose(boolean forced) {}
+    public void onClose(boolean forced) {
+
+    }
 
     @Override
     public void onTick(int ticks) {
@@ -152,37 +167,46 @@ public class EditorBaseMenu extends AbstractStaticMenu {
                 if (hat == null) {
 
                     continue;
+
                 }
 
                 IconData iconData = hat.getIconData();
                 if (!iconData.isLive()) {
 
                     continue;
+
                 }
 
                 ItemStackTemplate itemTemplate = iconData.getNextItem(ticks);
                 ItemUtil.setItemType(getItem(slot), itemTemplate.getMaterial(), itemTemplate.getDurability());
+
             }
+
         }
+
     }
 
     @Override
     public String getName() {
 
         return menuInventory.getName();
+
     }
 
     /**
      * Removes the hat at this slot
+     * 
      * @param slot
      */
     public void removeHat(int slot) {
 
         menuInventory.removeHat(slot);
+
     }
 
     /**
      * Removes the hat and item at this slot
+     * 
      * @param slot
      */
     public void removeButton(int slot) {
@@ -190,36 +214,42 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         removeHat(slot);
 
         setButton(slot, emptyItem, emptyParticleAction);
+
     }
 
     /**
      * Get this menus MenuInventory
+     * 
      * @return
      */
     public MenuInventory getMenuInventory() {
 
         return menuInventory;
+
     }
 
     /**
      * Set this menu's title
+     * 
      * @param title
      */
     public void setTitle(String title) {
 
         menuInventory.setTitle(Utils.legacySerializerAnyCase(title));
 
-        Inventory replacementInventory =
-                Bukkit.createInventory(null, inventory.getSize(), Utils.legacySerializerAnyCase(editingTitle));
+        Inventory replacementInventory = Bukkit.createInventory(null, inventory.getSize(),
+                Utils.legacySerializerAnyCase(editingTitle));
         replacementInventory.setContents(inventory.getContents());
 
         inventory = replacementInventory;
 
         core.getDatabase().saveMenuTitle(getName(), title);
+
     }
 
     /**
      * Set this menu's alias
+     * 
      * @param alias
      */
     public void setAlias(String alias) {
@@ -227,6 +257,7 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         menuInventory.setAlias(alias);
 
         core.getDatabase().saveMenuAlias(getName(), alias);
+
     }
 
     /**
@@ -247,11 +278,14 @@ public class EditorBaseMenu extends AbstractStaticMenu {
 
                 Damageable damageable = (Damageable) meta;
                 damage = damageable.getDamage();
+
             }
+
         }
 
         // Call the ItemUtil method to update the item type and its damage
         ItemUtil.setItemType(getItem(slot), material, damage);
+
     }
 
     /**
@@ -260,24 +294,29 @@ public class EditorBaseMenu extends AbstractStaticMenu {
     public void toggleUpdates() {
 
         canUpdate = !canUpdate;
+
     }
 
     /**
      * Checks to see if this menu can update icons
+     * 
      * @return
      */
     public boolean canUpdate() {
 
         return canUpdate;
+
     }
 
     /**
      * Get how many rows this inventory has
+     * 
      * @return
      */
     public int rows() {
 
         return rows;
+
     }
 
     /**
@@ -288,17 +327,20 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         for (Entry<Integer, Hat> hats : menuInventory.getHats().entrySet()) {
 
             hats.getValue().getIconData().reset();
+
         }
+
     }
 
     public void resizeTo(int rows) {
 
         if (this.rows != rows) {
 
-            Inventory replacementInventory =
-                    Bukkit.createInventory(null, (9 * rows), Utils.legacySerializerAnyCase(editingTitle));
+            Inventory replacementInventory = Bukkit.createInventory(null, (9 * rows),
+                    Utils.legacySerializerAnyCase(editingTitle));
 
-            // inventory.setContents() only works when resizing the menus to a smaller size. So, we need to use a loop
+            // inventory.setContents() only works when resizing the menus to a smaller size.
+            // So, we need to use a loop
             // to account for the other option.
             for (int i = 0; i < replacementInventory.getSize(); i++) {
 
@@ -307,7 +349,9 @@ public class EditorBaseMenu extends AbstractStaticMenu {
                     replacementInventory.setItem(i, inventory.getItem(i));
 
                 } catch (ArrayIndexOutOfBoundsException error) {
+
                 }
+
             }
 
             // Fill in any empty slots.
@@ -316,7 +360,9 @@ public class EditorBaseMenu extends AbstractStaticMenu {
                 for (int i = inventory.getSize(); i < replacementInventory.getSize(); i++) {
 
                     replacementInventory.setItem(i, emptyItem);
+
                 }
+
             }
 
             inventory = replacementInventory;
@@ -324,7 +370,9 @@ public class EditorBaseMenu extends AbstractStaticMenu {
             this.rows = rows;
 
             core.getDatabase().saveMenuSize(getName(), rows);
+
         }
+
     }
 
     public void changeSlots(int currentSlot, int newSlot, boolean swapping) {
@@ -348,6 +396,7 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         } else {
 
             menuInventory.removeHat(currentSlot);
+
         }
 
         setButton(currentSlot, swappingItem, swappingAction);
@@ -357,10 +406,12 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         editorManager.setTargetSlot(newSlot);
 
         core.getDatabase().moveHat(currentHat, swappingHat, getName(), null, currentSlot, newSlot, swapping);
+
     }
 
     /**
      * Clones a hat and adds it to the new slot
+     * 
      * @param currentSlot
      * @param newSlot
      */
@@ -378,20 +429,24 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         EditorLore.updateHatDescription(getItem(newSlot), clonedHat, true);
 
         core.getDatabase().cloneHat(getName(), currentHat, newSlot);
+
     }
 
     /**
      * Updates the item's display name that belongs in this slot
+     * 
      * @param hat
      * @param slot
      */
     public void onHatNameChange(Hat hat, int slot) {
 
         ItemUtil.setItemName(getItem(slot), hat.getDisplayName());
+
     }
 
     /**
      * Creates and returns a new hat object
+     * 
      * @param slot
      * @return
      */
@@ -402,8 +457,8 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         hat.setSlot(slot);
         hat.setLoaded(true);
 
-        ItemStack emptyItem = ItemUtil.createItem(
-                CompatibleMaterial.SUNFLOWER.getMaterial(), 1, Message.EDITOR_MISC_NEW_PARTICLE.getValue());
+        ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.SUNFLOWER.getMaterial(), 1,
+                Message.EDITOR_MISC_NEW_PARTICLE.getValue());
 
         EditorLore.updateHatDescription(emptyItem, hat, true);
 
@@ -413,10 +468,12 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         core.getDatabase().createHat(menuInventory.getName(), hat);
 
         return hat;
+
     }
 
     /**
      * Deletes the hat in the current slot
+     * 
      * @param slot
      */
     private void deleteHat(int slot) {
@@ -425,5 +482,7 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         menuInventory.removeHat(slot);
 
         core.getDatabase().deleteHat(menuInventory.getName(), slot);
+
     }
+
 }

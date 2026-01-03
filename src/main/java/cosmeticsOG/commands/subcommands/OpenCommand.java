@@ -33,6 +33,7 @@ public class OpenCommand extends Command {
 
         openPlayerCommand = new OpenPlayerCommand(this);
         register(openPlayerCommand);
+
     }
 
     @Override
@@ -47,7 +48,9 @@ public class OpenCommand extends Command {
                 if (hasPermission(sender, menu)) {
 
                     result.add(menu);
+
                 }
+
             }
 
             return result;
@@ -55,9 +58,11 @@ public class OpenCommand extends Command {
         } else if (args.size() == 2) {
 
             return openPlayerCommand.onTabComplete(core, sender, label, args);
+
         }
 
         return Arrays.asList("");
+
     }
 
     @Override
@@ -74,9 +79,11 @@ public class OpenCommand extends Command {
 
                 Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
                 Utils.logToConsole(Message.COMMAND_OPEN_USAGE.getValue());
+
             }
 
             return false;
+
         }
 
         if (args.size() == 1) {
@@ -92,16 +99,18 @@ public class OpenCommand extends Command {
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 if (playerState.hasEditorOpen()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(
-                            (Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                            Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                     return false;
+
                 }
 
                 AbstractMenu menu = getRequestedMenu(playerState, args.get(0), sender, sender.getPlayer());
                 if (menu == null) {
 
                     return false;
+
                 }
 
                 StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
@@ -110,66 +119,78 @@ public class OpenCommand extends Command {
                 menu.open();
 
                 return true;
+
             }
 
         } else {
 
             return openPlayerCommand.onCommand(core, sender, label, args);
+
         }
+
     }
 
     @Override
     public String getName() {
 
         return "open menu";
+
     }
 
     @Override
     public String getArgumentName() {
 
         return "open";
+
     }
 
     @Override
     public Message getUsage() {
 
         return Message.COMMAND_OPEN_USAGE;
+
     }
 
     @Override
     public Message getDescription() {
 
         return Message.COMMAND_OPEN_DESCRIPTION;
+
     }
 
     @Override
     public Permission getPermission() {
 
         return Permission.COMMAND_OPEN;
+
     }
 
     @Override
     public boolean hasWildcardPermission() {
 
         return true;
+
     }
 
     @Override
     public Permission getWildcardPermission() {
 
         return Permission.COMMAND_OPEN_ALL;
+
     }
 
     @Override
     public boolean showInHelp() {
 
         return true;
+
     }
 
     @Override
     public boolean isPlayerOnly() {
 
         return false;
+
     }
 
     @Override
@@ -178,12 +199,14 @@ public class OpenCommand extends Command {
         if (!sender.isPlayer()) {
 
             return true;
+
         }
 
         // /h wild card check.
         if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
             return true;
+
         }
 
         // Specific command wild card check.
@@ -192,7 +215,9 @@ public class OpenCommand extends Command {
             if (getWildcardPermission().hasPermission(sender)) {
 
                 return true;
+
             }
+
         }
 
         // Check for individual menu permissions
@@ -201,10 +226,13 @@ public class OpenCommand extends Command {
             if (sender.hasPermission(getPermission().append(menu))) {
 
                 return true;
+
             }
+
         }
 
         return false;
+
     }
 
     @Override
@@ -213,12 +241,14 @@ public class OpenCommand extends Command {
         if (!sender.isPlayer()) {
 
             return true;
+
         }
 
         // /h wild card check.
         if (Permission.COMMAND_ALL.hasPermission(sender)) {
 
             return true;
+
         }
 
         // Specific command wild card check.
@@ -227,7 +257,9 @@ public class OpenCommand extends Command {
             if (getWildcardPermission().hasPermission(sender)) {
 
                 return true;
+
             }
+
         }
 
         if (arg != null && !arg.equals("")) {
@@ -235,14 +267,18 @@ public class OpenCommand extends Command {
             if (sender.hasPermission(getPermission().append(arg))) {
 
                 return true;
+
             }
+
         }
 
         return false;
+
     }
 
-    public AbstractMenu getRequestedMenu(
-            PlayerState playerState, String requestedMenuName, Sender sender, Player player) {
+    public AbstractMenu getRequestedMenu(PlayerState playerState, String requestedMenuName, Sender sender,
+            Player player)
+    {
 
         // Grab the name without any extensions.
         String menuName = (requestedMenuName.contains(".") ? requestedMenuName.split("\\.")[0] : requestedMenuName);
@@ -252,6 +288,7 @@ public class OpenCommand extends Command {
             Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_ERROR.replace("{1}", menuName));
 
             return null;
+
         }
 
         StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
@@ -263,15 +300,19 @@ public class OpenCommand extends Command {
 
             if (menuInventory == null) {
 
-                Utils.cosmeticsOGPlaceholderMessage(
-                        (Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
                 return null;
+
             }
 
             return new StaticMenu(core, staticManager, player, menuInventory);
+
         }
 
         return menu;
+
     }
+
 }

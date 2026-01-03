@@ -25,8 +25,8 @@ public class EditorDescriptionMenu extends AbstractListMenu {
     private final boolean isEditingDescription;
     private final Hat targetHat;
 
-    private final ItemStack emptyItem = ItemUtil.createItem(
-            CompatibleMaterial.BARRIER.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_EMPTY.getValue());
+    private final ItemStack emptyItem = ItemUtil.createItem(CompatibleMaterial.BARRIER.getMaterial(), 1,
+            Message.EDITOR_DESCRIPTION_MENU_EMPTY.getValue());
 
     private final String lineTitle = Message.EDITOR_DESCIPRION_LINE_TITLE.getValue();
     private final String lineDescription = Message.EDITOR_DESCRIPTION_MENU_LINE_DESCRIPTION.getValue();
@@ -35,8 +35,9 @@ public class EditorDescriptionMenu extends AbstractListMenu {
     private int editingLine = -1;
     private boolean isModified = false;
 
-    public EditorDescriptionMenu(
-            CosmeticsOG core, EditorMenuManager menuManager, Player owner, boolean isEditingDescription) {
+    public EditorDescriptionMenu(CosmeticsOG core, EditorMenuManager menuManager, Player owner,
+            boolean isEditingDescription)
+    {
 
         super(core, menuManager, owner, true);
 
@@ -45,24 +46,25 @@ public class EditorDescriptionMenu extends AbstractListMenu {
         this.targetHat = menuManager.getBaseHat();
         this.totalPages = 1;
 
-        setMenu(
-                0,
-                Bukkit.createInventory(
-                        null, 54, Utils.legacySerializerAnyCase(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
+        setMenu(0, Bukkit.createInventory(null, 54,
+                Utils.legacySerializerAnyCase(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
 
         build();
+
     }
 
     @Override
     public void insertEmptyItem() {
 
         setButton(0, 22, emptyItem, emptyAction);
+
     }
 
     @Override
     public void removeEmptyItem() {
 
         setButton(0, 22, null, emptyAction);
+
     }
 
     @Override
@@ -79,9 +81,11 @@ public class EditorDescriptionMenu extends AbstractListMenu {
             editingLine = -1;
 
             EditorLore.updatePreviewDecription(getItem(0, 49), description, targetHat);
+
         }
 
         super.open();
+
     }
 
     @Override
@@ -89,10 +93,11 @@ public class EditorDescriptionMenu extends AbstractListMenu {
 
         setButton(0, 46, backButtonItem, backButtonAction);
 
-        ItemStack previewItem = ItemUtil.createItem(
-                CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_PREVIEW.getValue());
+        ItemStack previewItem = ItemUtil.createItem(CompatibleMaterial.WRITABLE_BOOK.getMaterial(), 1,
+                Message.EDITOR_DESCRIPTION_MENU_PREVIEW.getValue());
         EditorLore.updatePreviewDecription(previewItem, getDescription(), targetHat);
         setButton(0, 49, previewItem, (event, slot) -> {
+
             if (event.isShiftRightClick()) {
 
                 getDescription().clear();
@@ -100,6 +105,7 @@ public class EditorDescriptionMenu extends AbstractListMenu {
                 for (int i = 0; i <= 27; i++) {
 
                     setItem(0, getNormalIndex(i, 10, 2), null);
+
                 }
 
                 setEmpty(true);
@@ -109,36 +115,42 @@ public class EditorDescriptionMenu extends AbstractListMenu {
                 isModified = true;
 
                 return MenuClickResult.NEGATIVE;
+
             }
 
             return MenuClickResult.NONE;
+
         });
 
         // Add Line.
-        ItemStack addItem = ItemUtil.createItem(
-                CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1, Message.EDITOR_DESCRIPTION_MENU_ADD_LINE.getValue());
+        ItemStack addItem = ItemUtil.createItem(CompatibleMaterial.TURTLE_HELMET.getMaterial(), 1,
+                Message.EDITOR_DESCRIPTION_MENU_ADD_LINE.getValue());
         setButton(0, 52, addItem, (event, slot) -> {
+
             List<String> description = getDescription();
             int size = description.size();
             if (size <= 27) {
 
-                ItemStack item =
-                        ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(size + 1)));
+                ItemStack item = ItemUtil.createItem(Material.PAPER, 1,
+                        lineTitle.replace("{1}", Integer.toString(size + 1)));
 
                 description.add("");
                 EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
 
                 setLineDescription(item, "");
                 setItem(0, getNormalIndex(size, 10, 2), item);
+
             }
 
             setEmpty(false);
             isModified = true;
 
             return MenuClickResult.NEUTRAL;
+
         });
 
         final MenuAction editAction = (event, slot) -> {
+
             if (event.isLeftClick()) {
 
                 if (event.isShiftClick()) {
@@ -146,13 +158,14 @@ public class EditorDescriptionMenu extends AbstractListMenu {
                     onInsert(slot);
 
                     return MenuClickResult.NEUTRAL;
+
                 }
 
                 editingLine = getClampedIndex(slot, 10, 2);
                 editorManager.getOwnerState().setMetaDescriptionLine(editingLine);
 
-                MetaState metaState =
-                        isEditingDescription ? MetaState.HAT_DESCRIPTION : MetaState.HAT_PERMISSION_DESCRIPTION;
+                MetaState metaState = isEditingDescription ? MetaState.HAT_DESCRIPTION
+                        : MetaState.HAT_PERMISSION_DESCRIPTION;
                 editorManager.getOwnerState().setMetaState(metaState);
                 core.prompt(owner, metaState);
 
@@ -167,14 +180,17 @@ public class EditorDescriptionMenu extends AbstractListMenu {
                 isModified = true;
 
                 return MenuClickResult.NEGATIVE;
+
             }
 
             return MenuClickResult.NEUTRAL;
+
         };
 
         for (int i = 0; i < 28; i++) {
 
             setAction(getNormalIndex(i, 10, 2), editAction);
+
         }
 
         List<String> description = getDescription();
@@ -184,17 +200,20 @@ public class EditorDescriptionMenu extends AbstractListMenu {
             setEmpty(true);
 
             return;
+
         }
 
         for (int i = 0; i < description.size(); i++) {
 
-            ItemStack lineItem =
-                    ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(i + 1)));
+            ItemStack lineItem = ItemUtil.createItem(Material.PAPER, 1,
+                    lineTitle.replace("{1}", Integer.toString(i + 1)));
             String line = description.get(i);
 
             setLineDescription(lineItem, line);
             setItem(0, getNormalIndex(i, 10, 2), lineItem);
+
         }
+
     }
 
     @Override
@@ -207,11 +226,15 @@ public class EditorDescriptionMenu extends AbstractListMenu {
             String menuName = editorManager.getMenuName();
 
             database.saveMetaData(menuName, targetHat, type, 0);
+
         }
+
     }
 
     @Override
-    public void onTick(int ticks) {}
+    public void onTick(int ticks) {
+
+    }
 
     @Override
     public void deleteSlot(int page, int slot) {
@@ -227,28 +250,35 @@ public class EditorDescriptionMenu extends AbstractListMenu {
             if (item == null) {
 
                 continue;
+
             }
 
             ItemUtil.setItemName(item, lineTitle.replace("{1}", Integer.toString(i + 1)));
+
         }
 
         if (getDescription().size() == 0) {
 
             setEmpty(true);
+
         }
+
     }
 
     /**
      * Get the hat's description depending on the <b>isEditingDescription</b> value
+     * 
      * @return
      */
     private List<String> getDescription() {
 
         return isEditingDescription ? targetHat.getDescription() : targetHat.getPermissionDescription();
+
     }
 
     /**
      * Adds a line to this item's description
+     * 
      * @param item
      * @param line
      */
@@ -258,12 +288,14 @@ public class EditorDescriptionMenu extends AbstractListMenu {
         if (!line.isEmpty() && line.charAt(0) != '&') {
 
             prefix = "&5&o";
+
         }
 
         String s = line.equals("") ? descriptionInfo[1] : prefix + line;
         String d = lineDescription.replace(descriptionInfo[0], s);
 
         ItemUtil.setItemDescription(item, StringUtil.parseDescription(d));
+
     }
 
     private void onInsert(int slot) {
@@ -285,14 +317,18 @@ public class EditorDescriptionMenu extends AbstractListMenu {
 
                 setItem(0, fromSlot, null);
                 setItem(0, toSlot, item);
+
             }
 
-            ItemStack item =
-                    ItemUtil.createItem(Material.PAPER, 1, lineTitle.replace("{1}", Integer.toString(index + 1)));
+            ItemStack item = ItemUtil.createItem(Material.PAPER, 1,
+                    lineTitle.replace("{1}", Integer.toString(index + 1)));
             EditorLore.updatePreviewDecription(getItem(0, 49), getDescription(), targetHat);
 
             setLineDescription(item, "");
             setItem(0, getNormalIndex(index, 10, 2), item);
+
         }
+
     }
+
 }
