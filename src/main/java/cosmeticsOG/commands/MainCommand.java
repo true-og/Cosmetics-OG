@@ -127,7 +127,7 @@ public class MainCommand extends Command {
     @Override
     public String getArgumentName() {
 
-        return "h";
+        return "cosmetics";
 
     }
 

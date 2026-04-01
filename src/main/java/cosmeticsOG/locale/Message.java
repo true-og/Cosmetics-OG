@@ -27,9 +27,9 @@ public enum Message {
      */
 
     // Miscellaneous.
-    COMMAND_ERROR_UNKNOWN("&cUnknown command, try &7/h help &cfor a list of commands"),
+    COMMAND_ERROR_UNKNOWN("&cUnknown command, try &7/cosmetics help &cfor a list of commands"),
     COMMAND_ERROR_NO_PERMISSION("&cYou don't have permission to use this command"),
-    COMMAND_ERROR_PLAYER_ONLY("&cYou must be a player to use this command, try &7/h help"),
+    COMMAND_ERROR_PLAYER_ONLY("&cYou must be a player to use this command, try &7/cosmetics help"),
     COMMAND_ERROR_ARGUMENTS("&cWrong number of arguments"),
     COMMAND_ERROR_MENU_EXISTS("&7Menu '&c{1}&7' already exists"),
     COMMAND_ERROR_UNKNOWN_MENU("&cUnable to find menu '&7{1}&c'"),
@@ -43,114 +43,117 @@ public enum Message {
     COMMAND_ERROR_UNKNOWN_NPC("&cUnable to find a NPC with that id"),
 
     // Main Command.
-    COMMAND_MAIN_DESCRIPTION("Main Command"), COMMAND_MAIN_USAGE("/h"),
+    COMMAND_MAIN_DESCRIPTION("Main Command"), COMMAND_MAIN_USAGE("/cosmetics"),
     COMMAND_MAIN_DEFAULT_MENU_ERROR("&cThere is no default menu set in config.yml"),
 
     // Help Command.
-    COMMAND_HELP_DESCRIPTION("Displays all commands and their usage"), COMMAND_HELP_USAGE("/h help"),
+    COMMAND_HELP_DESCRIPTION("Displays all commands and their usage"), COMMAND_HELP_USAGE("/cosmetics help"),
     COMMAND_HELP_TIP("&7&oOnly showing commands you have permission for"),
 
     // Reload Command.
-    COMMAND_RELOAD_DESCRIPTION("Reloads the plugin"), COMMAND_RELOAD_USAGE("/h reload"),
+    COMMAND_RELOAD_DESCRIPTION("Reloads the plugin"), COMMAND_RELOAD_USAGE("/cosmetics reload"),
     COMMAND_RELOAD_SUCCESS("&aParticleHats reloaded"),
 
     // Clear Command.
-    COMMAND_CLEAR_DESCRIPTION("Removes all of the players active particles"), COMMAND_CLEAR_USAGE("/h clear"),
+    COMMAND_CLEAR_DESCRIPTION("Removes all of the players active particles"), COMMAND_CLEAR_USAGE("/cosmetics clear"),
     COMMAND_CLEAR_SUCCESS("&aAll particles cleared"),
     COMMAND_CLEAR_PLAYER_DESCRIPTION("Removes all particles for the target player"),
-    COMMAND_CLEAR_PLAYER_USAGE("/h clear <player>"), COMMAND_CLEAR_PLAYER_SUCCESS("&aAll particles cleared for &3{1}"),
+    COMMAND_CLEAR_PLAYER_USAGE("/cosmetics clear <player>"),
+    COMMAND_CLEAR_PLAYER_SUCCESS("&aAll particles cleared for &3{1}"),
 
     // Toggle Command.
-    COMMAND_TOGGLE_DESCRIPTION("Toggles all particles on / off"), COMMAND_TOGGLE_USAGE("/h toggle <on/off>"),
+    COMMAND_TOGGLE_DESCRIPTION("Toggles all particles on / off"), COMMAND_TOGGLE_USAGE("/cosmetics toggle <on/off>"),
     COMMAND_TOGGLE_ON("&aToggled all particles &2On"), COMMAND_TOGGLE_OFF("&aToggled all particles &cOff"),
     COMMAND_TOGGLE_PLAYER_DESCRIPTION("Toggles all particles on / off for the given player"),
-    COMMAND_TOGGLE_PLAYER_USAGE("/h toggle <on/off> <player>"),
+    COMMAND_TOGGLE_PLAYER_USAGE("/cosmetics toggle <on/off> <player>"),
     COMMAND_TOGGLE_PLAYER_ON("&aToggled all particles &2On &afor {1}"),
     COMMAND_TOGGLE_PLAYER_OFF("&aToggled all particles &cOff &afor {1}"),
 
     // Create Command.
-    COMMAND_CREATE_DESCRIPTION("Creates a new menu with the given name"), COMMAND_CREATE_USAGE("/h create <menu name>"),
-    COMMAND_CREATE_SUCCESS("&aCreated menu {1}"), COMMAND_CREATE_INVALID("&cInvalid menu name"),
+    COMMAND_CREATE_DESCRIPTION("Creates a new menu with the given name"),
+    COMMAND_CREATE_USAGE("/cosmetics create <menu name>"), COMMAND_CREATE_SUCCESS("&aCreated menu {1}"),
+    COMMAND_CREATE_INVALID("&cInvalid menu name"),
 
     // Edit Command.
-    COMMAND_EDIT_DESCRIPTION("Opens a menu in the editor"), COMMAND_EDIT_USAGE("/h edit <menu name>"),
+    COMMAND_EDIT_DESCRIPTION("Opens a menu in the editor"), COMMAND_EDIT_USAGE("/cosmetics edit <menu name>"),
 
     // Meta Command.
     COMMAND_META_DESCRIPTION("Lets the player edit meta properties while editing a menu"),
-    COMMAND_META_USAGE("/h meta {1}"),
+    COMMAND_META_USAGE("/cosmetics meta {1}"),
 
     // Open Command.
-    COMMAND_OPEN_DESCRIPTION("Opens the selected menu"), COMMAND_OPEN_USAGE("/h open <menu name>"),
+    COMMAND_OPEN_DESCRIPTION("Opens the selected menu"), COMMAND_OPEN_USAGE("/cosmetics open <menu name>"),
     COMMAND_OPEN_ERROR("&cCan't open menu '&7{1}&c' from command"),
 
     // Open Player Command.
     COMMAND_OPEN_PLAYER_DESCRIPTION("Opens the selected menu for the target player"),
-    COMMAND_OPEN_PLAYER_USAGE("/h open <menu name> <player>"),
+    COMMAND_OPEN_PLAYER_USAGE("/cosmetics open <menu name> <player>"),
     COMMAND_OPEN_PLAYER_EDITING("&c{1} can't open menus while editing"),
 
     // Particles Command.
     COMMAND_PARTICLE_DESCRIPTION("Lets players manage their equipped particles"),
-    COMMAND_PARTICLE_USAGE("/h particles"),
+    COMMAND_PARTICLE_USAGE("/cosmetics particles"),
 
     // Set Command.
     COMMAND_SET_DESCRIPTION("Creates a new hat from the given label and equips it to the player"),
-    COMMAND_SET_USAGE("/h set <player> <label> <demo true|false> <tellPlayer true|false>"),
+    COMMAND_SET_USAGE("/cosmetics set <player> <label> <demo true|false> <tellPlayer true|false>"),
     COMMAND_SET_LABEL_ERROR("&cUnable to find label '&7{1}&c'"),
     COMMAND_SET_ALREADY_SET("&c{1} is already wearing this hat"), COMMAND_SET_SUCCESS("&aYou were given the {1} &ahat"),
 
     // Unset Command.
     COMMAND_UNSET_DESCRIPTION("Unequips the hat with the given label from player"),
-    COMMAND_UNSET_USAGE("/h unset <player> <label> <tellPlayer true|false>"),
+    COMMAND_UNSET_USAGE("/cosmetics unset <player> <label> <tellPlayer true|false>"),
     COMMAND_UNSET_LABEL_ERROR("&cUnable to find label '&7{1}&c'"),
     COMMAND_UNSET_NOT_WEARING("&c{1} isn't wearing this hat"),
     COMMAND_UNSET_SUCCESS("&aThe {1} &ahat was taken from you"),
 
     // Add Group Command.
     COMMAND_ADD_GROUP_DESCRIPTION("Add a new group, use weight to determine a groups priority"),
-    COMMAND_ADD_GROUP_USAGE("/h group add <name> <menu> <weight>"), COMMAND_ADD_GROUP_SUCCESS("&aAdded group &3'{1}'"),
+    COMMAND_ADD_GROUP_USAGE("/cosmetics group add <name> <menu> <weight>"),
+    COMMAND_ADD_GROUP_SUCCESS("&aAdded group &3'{1}'"),
 
     // Delete Group Command.
-    COMMAND_REMOVE_GROUP_DESCRIPTION("Removes a group"), COMMAND_REMOVE_GROUP_USAGE("/h group remove <group>"),
+    COMMAND_REMOVE_GROUP_DESCRIPTION("Removes a group"), COMMAND_REMOVE_GROUP_USAGE("/cosmetics group remove <group>"),
     COMMAND_REMOVE_GROUP_SUCCESS("&aGroup '&3{1}&a' removed"),
 
     // Edit Group Command.
     COMMAND_EDIT_GROUP_DESCRIPTION("Edit an existing group"),
-    COMMAND_EDIT_GROUP_USAGE("/h group edit <group> <menu> <weight>"),
+    COMMAND_EDIT_GROUP_USAGE("/cosmetics group edit <group> <menu> <weight>"),
     COMMAND_EDIT_GROUP_SUCCESS("&aUpdated group '&3{1}&a'"),
 
     // Group Info Command.
-    COMMAND_GROUP_INFO_DESCRIPTION("Lists all available groups"), COMMAND_GROUP_INFO_USAGE("/h group info"),
+    COMMAND_GROUP_INFO_DESCRIPTION("Lists all available groups"), COMMAND_GROUP_INFO_USAGE("/cosmetics group info"),
     COMMAND_GROUP_INFO_TIP("&3Groups:"), COMMAND_GROUP_INFO("&3name: &f{1} &3menu: &f{2} &3weight: &f{3}"),
 
     // Add Type Command.
     COMMAND_ADD_TYPE_DESCRIPTION("Adds a custom type to the MySQL database"),
-    COMMAND_ADD_TYPE_USAGE("/h type add <type>"), COMMAND_ADD_TYPE_SUCCESS("&aAdded '&3{1}&a' to the database"),
+    COMMAND_ADD_TYPE_USAGE("/cosmetics type add <type>"), COMMAND_ADD_TYPE_SUCCESS("&aAdded '&3{1}&a' to the database"),
     COMMAND_ADD_TYPE_ERROR("&cThis command only works with a MySQL database"),
 
     // Remove Type Command.
     COMMAND_REMOVE_TYPE_DESCRIPTION("Removes a custom type from the MySQL database"),
-    COMMAND_REMOVE_TYPE_USAGE("/h type remove <type>"),
+    COMMAND_REMOVE_TYPE_USAGE("/cosmetics type remove <type>"),
     COMMAND_REMOVE_TYPE_SUCCESS("&aRemoved '&3{1}&a' from the database"),
-    COMMAND_REMOVE_TYPE_PROMPT("&a'&3{1}&a' is being used currently, use /h type remove {1} again to remove"),
+    COMMAND_REMOVE_TYPE_PROMPT("&a'&3{1}&a' is being used currently, use /cosmetics type remove {1} again to remove"),
 
     // Import Command.
     COMMAND_IMPORT_DESCRIPTION("Adds an existing .yml menu into the MySQL database"),
-    COMMAND_IMPORT_USAGE("/h import <menu>"), COMMAND_IMPORT_SUCCESS("&aAdded '&3{1}&a' to the MySQL database"),
+    COMMAND_IMPORT_USAGE("/cosmetics import <menu>"), COMMAND_IMPORT_SUCCESS("&aAdded '&3{1}&a' to the MySQL database"),
     COMMAND_IMPORT_ERROR("&cThere was an error importing this menu error: {1}"),
 
     // NPC Command.
     COMMAND_NPC_SUPPORT_ERROR("&cUnable to find Citizens plugin"),
 
     // NPC Clear Command.
-    COMMAND_NPC_CLEAR_DESCRIPTION("Clears all active hats for this NPC"), COMMAND_NPC_CLEAR_USAGE("/h npc clear <id>"),
-    COMMAND_NPC_CLEAR_SUCCESS("&aCleared all hats for {1}"),
+    COMMAND_NPC_CLEAR_DESCRIPTION("Clears all active hats for this NPC"),
+    COMMAND_NPC_CLEAR_USAGE("/cosmetics npc clear <id>"), COMMAND_NPC_CLEAR_SUCCESS("&aCleared all hats for {1}"),
 
     // Manage NPC Command.
-    COMMAND_MANAGE_NPC_DESCRIPTION("Manage this NPC's hats"), COMMAND_MANAGE_NPC_USAGE("/h npc manage"),
+    COMMAND_MANAGE_NPC_DESCRIPTION("Manage this NPC's hats"), COMMAND_MANAGE_NPC_USAGE("/cosmetics npc manage"),
 
     // NPC Set Command.
     COMMAND_NPC_SET_SUCCESS("&aGave &3{1} &athe &3{2} &r&ahat"), COMMAND_NPC_SET_DESCRIPTION("Equip a hat to a NPC"),
-    COMMAND_NPC_SET_USAGE("/h npc set <npc id> <label>"),
+    COMMAND_NPC_SET_USAGE("/cosmetics npc set <npc id> <label>"),
 
     // Purchase menu.
     PURCHASE_MENU_TITLE("Confirm Purchase"), PURCHASE_MENU_CONFIRM("&3Accept Purchase"),
@@ -368,35 +371,38 @@ public enum Message {
     /**
      * Meta State
      */
-    META_ERROR("&cYou are not editing a menu"), META_HAT_NAME_USAGE("&6Use &f/h meta <name> &6to rename"),
+    META_ERROR("&cYou are not editing a menu"), META_HAT_NAME_USAGE("&6Use &f/cosmetics meta <name> &6to rename"),
     META_HAT_NAME_DESCRIPTION("Type the &eName &finto chat, or '&ccancel&f' to return"),
-    META_HAT_NAME_SUGGESTION("hat name..."), META_HAT_LABEL_USAGE("&6Use &f/h meta <label> &6to rename"),
+    META_HAT_NAME_SUGGESTION("hat name..."), META_HAT_LABEL_USAGE("&6Use &f/cosmetics meta <label> &6to rename"),
     META_HAT_LABEL_DESCRIPTION("Type the &eLabel &finto chat, or '&6cancel&f' to return"),
-    META_HAT_LABEL_SUGGESTION("label..."), META_HAT_COMMAND_USAGE("&6Use &f/h meta <command> &6to rename"),
+    META_HAT_LABEL_SUGGESTION("label..."), META_HAT_COMMAND_USAGE("&6Use &f/cosmetics meta <command> &6to rename"),
     META_HAT_COMMAND_DESCRIPTION("Type the &eCommand &7(without '/') &finto chat, or '&6cancel&f' to return"),
-    META_HAT_COMMAND_SUGGESTION("command..."), META_HAT_DESCRIPTION_USAGE("&6Use &f/h meta <description> &6to rename"),
+    META_HAT_COMMAND_SUGGESTION("command..."),
+    META_HAT_DESCRIPTION_USAGE("&6Use &f/cosmetics meta <description> &6to rename"),
     META_HAT_DESCRIPTION_DESCRIPTION("Type the &eDescription &finto chat, or '&6cancel&f' to return"),
     META_HAT_DESCRIPTION_SUGGESTION("description..."),
-    META_HAT_PERMISSION_USAGE("&6Use &f/h meta <permission> &6to rename"),
+    META_HAT_PERMISSION_USAGE("&6Use &f/cosmetics meta <permission> &6to rename"),
     META_HAT_PERMISSION_DESCRIPTION("Type the &ePermission &finto chat, or '&6cancel&f' to return"),
     META_HAT_PERMISSION_SUGGESTION("permission..."),
-    META_HAT_PERMISSION_DESCRIPTION_USAGE("&6Use &f/h meta <description> &6to rename"),
+    META_HAT_PERMISSION_DESCRIPTION_USAGE("&6Use &f/cosmetics meta <description> &6to rename"),
     META_HAT_PERMISSION_DESCRIPTION_DESCRIPTION("Type the &eDescription &finto chat, or '&6cancel&f' to return"),
     META_HAT_PERMISSION_DESCRIPTION_SUGGESTION("description..."),
-    META_HAT_PERMISSION_MESSAGE_USAGE("&6Use &f/h meta <permission message> &6to rename"),
+    META_HAT_PERMISSION_MESSAGE_USAGE("&6Use &f/cosmetics meta <permission message> &6to rename"),
     META_HAT_PERMISSION_MESSAGE_DESCRIPTION("Type the &eMessage &finto chat, or '&6cancel&f' to return"),
     META_HAT_PERMISSION_MESSAGE_SUGGESTION("permission message..."),
-    META_HAT_EQUIP_MESSAGE_USAGE("&6Use &f/h meta <equip message> &6to rename"),
+    META_HAT_EQUIP_MESSAGE_USAGE("&6Use &f/cosmetics meta <equip message> &6to rename"),
     META_HAT_EQUIP_MESSAGE_DESCRIPTION("Type the &eMessage &finto chat, or '&6cancel&f' to return"),
-    META_HAT_EQUIP_MESSAGE_SUGGESTION("equip message..."), META_HAT_TAG_USAGE("&6Use &f/h meta <tag> &6to set"),
+    META_HAT_EQUIP_MESSAGE_SUGGESTION("equip message..."), META_HAT_TAG_USAGE("&6Use &f/cosmetics meta <tag> &6to set"),
     META_HAT_TAG_DESCRIPTION("Type the &eTag &finto chat, or '&6cancel&f' to return"),
-    META_HAT_TAG_SUGGESTION("tag..."), META_MENU_TITLE_USAGE("&6Use &f/h meta <title> &6to rename"),
+    META_HAT_TAG_SUGGESTION("tag..."), META_MENU_TITLE_USAGE("&6Use &f/cosmetics meta <title> &6to rename"),
     META_MENU_TITLE_DESCRIPTION("Type the &eTitle &finto chat, or '&6cancel&f' to return"),
-    META_MENU_TITLE_SUGGESTION("menu title..."), META_MENU_ALIAS_USAGE("&6Use &f/h meta <alias> &6to assign"),
+    META_MENU_TITLE_SUGGESTION("menu title..."), META_MENU_ALIAS_USAGE("&6Use &f/cosmetics meta <alias> &6to assign"),
     META_MENU_ALIAS_DESCRIPTION("Type the &eAlias &finto chat, or '&6cancel&f' to return"),
-    META_MENU_ALIAS_SUGGESTION("menu alias"), META_NEW_MENU_USAGE("&6Use &f/h meta <menu name> &6to create a new menu"),
+    META_MENU_ALIAS_SUGGESTION("menu alias"),
+    META_NEW_MENU_USAGE("&6Use &f/cosmetics meta <menu name> &6to create a new menu"),
     META_NEW_MENU_DESCRIPTION("Type the &eName &finto chat, or '&6cancel&f' to return"),
-    META_NEW_MENU_SUGGESTION("menu name..."), META_BLOCK_SEARCH_USAGE("&6Use &f/h meta <block name> &6to search"),
+    META_NEW_MENU_SUGGESTION("menu name..."),
+    META_BLOCK_SEARCH_USAGE("&6Use &f/cosmetics meta <block name> &6to search"),
     META_BLOCK_SEARCH_DESCRIPTION("Type the &eBlock Name &finto chat, or '&6cancel&f' to return"),
     META_BLOCK_SEARCH_SUGGESTION("block name..."), META_NPC_MANAGE_USAGE("Right Click on a NPC to manage their hats"),
     META_NPC_MANAGE_DESCRIPTION("Right Click on a NPC to manage their hats"),
@@ -677,7 +683,7 @@ public enum Message {
     EDITOR_META_MENU_NAME_DESCRIPTION(
             "/n&8Current:/n&8� {1}/n/n&3Left Click to Change{2=/n&cShift Right Click to Reset}"),
     EDITOR_META_MENU_LABEL_DESCRIPTION(
-            "/n&8Labels allow you to use this hat/n&8in commands like: &7/h set <player> <label>/n/n&8Current:/n&8� &7{1=&cNot Set}/n/n&3Left Click to Change{2=/n&cShift Right Click to Clear}"),
+            "/n&8Labels allow you to use this hat/n&8in commands like: &7/cosmetics set <player> <label>/n/n&8Current:/n&8� &7{1=&cNot Set}/n/n&3Left Click to Change{2=/n&cShift Right Click to Clear}"),
     EDITOR_META_MENU_DESCRIPTION_DESCRIPTION(
             "/n&8Current:/n{1}/n&3Left Click to Change{2=/n&cShift Right Click to Clear}"),
     EDITOR_META_MENU_EMPTY_DESCRIPTION("/n&8Current:/n&8� &cNot Set/n/n&3Left Click to Change"),

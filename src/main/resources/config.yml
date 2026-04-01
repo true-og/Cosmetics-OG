@@ -15,7 +15,7 @@ version: 2.2
 # Enable automatic config updates
 config-auto-update: true
 #
-# Set the default menu that will open any time a player executes /h
+# Set the default menu that will open any time a player executes /cosmetics
 default-menu: particles.yml
 #
 # Set the language file
@@ -184,7 +184,7 @@ editor:
   meta-time-limit: 60
   #
   # Restrict players from using commands while editing.
-  # When a player is editing meta properties, they'll be asked to type in chat, or by using /h meta. This will prevent them from
+  # When a player is editing meta properties, they'll be asked to type in chat, or by using /cosmetics meta. This will prevent them from
   # using other plugin commands until they're done.
   restrict-commands-while-editing: true
   #
