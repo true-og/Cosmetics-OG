@@ -219,7 +219,7 @@ public class CosmeticsOG extends JavaPlugin {
             // Create our managers
             resourceManager = new ResourceManager(this);
             eventManager = new EventManager(this);
-            commandManager = new CommandManager(this, "h");
+            commandManager = new CommandManager(this, "cosmetics");
             particleManager = new ParticleManager(this);
             hookManager = new HookManager(this);
 
