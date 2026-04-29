@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -49,7 +49,7 @@ public class EditorBaseMenu extends AbstractStaticMenu {
                 StringUtil.parseDescription(Message.EDITOR_SLOT_DESCRIPTION.getValue()));
         this.editingTitle = EditorLore.getTrimmedMenuTitle(menuInventory.getName(), Message.EDITOR_BASE_MENU_TITLE);
         this.inventory = Bukkit.createInventory(null, menuInventory.getSize(),
-                Utils.legacySerializerAnyCase(editingTitle));
+                UtilitiesOG.trueogColorize(editingTitle));
         this.inventory.setContents(menuInventory.getContents());
 
         emptyParticleAction = (event, slot) -> {
@@ -235,10 +235,10 @@ public class EditorBaseMenu extends AbstractStaticMenu {
      */
     public void setTitle(String title) {
 
-        menuInventory.setTitle(Utils.legacySerializerAnyCase(title));
+        menuInventory.setTitle(UtilitiesOG.trueogColorize(title));
 
         Inventory replacementInventory = Bukkit.createInventory(null, inventory.getSize(),
-                Utils.legacySerializerAnyCase(editingTitle));
+                UtilitiesOG.trueogColorize(editingTitle));
         replacementInventory.setContents(inventory.getContents());
 
         inventory = replacementInventory;
@@ -337,7 +337,7 @@ public class EditorBaseMenu extends AbstractStaticMenu {
         if (this.rows != rows) {
 
             Inventory replacementInventory = Bukkit.createInventory(null, (9 * rows),
-                    Utils.legacySerializerAnyCase(editingTitle));
+                    UtilitiesOG.trueogColorize(editingTitle));
 
             // inventory.setContents() only works when resizing the menus to a smaller size.
             // So, we need to use a loop

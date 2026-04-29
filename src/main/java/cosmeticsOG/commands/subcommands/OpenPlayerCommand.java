@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -33,11 +33,11 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                CosmeticsOG.chatMessage((Player) sender, getUsage().getValue());
 
             } else {
 
-                Utils.logToConsole(getUsage().getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), getUsage().getValue());
 
             }
 
@@ -50,12 +50,13 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
             }
 
@@ -67,12 +68,12 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
 
             } else {
 
-                Utils.logToConsole(
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", targetPlayer.getName()));
 
             }
@@ -86,12 +87,13 @@ public class OpenPlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_OPEN_PLAYER_EDITING.replace("{1}", targetPlayer.getName()));
 
             }
 

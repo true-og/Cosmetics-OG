@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.Database;
@@ -27,8 +27,7 @@ public class CreateCommand extends Command {
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 if (playerState.hasEditorOpen()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                            Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                    CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                     return false;
 
@@ -42,11 +41,11 @@ public class CreateCommand extends Command {
 
                 if (sender.isPlayer()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CREATE_INVALID.getValue());
+                    CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_CREATE_INVALID.getValue());
 
                 } else {
 
-                    Utils.logToConsole(Message.COMMAND_CREATE_INVALID.getValue());
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_CREATE_INVALID.getValue());
 
                 }
 
@@ -61,12 +60,13 @@ public class CreateCommand extends Command {
 
                 if (sender.isPlayer()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                    CosmeticsOG.chatMessage((Player) sender,
                             Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
 
                 } else {
 
-                    Utils.logToConsole(Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                            Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
 
                 }
 
@@ -78,18 +78,18 @@ public class CreateCommand extends Command {
 
             if (!sender.isPlayer()) {
 
-                Utils.logToConsole(Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
 
                 return true;
 
             } else {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_CREATE_SUCCESS.replace("{1}", menuName));
 
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 EditorMenuManager editorManager = core.getMenuManagerFactory().getEditorMenuManager(playerState);
-                MenuInventory inventory = new MenuInventory(menuName, Utils.legacySerializerAnyCase(menuName), 6, null);
+                MenuInventory inventory = new MenuInventory(menuName, UtilitiesOG.trueogColorize(menuName), 6, null);
 
                 editorManager.setEditingMenu(inventory);
                 editorManager.open();

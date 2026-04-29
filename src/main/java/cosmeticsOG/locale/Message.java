@@ -851,7 +851,7 @@ public enum Message {
      */
     public void sendTo(Player player) {
 
-        player.sendMessage(getValue());
+        CosmeticsOG.chatMessage(player, getValue());
 
     }
 
@@ -861,6 +861,13 @@ public enum Message {
      * @param sender
      */
     public void sendTo(CommandSender sender) {
+
+        if (sender instanceof Player) {
+
+            CosmeticsOG.chatMessage((Player) sender, getValue());
+            return;
+
+        }
 
         sender.sendMessage(getValue());
 

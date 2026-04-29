@@ -1,7 +1,6 @@
 package cosmeticsOG.managers;
 
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.hooks.VanishHook;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.Hat;
@@ -121,7 +120,7 @@ public class ParticleManager {
         // Disabled World.
         if (disabledWorlds.contains(worldName)) {
 
-            Utils.cosmeticsOGPlaceholderMessage(player, Message.WORLD_DISABLED.getValue());
+            CosmeticsOG.chatMessage(player, Message.WORLD_DISABLED.getValue());
 
             return false;
 
@@ -134,7 +133,7 @@ public class ParticleManager {
                     && !player.hasPermission(Permission.WORLD.append(worldName)))
             {
 
-                Utils.cosmeticsOGPlaceholderMessage(player, Message.WORLD_NO_PERMISSION.getValue());
+                CosmeticsOG.chatMessage(player, Message.WORLD_NO_PERMISSION.getValue());
 
                 return false;
 
@@ -155,7 +154,7 @@ public class ParticleManager {
 
             } else {
 
-                Utils.cosmeticsOGPlaceholderMessage(player, Message.HAT_EQUIPPED_OVERFLOW.replace("{1}",
+                CosmeticsOG.chatMessage(player, Message.HAT_EQUIPPED_OVERFLOW.replace("{1}",
                         Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
 
                 return false;
@@ -187,13 +186,13 @@ public class ParticleManager {
 
                 if (!equipMessage.equals("")) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(player, equipMessage);
+                    CosmeticsOG.chatMessage(player, equipMessage);
 
                 } else {
 
                     Message defaultMessage = hat.isVanished() ? Message.HAT_EQUIPPED_VANISHED : Message.HAT_EQUIPPED;
 
-                    Utils.cosmeticsOGPlaceholderMessage(player, defaultMessage.replace("{1}", hat.getDisplayName()));
+                    CosmeticsOG.chatMessage(player, defaultMessage.replace("{1}", hat.getDisplayName()));
 
                 }
 

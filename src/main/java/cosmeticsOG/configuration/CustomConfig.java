@@ -1,7 +1,7 @@
 package cosmeticsOG.configuration;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.util.ResourceUtil;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class CustomConfig {
 
         } else if (logOutput) {
 
-            Utils.logToConsole("Loading " + path + File.separator + fileName);
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Loading " + path + File.separator + fileName);
 
         }
 
@@ -47,7 +47,8 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
 
         }
 
@@ -69,7 +70,8 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
 
         }
 
@@ -86,7 +88,8 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error saving the config file: " + error.getMessage());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "There was an error saving the config file: " + error.getMessage());
 
         }
 
@@ -103,7 +106,8 @@ public class CustomConfig {
 
         } catch (Exception error) {
 
-            Utils.logToConsole("There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "There was an error loading " + name + ", error: " + error.getClass().getSimpleName());
 
         }
 
@@ -175,8 +179,8 @@ public class CustomConfig {
 
             } catch (IOException error) {
 
-                Utils.logToConsole("ERROR: Failed to copy resource: " + core.getResource(fileName) + "into file: "
-                        + file.getAbsolutePath());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "ERROR: Failed to copy resource: "
+                        + core.getResource(fileName) + "into file: " + file.getAbsolutePath());
 
             }
 
@@ -190,7 +194,8 @@ public class CustomConfig {
 
                 } catch (IOException error) {
 
-                    Utils.logToConsole("ERROR: Failed to create file: " + file.getAbsolutePath());
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                            "ERROR: Failed to create file: " + file.getAbsolutePath());
 
                 }
 
@@ -200,7 +205,7 @@ public class CustomConfig {
 
         if (logOutput) {
 
-            Utils.logToConsole("Creating " + path + File.separator + fileName);
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Creating " + path + File.separator + fileName);
 
         }
 

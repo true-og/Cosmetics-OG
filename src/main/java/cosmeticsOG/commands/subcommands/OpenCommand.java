@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.Database;
@@ -72,13 +72,13 @@ public class OpenCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_USAGE.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_OPEN_USAGE.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(Message.COMMAND_OPEN_USAGE.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_OPEN_USAGE.getValue());
 
             }
 
@@ -90,7 +90,7 @@ public class OpenCommand extends Command {
 
             if (!sender.isPlayer()) {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
 
                 return false;
 
@@ -99,8 +99,7 @@ public class OpenCommand extends Command {
                 PlayerState playerState = core.getPlayerState(sender.getPlayer());
                 if (playerState.hasEditorOpen()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                            Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                    CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                     return false;
 
@@ -285,7 +284,7 @@ public class OpenCommand extends Command {
 
         if (menuName.equals("purchase")) {
 
-            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_OPEN_ERROR.replace("{1}", menuName));
+            CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_OPEN_ERROR.replace("{1}", menuName));
 
             return null;
 
@@ -300,8 +299,7 @@ public class OpenCommand extends Command {
 
             if (menuInventory == null) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
                 return null;
 

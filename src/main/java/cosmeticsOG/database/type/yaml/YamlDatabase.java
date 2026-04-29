@@ -1,7 +1,7 @@
 package cosmeticsOG.database.type.yaml;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.configuration.CustomConfig;
 import cosmeticsOG.database.Database;
@@ -73,7 +73,7 @@ public class YamlDatabase implements Database {
 
     public YamlDatabase(CosmeticsOG core) {
 
-        Utils.logToConsole("Loaded YAML database.");
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Loaded YAML database.");
 
         this.core = core;
 
@@ -131,7 +131,8 @@ public class YamlDatabase implements Database {
                     core.getDataFolder() + File.separator + "menus" + File.separator + "particles.yml");
             if (!particlesFile.exists()) {
 
-                Utils.logToConsole("particlesFile does not exist at path: " + particlesFile.getAbsolutePath());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "particlesFile does not exist at path: " + particlesFile.getAbsolutePath());
                 InputStream particleStream = ResourceUtil.getMostCompatibleParticlesMenu();
                 if (particleStream != null) {
 
@@ -914,7 +915,7 @@ public class YamlDatabase implements Database {
         File menusFolder = new File(core.getDataFolder() + File.separator + "menus");
         if (!menusFolder.isDirectory()) {
 
-            Utils.logToConsole("Unable to find menus folder");
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Unable to find menus folder");
             return;
 
         }
@@ -1060,7 +1061,7 @@ public class YamlDatabase implements Database {
 
         FileConfiguration config = menuConfig.getConfig();
         final String menuName = menuConfig.getName();
-        final TextComponent menuTitle = Utils.legacySerializerAnyCase(config.getString("settings.title", "New Menu"));
+        final TextComponent menuTitle = UtilitiesOG.trueogColorize(config.getString("settings.title", "New Menu"));
         final int menuSize = config.getInt("settings.size", 6);
         final String alias = config.getString("settings.alias");
         final MenuInventory inventory = new MenuInventory(menuName, menuTitle, menuSize, alias);

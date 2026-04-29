@@ -1,7 +1,7 @@
 package cosmeticsOG.editor;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.particles.Hat;
@@ -904,7 +904,7 @@ public class EditorLore {
         List<Component> footerDescription = StringUtil
                 .parseDescription(Message.EDITOR_HAT_FOOTER_DESCRIPTION.getValue());
         List<String> footerStrings = footerDescription.stream()
-                .map(component -> Utils.legacySerializerAnyCase(component.toString()).content())
+                .map(component -> UtilitiesOG.trueogColorize(component.toString()).content())
                 .collect(Collectors.toList());
 
         description.addAll(footerStrings);
@@ -998,7 +998,7 @@ public class EditorLore {
         String formattedTitle = menuTitle.replace(extraInfo[0], title);
 
         // Process color codes.
-        return Utils.legacySerializerAnyCase(formattedTitle).content();
+        return UtilitiesOG.trueogColorize(formattedTitle).content();
 
     }
 

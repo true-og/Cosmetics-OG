@@ -1,7 +1,7 @@
 package cosmeticsOG.util;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.configuration.CustomConfig;
 import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.managers.SettingsManager.Type;
@@ -15,7 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class YamlUtil {
 
     private static final double MENU_VERSION = 4.0;
-    private static final double CONFIG_VERSION = 2.2;
+    private static final double CONFIG_VERSION = 2.3;
 
     /**
      * Checks to see if this CustomConfig is updated to the current version
@@ -36,7 +36,8 @@ public class YamlUtil {
      */
     public static void updateMenuSaveFormat(CustomConfig menuConfig) {
 
-        Utils.logToConsole("Updating " + menuConfig.getFileName() + " to new save format...");
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                "Updating " + menuConfig.getFileName() + " to new save format...");
 
         FileConfiguration config = menuConfig.getConfig();
         config.set("version", MENU_VERSION);
@@ -311,6 +312,8 @@ public class YamlUtil {
 
         }
 
+        migrateLegacyEconomyConfig(config);
+
         // Update any missing values.
         for (SettingsManager setting : SettingsManager.values()) {
 
@@ -325,10 +328,38 @@ public class YamlUtil {
         config.set("version", CONFIG_VERSION);
 
         core.saveConfig();
+        SettingsManager.onReload();
+
+    }
+
+    private static void migrateLegacyEconomyConfig(FileConfiguration config) {
+
+        if (!config.isSet(SettingsManager.FLAG_DIAMONDBANK.getKey())) {
+
+            final boolean legacyEconomyEnabled = config.getBoolean("flags.vault", false)
+                    || config.getBoolean("flags.playerpoints", false);
+            if (legacyEconomyEnabled) {
+
+                config.set(SettingsManager.FLAG_DIAMONDBANK.getKey(), true);
+
+            }
+
+        }
+
+        config.set("flags.vault", null);
+        config.set("flags.playerpoints", null);
 
     }
 
     private static void updateLegacyConfig(FileConfiguration config) {
+
+        final boolean legacyEconomyEnabled = config.getBoolean("defaults.flags.vault", false)
+                || config.getBoolean("defaults.flag.playerpoints", false);
+        if (legacyEconomyEnabled) {
+
+            config.set(SettingsManager.FLAG_DIAMONDBANK.getKey(), true);
+
+        }
 
         // Loop through all legacy config keys and update.
         for (LegacyType type : LegacyType.values()) {
@@ -382,12 +413,12 @@ public class YamlUtil {
         DISABLED_WORLDS("defaults.disabled_worlds", "disabled-worlds", Type.STRING_LIST, new ArrayList<String>()),
         CHECK_WORLD_PERMISSION("defaults.check_world_permission", "check-world-permission", Type.BOOLEAN, false),
         HALO("defaults.halo", "", Type.DEPRECATED, 0), EFFECT("defaults.effect", "", Type.DEPRECATED, 0),
-        FLAGS_VAULT("defaults.flags.vault", "flags.vault", Type.BOOLEAN, false),
+        FLAGS_VAULT("defaults.flags.vault", "", Type.DEPRECATED, 0),
         FLAGS_EXPERIENCE("defaults.flags.experience", "flags.experience", Type.BOOLEAN, false),
         FLAGS_PERMISSION("defaults.flags.permission", "flags.permission", Type.BOOLEAN, true),
         FLAGS_VANISH("defaults.flags.vanish", "flags.vanish", Type.BOOLEAN, false),
-        FLAGS_PLAYERPOINTS("defaults.flag.playerpoints", "flags.playerpoints", Type.BOOLEAN, false),
-        CURRENCY_TYPE("defaults.currency_type", "currency", Type.STRING, "$"),
+        FLAGS_PLAYERPOINTS("defaults.flag.playerpoints", "", Type.DEPRECATED, 0),
+        CURRENCY_TYPE("defaults.currency_type", "currency", Type.STRING, "&bShards"),
         CLOSE_MENU_ON_EQUIP("defaults.close_menu_on_equip", "close-menu-on-equip", Type.BOOLEAN, true),
         MENU_LOCK_HATS_WITHOUT_PERMISSION("defaults.menu.lock_hats_without_permission",
                 "menu.lock-hats-without-permission", Type.BOOLEAN, false),

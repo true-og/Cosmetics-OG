@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -40,7 +40,7 @@ public class EditorColorMenu extends AbstractStaticMenu {
         this.callback = callback;
         this.colors = new HashMap<Integer, Color>();
         this.inventory = Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_COLOUR_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_COLOUR_MENU_TITLE.getValue()));
 
         this.setColorAction = (event, slot) -> {
 
@@ -202,7 +202,7 @@ public class EditorColorMenu extends AbstractStaticMenu {
     private String getColorDescription(Color color, String title) {
 
         String description = Message.EDITOR_COLOUR_MENU_PRESET_DESCRIPTION.getValue();
-        String s = description.replace("{1}", Utils.stripColors(title.toLowerCase()))
+        String s = description.replace("{1}", UtilitiesOG.stripFormatting(title.toLowerCase()))
                 .replace("{2}", Integer.toString(color.getRed())).replace("{3}", Integer.toString(color.getGreen()))
                 .replace("{4}", Integer.toString(color.getBlue()));
 

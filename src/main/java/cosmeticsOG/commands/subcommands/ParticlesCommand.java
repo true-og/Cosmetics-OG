@@ -1,7 +1,6 @@
 package cosmeticsOG.commands.subcommands;
 
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -23,7 +22,7 @@ public class ParticlesCommand extends Command {
             PlayerState playerState = core.getPlayerState(sender.getPlayer());
             if (playerState.hasEditorOpen()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
                 return false;
 

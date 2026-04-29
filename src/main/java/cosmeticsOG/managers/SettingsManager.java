@@ -23,7 +23,7 @@ public enum SettingsManager {
     LOAD_INCLUDED_CUSTOM_TYPES("load-included-custom-types", Type.BOOLEAN, true),
     DISABLED_WORLDS("disabled-worlds", Type.STRING_LIST, new ArrayList<String>()),
     CHECK_WORLD_PERMISSION("check-world-permission", Type.BOOLEAN, true),
-    CLOSE_MENU_ON_EQUIP("close-menu-on-equip", Type.BOOLEAN, true), CURRENCY("currency", Type.STRING, "$"),
+    CLOSE_MENU_ON_EQUIP("close-menu-on-equip", Type.BOOLEAN, true), CURRENCY("currency", Type.STRING, "&bShards"),
     LIVE_MENUS("live-menus", Type.BOOLEAN, true), LIVE_MENU_UPDATE_FREQUENCY("live-menu-update-frequency", Type.INT, 5),
     MAXIMUM_HAT_LIMIT("max-hats", Type.INT_CLAMPED, 7, 28),
     UNEQUIP_OVERFLOW_HATS("unequip-overflow-hats", Type.BOOLEAN, false),
@@ -43,8 +43,7 @@ public enum SettingsManager {
     /**
      * Flags
      */
-    FLAG_VAULT("flags.vault", Type.BOOLEAN, false), FLAG_PLAYERPOINTS("flags.playerpoints", Type.BOOLEAN, false),
-    FLAG_TOKEN_MANAGER("flags.token-manager", Type.BOOLEAN, false),
+    FLAG_DIAMONDBANK("flags.diamondbank", Type.BOOLEAN, false),
     FLAG_EXPERIENCE("flags.experience", Type.BOOLEAN, false), FLAG_PERMISSION("flags.permission", Type.BOOLEAN, true),
     FLAG_VANISH("flags.vanish", Type.BOOLEAN, false),
     FLAG_ESSENTIALS_VANISH("flags.essentials-vanish", Type.BOOLEAN, false),
@@ -157,7 +156,7 @@ public enum SettingsManager {
 
     public static boolean isEconomyEnabled() {
 
-        return FLAG_VAULT.getBoolean() || FLAG_PLAYERPOINTS.getBoolean() || FLAG_TOKEN_MANAGER.getBoolean();
+        return FLAG_DIAMONDBANK.getBoolean();
 
     }
 

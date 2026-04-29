@@ -1,7 +1,7 @@
 package cosmeticsOG.util;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import java.util.Arrays;
@@ -66,7 +66,7 @@ public class ItemUtil {
             List<TextComponent> description)
     {
 
-        TextComponent title = Utils.legacySerializerAnyCase(titleString);
+        TextComponent title = UtilitiesOG.trueogColorize(titleString);
 
         ItemStack item = new ItemStack(material, quantity);
         ItemMeta itemMeta = item.getItemMeta();
@@ -90,7 +90,7 @@ public class ItemUtil {
         ItemStack item = new ItemStack(material, quantity);
         ItemMeta itemMeta = item.getItemMeta();
 
-        itemMeta.displayName(Utils.legacySerializerAnyCase(title));
+        itemMeta.displayName(UtilitiesOG.trueogColorize(title));
 
         addItemFlags(itemMeta);
         item.setItemMeta(itemMeta);
@@ -101,7 +101,7 @@ public class ItemUtil {
 
     public static ItemStack createItem(Material material, String displayNameString, List<Component> description) {
 
-        TextComponent displayName = Utils.legacySerializerAnyCase(displayNameString);
+        TextComponent displayName = UtilitiesOG.trueogColorize(displayNameString);
 
         // Create the item with the material.
         ItemStack item = new ItemStack(material);
@@ -143,7 +143,7 @@ public class ItemUtil {
             if (component instanceof TextComponent) {
 
                 // Process color codes for TextComponent
-                return Utils.legacySerializerAnyCase(((TextComponent) component).content());
+                return UtilitiesOG.trueogColorize(((TextComponent) component).content());
 
             } else {
 
@@ -170,8 +170,7 @@ public class ItemUtil {
 
         // Convert TextComponent array to List<Component> for color code processing.
         List<Component> components = Arrays.stream(description)
-                .map(textComponent -> Utils.legacySerializerAnyCase(textComponent.content()))
-                .collect(Collectors.toList());
+                .map(textComponent -> UtilitiesOG.trueogColorize(textComponent.content())).collect(Collectors.toList());
 
         ItemMeta itemMeta = item.getItemMeta();
 
@@ -204,7 +203,7 @@ public class ItemUtil {
         }
 
         // Set the display name of the item using the legacy formatted string.
-        meta.displayName(Utils.legacySerializerAnyCase(name));
+        meta.displayName(UtilitiesOG.trueogColorize(name));
 
         // Apply the modified meta back to the item.
         item.setItemMeta(meta);

@@ -10,7 +10,7 @@
 #
 # Don't Change This!
 # This value gets updated automatically
-version: 2.2
+version: 2.3
 #
 # Enable automatic config updates
 config-auto-update: true
@@ -40,8 +40,9 @@ check-world-permission: false
 # Closes the players menu any time they equip a hat
 close-menu-on-equip: true
 #
-# Use {CURRENCY} in your item descriptions to utilize this value
-currency: &BDiamonds
+# Use {CURRENCY} in your item descriptions to utilize this value.
+# Purchase prices are stored and calculated as DiamondBank-OG shards.
+currency: '&bShards'
 #
 # Let menus dynamically update their content (Cosmetic only)
 live-menus: true
@@ -83,11 +84,8 @@ database:
 #
 flags:
   #
-  # Enable Vault and use any economy plugin you want to unlock hats
-  vault: false
-  #
-  # Enable PlayerPoints economy
-  playerpoints: false
+  # Enable DiamondBank-OG economy purchases.
+  diamondbank: false
   #
   # Allow players to unlock hats using their experience points
   experience: false
@@ -96,14 +94,11 @@ flags:
   permission: true
   #
   # Use a supported vanish plugin, and hide particles any time a player vanishes
-  # Supported plugins are: SuperVanish, PremiumVanish, & VanishNoPacket
+  # Supported plugins are: Vanish-OG, SuperVanish, PremiumVanish, & VanishNoPacket
   vanish: false
   #
   # Disable particle effects when a player has a potion of invisibility effect
   essentials-vanish: true
-  #
-  # Enable TokenManager economy
-  token-manager: false
 #
 afk:
   # Set how many seconds the plugin will wait before marking a player as AFK

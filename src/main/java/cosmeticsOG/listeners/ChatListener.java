@@ -1,7 +1,7 @@
 package cosmeticsOG.listeners;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.editor.MetaState;
 import cosmeticsOG.managers.SettingsManager;
@@ -68,7 +68,7 @@ public class ChatListener implements Listener {
                     // Convert the Component to a plain string
                     String messageString = PlainTextComponentSerializer.plainText().serialize(event.message());
 
-                    if (Utils.stripColors(messageString).equals("cancel")) {
+                    if (UtilitiesOG.stripFormatting(messageString).equals("cancel")) {
 
                         editorManager.reopen();
 

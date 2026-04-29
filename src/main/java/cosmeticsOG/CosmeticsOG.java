@@ -1,5 +1,24 @@
 package cosmeticsOG;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import cosmeticsOG.API.HatAPI;
 import cosmeticsOG.API.ParticleHatsAPI;
 import cosmeticsOG.database.Database;
@@ -25,23 +44,9 @@ import cosmeticsOG.tasks.MenuTask;
 import cosmeticsOG.tasks.PromptTask;
 import cosmeticsOG.ui.MenuManagerFactory;
 import cosmeticsOG.util.YamlUtil;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import net.trueog.diamondbankog.api.DiamondBankAPIJava;
+import net.trueog.utilitiesog.UtilitiesOG;
 
-@SuppressWarnings("unused")
 public class CosmeticsOG extends JavaPlugin {
 
     // [Future] Are features that i plan on adding.
@@ -53,7 +58,6 @@ public class CosmeticsOG extends JavaPlugin {
     // groups as well.
 
     // TODO: [?] Enjin economy support?
-    // TODO: [?] Custom Player Head support? (Head Database, Heads Plugin)
     // TODO: [?] Type texture support? Lets built-in types display custom images
     // (eg. capes)
     // TODO: [?] More flexible mode support?
@@ -62,9 +66,8 @@ public class CosmeticsOG extends JavaPlugin {
     // Display when: (running, walking, flying, etc)
     // Disable when: (pvp, swimming, etc)
 
-    // TODO: [Future] Add update notifier
-    // TODO: [Future] Allow adding custom types images as frames to an animation
-    // TODO: [Future] Re-implement text particle type
+    // TODO: [Future] Allow adding custom types images as frames to an animation.
+    // TODO: [Future] Re-implement text particle type.
     // TODO: [Future] Let particles be attached to blocks...
     // Have a separate block menu that shows nearby particles for the player to
     // edit.
@@ -81,14 +84,16 @@ public class CosmeticsOG extends JavaPlugin {
 
     private ParticleRenderer particleRenderer;
 
-    // Managers
+    private static DiamondBankAPIJava diamondBankAPI;
+
+    // Managers.
     private ResourceManager resourceManager;
     private EventManager eventManager;
     private CommandManager commandManager;
     private ParticleManager particleManager;
     private HookManager hookManager;
 
-    // Lang
+    // Lang.
     private File langFile;
     private YamlConfiguration lang;
 
@@ -97,18 +102,18 @@ public class CosmeticsOG extends JavaPlugin {
 
     private ConcurrentHashMap<UUID, EntityState> entityState;
 
-    // Lets us know we can use the BaseComponent class from the bungee api
+    // Lets us know we can use the BaseComponent class from the bungee api.
     private boolean supportsBaseComponent = true;
     private Prompt prompt;
 
-    // Tasks
+    // Tasks.
     private MenuTask menuTask;
     private PromptTask promptTask;
     private EntityTask entityTask;
 
     private boolean enabled = false;
 
-    // Debugging
+    // Debugging.
     public static final boolean debugging = false;
 
     @Override
@@ -119,17 +124,38 @@ public class CosmeticsOG extends JavaPlugin {
         logger = instance.getLogger();
         hatAPI = new HatAPI(this);
 
-        // Make sure we're running on a supported version
+        // Initialize the DiamondBank-OG API.
+        final RegisteredServiceProvider<DiamondBankAPIJava> provider = getServer().getServicesManager()
+                .getRegistration(DiamondBankAPIJava.class);
+
+        // If the DiamondBank-OG API failed to initialize, do this...
+        if (provider == null) {
+
+            // Tell Bukkit to disable this plugin, and inform the console.
+            disableSelf("DiamondBank-OG API is null – disabling " + getPluginMeta().getName() + "!");
+
+            return;
+
+        }
+
+        // Assign the active instance of DiamondBank-OG to the API handler.
+        diamondBankAPI = provider.getProvider();
+
+        // Make sure we're running on a supported version.
         if (serverVersion < 13) {
 
             particleRenderer = new LegacyParticleRenderer();
 
             if (serverVersion < 8) {
 
-                Utils.logToConsole("-----------------------------------------------------------------------");
-                Utils.logToConsole("This version of ParticleHats is not compatible with your server version");
-                Utils.logToConsole("Download version 3.7.5 if your server is on a version older than 1.8");
-                Utils.logToConsole("-----------------------------------------------------------------------");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "-----------------------------------------------------------------------");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "This version of ParticleHats is not compatible with your server version");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "Download version 3.7.5 if your server is on a version older than 1.8");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "-----------------------------------------------------------------------");
 
                 getServer().getPluginManager().disablePlugin(this);
                 return;
@@ -142,56 +168,60 @@ public class CosmeticsOG extends JavaPlugin {
 
         }
 
-        // Check to see if we're running on Spigot
+        // Check to see if we're running on Spigot.
         try {
 
             Class.forName("net.md_5.bungee.api.chat.BaseComponent");
 
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException classNotFoundException) {
 
             supportsBaseComponent = false;
 
         }
 
-        // Save default config
+        // Save default config.
         saveDefaultConfig();
 
-        Utils.logToConsole("Loading ParticleHats v" + getPluginMeta().getVersion());
-        Utils.logToConsole("");
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Loading ParticleHats v" + getPluginMeta().getVersion());
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "");
         {
 
-            // Create our menu manager factory
+            // Create our menu manager factory.
             menuManagerFactory = new MenuManagerFactory(this);
 
             if (YamlUtil.checkConfigForUpdates(getConfig())) {
 
                 if (SettingsManager.CONFIG_AUTO_UPDATE.getBoolean()) {
 
-                    Utils.logToConsole("Updating config.yml");
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Updating config.yml");
                     YamlUtil.updateConfig(this, getConfig());
 
                 } else {
 
-                    Utils.logToConsole("There is an update for config.yml, auto updates are disabled.");
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                            "There is an update for config.yml, auto updates are disabled.");
 
                 }
 
             }
 
-            // Load our database
+            // Load our database.
             databaseType = DatabaseType.fromAlias(SettingsManager.DATABASE_TYPE.getString());
             database = databaseType.getDatabase(this);
 
             // yaml always returns true, mysql will return false if the connection could not
-            // be made
+            // be made.
             if (!database.isEnabled()) {
 
-                Utils.logToConsole("---------------------------------------------------");
-                Utils.logToConsole("There was an error connecting to the MySQL database");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "---------------------------------------------------");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "There was an error connecting to the MySQL database");
 
                 if (database.getException() != null) {
 
-                    Utils.logToConsole("Error: " + database.getException().getClass().getSimpleName());
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                            "Error: " + database.getException().getClass().getSimpleName());
                     if (debugging) {
 
                         database.getException().printStackTrace();
@@ -200,23 +230,24 @@ public class CosmeticsOG extends JavaPlugin {
 
                 }
 
-                Utils.logToConsole("Switching to yaml");
-                Utils.logToConsole("---------------------------------------------------");
-                Utils.logToConsole("");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Switching to yaml");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "---------------------------------------------------");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "");
 
                 databaseType = DatabaseType.YAML;
                 database = databaseType.getDatabase(this);
 
             }
 
-            // Initialize our player state map
-            entityState = new ConcurrentHashMap<UUID, EntityState>();
+            // Initialize our player state map.
+            entityState = new ConcurrentHashMap<>();
 
             // log("");
             checkDefaultLang();
             loadLang();
 
-            // Create our managers
+            // Create our managers.
             resourceManager = new ResourceManager(this);
             eventManager = new EventManager(this);
             commandManager = new CommandManager(this, "cosmetics");
@@ -233,22 +264,22 @@ public class CosmeticsOG extends JavaPlugin {
 
             }
 
-            // Handles menu updates
+            // Handles menu updates.
             menuTask = new MenuTask(this);
             menuTask.runTaskTimer(this, 0, SettingsManager.LIVE_MENU_UPDATE_FREQUENCY.getInt());
 
-            // Handles meta editing prompts
+            // Handles meta editing prompts.
             promptTask = new PromptTask(this);
             promptTask.runTaskTimer(this, 0, 40);
 
-            // Handles displaying particles
+            // Handles displaying particles.
             entityTask = new EntityTask(this);
             entityTask.runTaskTimer(this, 0, 4);
 
         }
 
-        Utils.logToConsole("");
-        Utils.logToConsole("Done :)");
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "");
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Done :)");
 
         enabled = true;
 
@@ -260,18 +291,31 @@ public class CosmeticsOG extends JavaPlugin {
 
     }
 
+    public static String getPrefix() {
+
+        return "&7[&aCosmetics-OG&f-&4OG&7]";
+
+    }
+
+    public static void chatMessage(Player player, String message) {
+
+        UtilitiesOG.trueogMessage(player, getPrefix() + " " + message);
+
+    }
+
     @Override
     public void onDisable() {
 
-        if (enabled) {
+        if (!enabled) {
 
-            database.onDisable();
-
-            menuTask.cancel();
-            promptTask.cancel();
-            entityTask.cancel();
+            return;
 
         }
+
+        database.onDisable();
+        menuTask.cancel();
+        promptTask.cancel();
+        entityTask.cancel();
 
     }
 
@@ -308,14 +352,14 @@ public class CosmeticsOG extends JavaPlugin {
         resourceManager.onReload();
         hookManager.onReload();
 
-        // Reload each equipped hats async task
+        // Reload each equipped hats async task.
         entityState.values().forEach(EntityState::reload);
 
     }
 
     /**
      * Get the ParticleHats Hat API
-     * 
+     *
      * @return
      */
     public ParticleHatsAPI getAPI() {
@@ -326,7 +370,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Returns the Database this plugin is using
-     * 
+     *
      * @return
      */
     public Database getDatabase() {
@@ -337,7 +381,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Returns the type of database this server is using
-     * 
+     *
      * @return
      */
     public DatabaseType getDatabaseType() {
@@ -348,7 +392,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Returns the MenuManagerFactory class
-     * 
+     *
      * @return
      */
     public MenuManagerFactory getMenuManagerFactory() {
@@ -359,7 +403,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Get the ParticleRenderer for this server version
-     * 
+     *
      * @return
      */
     public ParticleRenderer getParticleRenderer() {
@@ -370,7 +414,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Get the ResourceManager class
-     * 
+     *
      * @return
      */
     public ResourceManager getResourceManager() {
@@ -381,7 +425,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Get the ParticleManager class
-     * 
+     *
      * @return
      */
     public ParticleManager getParticleManager() {
@@ -392,7 +436,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Get the HookManager class
-     * 
+     *
      * @return
      */
     public HookManager getHookManager() {
@@ -403,7 +447,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Returns the PlayerState object that belongs to this player
-     * 
+     *
      * @return
      */
     public PlayerState getPlayerState(Player player) {
@@ -414,7 +458,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     public PlayerState getNewPlayerState(Player player) {
 
-        UUID id = player.getUniqueId();
+        final UUID id = player.getUniqueId();
         removePlayerState(id);
 
         return (PlayerState) getEntityState(player);
@@ -423,8 +467,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     public EntityState getEntityState(Entity entity, int entityID) {
 
-        UUID id = entity.getUniqueId();
-
+        final UUID id = entity.getUniqueId();
         if (entityState.containsKey(id)) {
 
             return entityState.get(id);
@@ -433,7 +476,7 @@ public class CosmeticsOG extends JavaPlugin {
 
         if (entity instanceof Player) {
 
-            EntityState eState;
+            final EntityState eState;
 
             if (entity.hasMetadata("NPC")) {
 
@@ -446,13 +489,15 @@ public class CosmeticsOG extends JavaPlugin {
             }
 
             entityState.put(id, eState);
+
             return eState;
 
         }
 
-        EntityState eState = new EntityState(entity, entityID);
+        final EntityState eState = new EntityState(entity, entityID);
 
         entityState.put(id, eState);
+
         return eState;
 
     }
@@ -465,7 +510,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Checks to see if this entity has an EntityState object loaded
-     * 
+     *
      * @param entity
      * @return
      */
@@ -477,7 +522,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Returns all currently active player states
-     * 
+     *
      * @return
      */
     public Collection<EntityState> getEntityStates() {
@@ -488,7 +533,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     public void removePlayerState(UUID id) {
 
-        EntityState es = entityState.remove(id);
+        final EntityState es = entityState.remove(id);
         if (es != null) {
 
             es.clearActiveHats();
@@ -499,7 +544,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Check to see if we can use the bungee BaseComponent class
-     * 
+     *
      * @return
      */
     public Boolean canUseBungee() {
@@ -510,19 +555,19 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Gets the current server version
-     * 
+     *
      * @return
      */
     public double getServerVersion() {
 
-        String version = Bukkit.getBukkitVersion().split("-")[0].substring(2);
+        final String version = StringUtils.substring(Bukkit.getBukkitVersion().split("-")[0], 2);
         return Double.parseDouble(version);
 
     }
 
     /**
      * Get this plugins CommandManager
-     * 
+     *
      * @return
      */
     public CommandManager getCommandManager() {
@@ -539,7 +584,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Sends the player a message using their Action Bar
-     * 
+     *
      * @param player
      * @param message
      */
@@ -557,15 +602,15 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Checks to see if a file exists with this name in the given folder
-     * 
+     *
      * @param folderName
      * @param fileName
      * @return
      */
     public boolean fileExists(String folderName, String fileName) {
 
-        String directory = getDataFolder() + File.separator + folderName + File.separator + fileName;
-        File file = new File(directory);
+        final String directory = getDataFolder() + File.separator + folderName + File.separator + fileName;
+        final File file = new File(directory);
 
         return file.exists();
 
@@ -573,7 +618,7 @@ public class CosmeticsOG extends JavaPlugin {
 
     /**
      * Logs a debug message to the server console if debugging is enabled
-     * 
+     *
      * @param obj
      */
     public static void debug(Object obj) {
@@ -590,26 +635,28 @@ public class CosmeticsOG extends JavaPlugin {
 
         String targetLang = SettingsManager.LANG.getString();
 
-        File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + targetLang);
+        final File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + targetLang);
         if (!langFile.exists()) {
 
-            if (targetLang.equals("en_US.lang")) {
+            if ("en_US.lang".equals(targetLang)) {
 
-                Utils.logToConsole("Creating en_US.lang");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Creating en_US.lang");
 
             } else {
 
-                Utils.logToConsole("Could not find locale " + targetLang + ", switching to en_US.lang");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        "Could not find locale " + targetLang + ", switching to en_US.lang");
 
             }
 
-            // Create our default .lang file since the specified one doesn't exist
+            // Create our default .lang file since the specified one doesn't exist.
             createDefaultLang();
             targetLang = "en_US.lang";
 
         }
 
-        Utils.logToConsole("Loaded locale " + targetLang);
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Loaded locale " + targetLang);
+
         this.langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + targetLang);
         this.lang = YamlConfiguration.loadConfiguration(this.langFile);
 
@@ -617,31 +664,35 @@ public class CosmeticsOG extends JavaPlugin {
 
     private void createDefaultLang() {
 
-        File langFolder = new File(getDataFolder() + File.separator + "lang");
+        final File langFolder = new File(getDataFolder() + File.separator + "lang");
         if (!langFolder.exists()) {
 
             langFolder.mkdirs();
 
         }
 
-        InputStream langStream = getResource("lang/en_US.lang");
-        if (langStream != null) {
+        final InputStream langStream = getResource("lang/en_US.lang");
+        if (langStream == null) {
 
-            File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + "en_US.lang");
+            return;
 
-            if (langFile.exists()) {
+        }
 
-                langFile.delete();
+        final File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + "en_US.lang");
+        if (langFile.exists()) {
 
-            }
+            langFile.delete();
 
-            try {
+        }
 
-                Files.copy(langStream, Paths.get(langFile.getPath()));
+        try {
 
-            } catch (IOException e) {
+            Files.copy(langStream, Paths.get(langFile.getPath()));
 
-            }
+        } catch (IOException ioException) {
+
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Error creating en_US.lang");
+            ioException.printStackTrace();
 
         }
 
@@ -649,22 +700,58 @@ public class CosmeticsOG extends JavaPlugin {
 
     private void checkDefaultLang() {
 
-        File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + "en_US.lang");
+        final File langFile = new File(getDataFolder() + File.separator + "lang" + File.separator + "en_US.lang");
         if (!langFile.exists()) {
 
             createDefaultLang();
 
         } else {
 
-            YamlConfiguration tempLangConfig = YamlConfiguration.loadConfiguration(langFile);
+            final YamlConfiguration tempLangConfig = YamlConfiguration.loadConfiguration(langFile);
             if (tempLangConfig.getDouble("version", 1.0) != LANG_VERSION) {
 
-                Utils.logToConsole("Updating en_US.lang");
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Updating en_US.lang");
+
                 createDefaultLang();
 
             }
 
         }
+
+    }
+
+    // Helps this plugin kill itself gracefully (in minecraft).
+    public static void disableSelf(String reason) {
+
+        final CosmeticsOG pluginInstance = getInstance();
+        if (pluginInstance == null) {
+
+            return;
+
+        }
+
+        Bukkit.getScheduler().runTask(pluginInstance, () -> {
+
+            // If this plugin is already disabled, do this...
+            if (!pluginInstance.isEnabled()) {
+
+                // Do nothing, task already completed.
+                return;
+
+            }
+
+            // Inform console of this plugin being disabled.
+            UtilitiesOG.logToConsole(getPrefix(), reason);
+
+            Bukkit.getPluginManager().disablePlugin(pluginInstance);
+
+        });
+
+    }
+
+    public static DiamondBankAPIJava getDiamondBankAPI() {
+
+        return diamondBankAPI;
 
     }
 

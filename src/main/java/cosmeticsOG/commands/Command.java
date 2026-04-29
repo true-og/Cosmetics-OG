@@ -1,7 +1,7 @@
 package cosmeticsOG.commands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.permission.Permission;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public abstract class Command {
 
         if (!sender.isPlayer() && isPlayerOnly()) {
 
-            Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
             return false;
 
         }
@@ -78,11 +78,11 @@ public abstract class Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                CosmeticsOG.chatMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
 
             }
 

@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.editor.MetaState;
@@ -30,7 +30,7 @@ public class MetaCommand extends EditCommand {
             PlayerState playerState = core.getPlayerState(player);
             if (!playerState.hasEditorOpen()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(player, Message.META_ERROR.getValue());
+                CosmeticsOG.chatMessage(player, Message.META_ERROR.getValue());
 
                 return false;
 
@@ -38,8 +38,8 @@ public class MetaCommand extends EditCommand {
 
             if (args.size() == 0) {
 
-                Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage(player,
+                CosmeticsOG.chatMessage(player, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage(player,
                         Message.COMMAND_META_USAGE.replace("{1}", playerState.getMetaState().getSuggestion()));
 
                 return false;
@@ -61,7 +61,7 @@ public class MetaCommand extends EditCommand {
 
         } else {
 
-            Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
 
         }
 

@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.compatibility.CompatibleSound;
 import cosmeticsOG.editor.EditorLore;
@@ -40,7 +40,7 @@ public class EditorTransferMenu extends AbstractStaticMenu {
         this.editorManager = menuManager;
         this.menuName = menuName;
         this.menuInventory = core.getDatabase().loadInventory(menuName, core.getPlayerState(owner));
-        this.inventory = Bukkit.createInventory(null, menuInventory.getSize(), Utils.legacySerializerAnyCase(
+        this.inventory = Bukkit.createInventory(null, menuInventory.getSize(), UtilitiesOG.trueogColorize(
                 EditorLore.getTrimmedMenuTitle(menuInventory.getTitle().content(), Message.EDITOR_MOVE_MENU_TITLE)));
 
         build();
@@ -100,7 +100,7 @@ public class EditorTransferMenu extends AbstractStaticMenu {
             } else {
 
                 ItemUtil.setNameAndDescription(item,
-                        Utils.legacySerializerAnyCase(Message.EDITOR_MOVE_MENU_OCCUPIED.getValue()),
+                        UtilitiesOG.trueogColorize(Message.EDITOR_MOVE_MENU_OCCUPIED.getValue()),
                         StringUtil.parseDescription(Message.EDITOR_MOVE_MENU_OCCUPIED_DESCRIPTION.getValue()));
 
                 setButton(i, item, cancelAction);

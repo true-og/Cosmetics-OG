@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -21,13 +21,13 @@ public class RemoveTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, getUsage().getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(getUsage().getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), getUsage().getValue());
 
             }
 
@@ -40,12 +40,12 @@ public class RemoveTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_ERROR_UNKNOWN_TYPE.replace("{1}", imageName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_TYPE.replace("{1}", imageName));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_TYPE.replace("{1}", imageName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_UNKNOWN_TYPE.replace("{1}", imageName));
 
             }
 
@@ -57,12 +57,12 @@ public class RemoveTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_REMOVE_TYPE_SUCCESS.replace("{1}", imageName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_REMOVE_TYPE_SUCCESS.replace("{1}", imageName));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_REMOVE_TYPE_SUCCESS.replace("{1}", imageName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_REMOVE_TYPE_SUCCESS.replace("{1}", imageName));
 
             }
 

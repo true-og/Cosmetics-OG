@@ -1,6 +1,6 @@
 package cosmeticsOG.particles.properties;
 
-import cosmeticsOG.Utils;
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.particles.Effect;
 import cosmeticsOG.particles.effects.AngelWingsEffect;
 import cosmeticsOG.particles.effects.AnimatedEffect;
@@ -145,7 +145,7 @@ public enum ParticleType {
      */
     public String getStrippedName() {
 
-        return Utils.stripColors(effect.getDisplayName());
+        return UtilitiesOG.stripFormatting(effect.getDisplayName());
 
     }
 

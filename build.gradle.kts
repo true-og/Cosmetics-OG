@@ -9,6 +9,10 @@ plugins {
     kotlin("jvm") version "2.1.21" // Import Kotlin JVM plugin.
 }
 
+extra["kotlinAttribute"] = Attribute.of("kotlin-tag", Boolean::class.javaObjectType)
+
+val kotlinAttribute: Attribute<Boolean> by rootProject.extra
+
 /* --------------------------- JDK / Kotlin ---------------------------- */
 java {
     sourceCompatibility = JavaVersion.VERSION_17 // Compile with JDK 17 compatibility.
@@ -23,7 +27,7 @@ kotlin { jvmToolchain(17) }
 /* ----------------------------- Metadata ------------------------------ */
 group = "net.trueog.cosmetics-og" // Declare bundle identifier.
 
-version = "4.6.2" // Declare plugin version (will be in .jar).
+version = "4.6.4" // Declare plugin version (will be in .jar).
 
 val apiVersion = "1.19" // Declare minecraft server target version.
 
@@ -48,9 +52,13 @@ dependencies {
     compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT") // Declare Purpur API version to be packaged.
     implementation("com.zaxxer:HikariCP:3.3.1") // Import HikariCP API.
     implementation("org.slf4j:slf4j-nop:1.7.25") // Import SLF4J API.
-    compileOnly("com.github.Realizedd:TokenManager:3.2.4") { exclude(group = "*", module = "*") } // TokenManager API.
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") { exclude(group = "org.bukkit", module = "bukkit") } // Vault API.
+    compileOnlyApi(project(":libs:Utilities-OG")) // Import TrueOG Network Utilities-OG Java API (from source).
+    compileOnlyApi(project(":libs:DiamondBank-OG")) {
+        attributes { attribute(kotlinAttribute, true) }
+    } // Import TrueOG network DiamondBank-OG Kotlin API (from source).
 }
+
+apply(from = "eclipse.gradle.kts") // Import eclipse classpath support script.
 
 /* ---------------------- Reproducible jars ---------------------------- */
 tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .jars
@@ -107,4 +115,14 @@ tasks.named("compileJava") {
 
 tasks.named("spotlessCheck") {
     dependsOn("spotlessApply") // Run spotless before checking if spotless ran.
+}
+
+/* ------------------------------ Eclipse SHIM ------------------------- */
+
+// This can't be put in eclipse.gradle.kts because Gradle is weird.
+subprojects {
+    apply(plugin = "java-library")
+    apply(plugin = "eclipse")
+    eclipse.project.name = "${project.name}-${rootProject.name}"
+    tasks.withType<Jar>().configureEach { archiveBaseName.set("${project.name}-${rootProject.name}") }
 }

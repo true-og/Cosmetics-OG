@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.database.Database.DataType;
 import cosmeticsOG.editor.EditorLore;
@@ -50,7 +50,7 @@ public class EditorIconMenuOverview extends AbstractListMenu {
         this.totalPages = 1;
 
         setMenu(0, Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_ICON_OVERVIEW_MENU_TITLE.getValue())));
+                UtilitiesOG.trueogColorize(Message.EDITOR_ICON_OVERVIEW_MENU_TITLE.getValue())));
 
         build();
 
@@ -257,8 +257,8 @@ public class EditorIconMenuOverview extends AbstractListMenu {
 
             int index = getNormalIndex(i, 10, 2);
 
-            // Convert the display name to TextComponent using TrueOG Utils for color codes.
-            TextComponent nameComponent = Utils.legacySerializerAnyCase(displayName);
+            // Convert the display name to TextComponent using Utilities-OG color codes.
+            TextComponent nameComponent = UtilitiesOG.trueogColorize(displayName);
 
             // Parse and process the description if it's a List<String>, converting it to
             // List<TextComponent>.

@@ -35,6 +35,8 @@ public class ConnectionListener implements Listener {
         Player player = event.getPlayer();
         UUID id = event.getPlayer().getUniqueId();
         PlayerState playerState = core.getNewPlayerState(player);
+        VanishHook vanishHook = core.getHookManager().getVanishHook();
+        boolean isVanished = vanishHook != null && vanishHook.isVanished(player);
 
         // Load equipped hats
         core.getDatabase().loadPlayerEquippedHats(id, (loadedHats) -> {
@@ -45,6 +47,7 @@ public class ConnectionListener implements Listener {
                 List<Hat> hats = (ArrayList<Hat>) loadedHats;
                 for (Hat hat : hats) {
 
+                    hat.setVanished(isVanished);
                     playerState.addHat(hat);
 
                 }
@@ -91,17 +94,6 @@ public class ConnectionListener implements Listener {
                 }
 
             });
-
-        }
-
-        VanishHook vanishHook = core.getHookManager().getVanishHook();
-        if (vanishHook != null) {
-
-            if (vanishHook.isVanished(player)) {
-
-                playerState.getActiveHats().forEach(hat -> hat.setVanished(true));
-
-            }
 
         }
 

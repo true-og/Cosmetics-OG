@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -33,7 +33,7 @@ public class EditorActionMenuOverview extends AbstractStaticMenu {
         this.callback = callback;
         this.targetHat = menuManager.getBaseHat();
         this.inventory = Bukkit.createInventory(null, 27,
-                Utils.legacySerializerAnyCase(Message.EDITOR_ACTION_OVERVIEW_MENU_TITlE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_ACTION_OVERVIEW_MENU_TITlE.getValue()));
 
         build();
 

@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.Database;
@@ -62,13 +62,13 @@ public class EditCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_EDIT_USAGE.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_EDIT_USAGE.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(Message.COMMAND_EDIT_USAGE.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_EDIT_USAGE.getValue());
 
             }
 
@@ -80,7 +80,7 @@ public class EditCommand extends Command {
         Database database = core.getDatabase();
         if (playerState.hasEditorOpen()) {
 
-            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+            CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
 
             return false;
 
@@ -105,8 +105,7 @@ public class EditCommand extends Command {
 
         if (!database.menuExists(menuName)) {
 
-            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                    Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
+            CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_MENU.replace("{1}", menuName));
 
             return false;
 

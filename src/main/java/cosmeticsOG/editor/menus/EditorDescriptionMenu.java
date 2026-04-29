@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.database.Database;
 import cosmeticsOG.database.Database.DataType;
@@ -47,7 +47,7 @@ public class EditorDescriptionMenu extends AbstractListMenu {
         this.totalPages = 1;
 
         setMenu(0, Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
+                UtilitiesOG.trueogColorize(Message.EDITOR_DESCRIPTION_MENU_TITLE.getValue())));
 
         build();
 

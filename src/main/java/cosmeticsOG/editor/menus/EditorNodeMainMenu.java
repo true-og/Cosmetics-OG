@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.locale.Message;
 import org.bukkit.Bukkit;
@@ -19,7 +19,7 @@ public class EditorNodeMainMenu extends EditorMainMenu {
     public void build() {
 
         this.inventory = Bukkit.createInventory(null, 45,
-                Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
         this.particleButtonSlot = 13;
         this.trackingButtonSlot = 19;
         this.countButtonSlot = 15;

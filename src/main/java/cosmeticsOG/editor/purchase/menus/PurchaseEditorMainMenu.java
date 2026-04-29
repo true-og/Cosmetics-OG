@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.purchase.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.database.Database;
 import cosmeticsOG.database.Database.DataType;
@@ -40,7 +40,7 @@ public class PurchaseEditorMainMenu extends AbstractStaticMenu {
         this.editorBaseMenu = menuManager.getEditingMenu();
         this.targetHat = menuManager.getBaseHat();
         this.inventory = Bukkit.createInventory(null, 36,
-                Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
 
         build();
 

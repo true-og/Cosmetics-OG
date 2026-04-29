@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.ui.AbstractStaticMenu;
@@ -22,7 +22,7 @@ public class EditorDeleteMenu extends AbstractStaticMenu {
 
         this.editorBaseMenu = editorBaseMenu;
         this.inventory = Bukkit.createInventory(null, 27,
-                Utils.legacySerializerAnyCase(Message.EDITOR_DELETE_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_DELETE_MENU_TITLE.getValue()));
 
         build();
 

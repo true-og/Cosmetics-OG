@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -30,13 +30,13 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
             Command command = cmds.getValue();
             if (command != null) {
 
-                String commandText = "&3Command: &f" + Utils.stripColors(command.getName()) + "\n" + "&3Description: &8"
-                        + Utils.stripColors(command.getDescription().getValue()) + "\n" + "&3Usage: &8"
-                        + Utils.stripColors(command.getUsage().getValue()) + "\n" + "&3Permission: &8"
-                        + Utils.stripColors(command.getPermission().getPermission());
+                String commandText = "&3Command: &f" + UtilitiesOG.stripFormatting(command.getName()) + "\n"
+                        + "&3Description: &8" + UtilitiesOG.stripFormatting(command.getDescription().getValue()) + "\n"
+                        + "&3Usage: &8" + UtilitiesOG.stripFormatting(command.getUsage().getValue()) + "\n"
+                        + "&3Permission: &8" + UtilitiesOG.stripFormatting(command.getPermission().getPermission());
 
-                TextComponent hoverText = Utils.legacySerializerAnyCase(commandText);
-                TextComponent commandComponent = Utils.legacySerializerAnyCase("&7> &3" + command.getUsage().getValue())
+                TextComponent hoverText = UtilitiesOG.trueogColorize(commandText);
+                TextComponent commandComponent = UtilitiesOG.trueogColorize("&7> &3" + command.getUsage().getValue())
                         .hoverEvent(HoverEvent.showText(hoverText))
                         .clickEvent(ClickEvent.suggestCommand(command.getUsage().getValue()));
 
@@ -54,13 +54,14 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
         if (sender.isPlayer()) {
 
             Player player = sender.getPlayer();
-            Utils.cosmeticsOGPlaceholderMessage(player, "&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
-            Utils.cosmeticsOGPlaceholderMessage(player, "&7> " + Message.COMMAND_HELP_TIP.getValue());
+            CosmeticsOG.chatMessage(player, "&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
+            CosmeticsOG.chatMessage(player, "&7> " + Message.COMMAND_HELP_TIP.getValue());
 
         } else {
 
-            Utils.logToConsole("&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
-            Utils.logToConsole("&7> " + Message.COMMAND_HELP_TIP.getValue());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "&f> &6ParticleHats v" + core.getPluginMeta().getVersion());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "&7> " + Message.COMMAND_HELP_TIP.getValue());
 
         }
 
@@ -76,7 +77,7 @@ public class SpigotHelpCommand extends BukkitHelpCommand {
 
                 } else {
 
-                    Utils.logToConsole(component.content());
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), component.content());
 
                 }
 

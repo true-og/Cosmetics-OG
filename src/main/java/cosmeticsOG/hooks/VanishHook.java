@@ -10,11 +10,11 @@ public interface VanishHook {
      * @param player
      * @return
      */
-    public boolean isVanished(Player player);
+    boolean isVanished(Player player);
 
     /**
      * Unregisters this hook
      */
-    public void unregister();
+    void unregister();
 
 }

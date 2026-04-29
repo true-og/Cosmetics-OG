@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.properties.Group;
@@ -22,13 +22,13 @@ public class DeleteGroupCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, getUsage().getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(getUsage().getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), getUsage().getValue());
 
             }
 
@@ -56,12 +56,12 @@ public class DeleteGroupCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_UNKNOWN_GROUP.replace("{1}", groupName));
 
             }
 
@@ -73,12 +73,12 @@ public class DeleteGroupCommand extends Command {
 
         if (sender.isPlayer()) {
 
-            Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                    Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+            CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
 
         } else {
 
-            Utils.logToConsole(Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    Message.COMMAND_REMOVE_GROUP_SUCCESS.replace("{1}", groupName));
 
         }
 

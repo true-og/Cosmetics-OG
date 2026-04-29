@@ -1,7 +1,7 @@
 package cosmeticsOG.particles;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.util.ItemUtil;
@@ -367,7 +367,7 @@ public enum ParticleEffect {
      */
     public String getStrippedName() {
 
-        return Utils.stripColors(getDisplayName());
+        return UtilitiesOG.stripFormatting(getDisplayName());
 
     }
 

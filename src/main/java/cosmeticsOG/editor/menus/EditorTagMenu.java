@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.properties.ParticleTag;
@@ -67,7 +67,7 @@ public class EditorTagMenu extends AbstractListMenu {
 
         for (int i = 0; i < totalPages; i++) {
 
-            Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title));
+            Inventory menu = Bukkit.createInventory(null, 54, UtilitiesOG.trueogColorize(title));
             menu.setItem(49, backButtonItem);
 
             // Next page.

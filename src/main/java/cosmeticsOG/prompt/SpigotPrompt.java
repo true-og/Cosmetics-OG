@@ -1,6 +1,6 @@
 package cosmeticsOG.prompt;
 
-import cosmeticsOG.Utils;
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.editor.MetaState;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -14,7 +14,7 @@ public class SpigotPrompt extends BukkitPrompt {
 
         try {
 
-            Component component = Utils.legacySerializerAnyCase(message);
+            Component component = UtilitiesOG.trueogColorize(message);
 
             // Send an action bar message using Adventure API.
             player.sendActionBar(component);

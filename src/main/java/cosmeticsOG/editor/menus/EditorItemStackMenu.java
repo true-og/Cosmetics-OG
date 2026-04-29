@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.database.Database.DataType;
 import cosmeticsOG.editor.EditorLore;
@@ -112,7 +112,7 @@ public class EditorItemStackMenu extends AbstractListMenu {
         };
 
         setMenu(0, Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_ITEMSTACK_MENU_TITLE.getValue())));
+                UtilitiesOG.trueogColorize(Message.EDITOR_ITEMSTACK_MENU_TITLE.getValue())));
 
         build();
 
@@ -260,7 +260,7 @@ public class EditorItemStackMenu extends AbstractListMenu {
             String displayName = Message.EDITOR_ICON_MENU_ITEM_PREFIX.getValue()
                     + StringUtil.getMaterialName(item.getType());
 
-            ItemUtil.setNameAndDescription(item, Utils.legacySerializerAnyCase(displayName),
+            ItemUtil.setNameAndDescription(item, UtilitiesOG.trueogColorize(displayName),
                     StringUtil.parseDescription(Message.EDITOR_ICON_MENU_ICON_DESCRIPTION.getValue()));
 
             setItem(0, getNormalIndex(i, 10, 2), item);

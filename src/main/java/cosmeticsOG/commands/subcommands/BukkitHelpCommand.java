@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -62,14 +62,15 @@ public class BukkitHelpCommand extends Command {
 
             Player player = sender.getPlayer();
 
-            Utils.cosmeticsOGPlaceholderMessage(player,
+            CosmeticsOG.chatMessage(player,
                     "<white>> <light_purple>Cosmetics<red>-OG <yellow>v" + core.getPluginMeta().getVersion());
-            Utils.cosmeticsOGPlaceholderMessage(player, "<gray>> " + Message.COMMAND_HELP_TIP.getValue());
+            CosmeticsOG.chatMessage(player, "<gray>> " + Message.COMMAND_HELP_TIP.getValue());
 
         } else {
 
-            Utils.logToConsole("&r&2Cosmetics&c-OG &ev" + core.getPluginMeta().getVersion());
-            Utils.logToConsole("&7 " + Message.COMMAND_HELP_TIP.getValue());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                    "&r&2Cosmetics&c-OG &ev" + core.getPluginMeta().getVersion());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "&7 " + Message.COMMAND_HELP_TIP.getValue());
 
         }
 
@@ -82,7 +83,7 @@ public class BukkitHelpCommand extends Command {
 
             } else {
 
-                Utils.logToConsole(MiniMessage.miniMessage().serialize(component));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), MiniMessage.miniMessage().serialize(component));
 
             }
 
@@ -114,11 +115,11 @@ public class BukkitHelpCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                CosmeticsOG.chatMessage(sender.getPlayer(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_NO_PERMISSION.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_NO_PERMISSION.getValue());
 
             }
 

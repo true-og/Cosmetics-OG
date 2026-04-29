@@ -1,7 +1,7 @@
 package cosmeticsOG.particles;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.effects.PixelEffect;
@@ -2194,8 +2194,8 @@ public class Hat {
         }
 
         menuItem = item.clone();
-        ItemUtil.setNameAndDescription(menuItem, Utils.legacySerializerAnyCase(name),
-                normalDescription.stream().map(Utils::legacySerializerAnyCase).collect(Collectors.toList()));
+        ItemUtil.setNameAndDescription(menuItem, UtilitiesOG.trueogColorize(name),
+                normalDescription.stream().map(UtilitiesOG::trueogColorize).collect(Collectors.toList()));
 
         return menuItem;
 

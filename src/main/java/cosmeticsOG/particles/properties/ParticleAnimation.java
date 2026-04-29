@@ -1,6 +1,6 @@
 package cosmeticsOG.particles.properties;
 
-import cosmeticsOG.Utils;
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.locale.Message;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +82,7 @@ public enum ParticleAnimation {
      */
     public String getStrippedName() {
 
-        return Utils.stripColors(getDisplayName());
+        return UtilitiesOG.stripFormatting(getDisplayName());
 
     }
 

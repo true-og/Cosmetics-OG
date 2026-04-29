@@ -1,7 +1,7 @@
 package cosmeticsOG.ui;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.locale.Message;
@@ -32,7 +32,7 @@ public class EquippedParticlesMenu extends AbstractListMenu {
         this.totalPages = 1;
 
         this.setMenu(0, Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.ACTIVE_PARTICLES_MENU_TITLE.getValue())));
+                UtilitiesOG.trueogColorize(Message.ACTIVE_PARTICLES_MENU_TITLE.getValue())));
 
         hatAction = (event, slot) -> {
 

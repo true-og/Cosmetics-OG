@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.ui.AbstractStaticMenu;
@@ -24,7 +24,7 @@ public class EditorResizeMenu extends AbstractStaticMenu {
 
         this.editorBaseMenu = editorBaseMenu;
         this.inventory = Bukkit.createInventory(null, 27,
-                Utils.legacySerializerAnyCase(Message.EDITOR_RESIZE_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_RESIZE_MENU_TITLE.getValue()));
 
         build();
 
@@ -60,7 +60,7 @@ public class EditorResizeMenu extends AbstractStaticMenu {
                     i == 0 ? "" : suffixInfo[1]);
             String description = Message.EDITOR_RESIZE_MENU_SET_ROW_DESCRIPTION.getValue();
 
-            List<TextComponent> descriptionList = List.of(Utils.legacySerializerAnyCase(description));
+            List<TextComponent> descriptionList = List.of(UtilitiesOG.trueogColorize(description));
 
             ItemStack row = ItemUtil.createItem(CompatibleMaterial.GRAY_DYE.getMaterial(), 1, t, descriptionList);
 

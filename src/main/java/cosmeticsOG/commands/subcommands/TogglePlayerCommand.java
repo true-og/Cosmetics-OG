@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -23,13 +23,13 @@ public class TogglePlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, getUsage().getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(getUsage().getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), getUsage().getValue());
 
             }
 
@@ -42,12 +42,13 @@ public class TogglePlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(1)));
 
             }
 
@@ -59,12 +60,13 @@ public class TogglePlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
             }
 
@@ -78,12 +80,13 @@ public class TogglePlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_TOGGLE_PLAYER_ON.getValue().replace("{1}", player.getName()));
 
             }
 
@@ -91,12 +94,13 @@ public class TogglePlayerCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_TOGGLE_PLAYER_OFF.getValue().replace("{1}", player.getName()));
 
             }
 

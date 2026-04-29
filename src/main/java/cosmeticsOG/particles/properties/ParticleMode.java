@@ -1,7 +1,7 @@
 package cosmeticsOG.particles.properties;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.locale.Message;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public enum ParticleMode {
      */
     public String getStrippedName() {
 
-        return Utils.stripColors(getDisplayName());
+        return UtilitiesOG.stripFormatting(getDisplayName());
 
     }
 

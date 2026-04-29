@@ -1,6 +1,6 @@
 package cosmeticsOG.util;
 
-import cosmeticsOG.Utils;
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.particles.Hat;
 import java.util.ArrayList;
@@ -168,7 +168,7 @@ public class StringUtil {
         List<TextComponent> result = new ArrayList<>();
         for (String s : list) {
 
-            result.add(Utils.legacySerializerAnyCase(s));
+            result.add(UtilitiesOG.trueogColorize(s));
 
         }
 
@@ -268,7 +268,7 @@ public class StringUtil {
 
         for (String s : values) {
 
-            desc.add(Utils.legacySerializerAnyCase(s));
+            desc.add(UtilitiesOG.trueogColorize(s));
 
         }
 
@@ -281,7 +281,7 @@ public class StringUtil {
         List<TextComponent> desc = new ArrayList<>();
         for (String line : description) {
 
-            desc.add(Utils.legacySerializerAnyCase(parseString(line, hat)));
+            desc.add(UtilitiesOG.trueogColorize(parseString(line, hat)));
 
         }
 
@@ -382,13 +382,13 @@ public class StringUtil {
         for (String s : list) {
 
             String formatted = s.replaceAll("(?<=<" + regex + ">).*?(?=</" + regex + ">)", "");
-            if (Utils.stripColors(formatted).length() == 0) {
+            if (UtilitiesOG.stripFormatting(formatted).length() == 0) {
 
                 continue;
 
             }
 
-            formattedList.add(Utils.legacySerializerAnyCase(formatted));
+            formattedList.add(UtilitiesOG.trueogColorize(formatted));
 
         }
 

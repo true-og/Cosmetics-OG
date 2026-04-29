@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.editor.MetaState;
@@ -35,7 +35,7 @@ public class EditorItemPromptMenu extends AbstractStaticMenu {
         this.callback = callback;
         this.itemName = itemName;
         this.itemDescription = itemDescription;
-        this.inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(title.getValue()));
+        this.inventory = Bukkit.createInventory(null, 54, UtilitiesOG.trueogColorize(title.getValue()));
 
         build();
 

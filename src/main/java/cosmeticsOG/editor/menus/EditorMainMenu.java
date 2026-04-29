@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.compatibility.CompatibleSound;
 import cosmeticsOG.database.Database;
@@ -63,7 +63,7 @@ public class EditorMainMenu extends AbstractStaticMenu {
         this.targetHat = editorManager.getTargetHat();
         this.ownerState = core.getPlayerState(owner);
         this.inventory = Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_MAIN_MENU_TITLE.getValue()));
 
         setParticleAction = (event, slot) -> {
 
@@ -385,7 +385,7 @@ public class EditorMainMenu extends AbstractStaticMenu {
             // Stop if the player has more than the maximum allowed hats.
             if (!ownerState.canEquip()) {
 
-                owner.sendMessage(Message.HAT_EQUIPPED_OVERFLOW.replace("{1}",
+                CosmeticsOG.chatMessage(owner, Message.HAT_EQUIPPED_OVERFLOW.replace("{1}",
                         Integer.toString(SettingsManager.MAXIMUM_HAT_LIMIT.getInt())));
 
                 return MenuClickResult.NEGATIVE;

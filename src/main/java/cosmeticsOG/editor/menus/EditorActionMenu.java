@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.locale.Message;
@@ -122,8 +122,8 @@ public class EditorActionMenu extends AbstractListMenu {
             String titleStr = menuTitle.replace(leftClickInfo[0], leftClick).replace(rightClickInfo[0], rightClick)
                     .replace("{3}", Integer.toString(i + 1)).replace("{4}", Integer.toString(totalPages));
 
-            // Convert the title string to a colorized TextComponent using TrueOG Utils.
-            Component title = Utils.legacySerializerAnyCase(titleStr);
+            // Convert the title string to a colorized TextComponent using Utilities-OG.
+            Component title = UtilitiesOG.trueogColorize(titleStr);
 
             // Pass the colorized title Component to createInventory.
             Inventory menu = Bukkit.createInventory(null, 54, title);

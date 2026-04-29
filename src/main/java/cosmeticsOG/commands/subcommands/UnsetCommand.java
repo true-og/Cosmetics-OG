@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.Database;
@@ -26,13 +26,13 @@ public class UnsetCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_UNSET_USAGE.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_UNSET_USAGE.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(Message.COMMAND_UNSET_USAGE.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_UNSET_USAGE.getValue());
 
             }
 
@@ -45,12 +45,13 @@ public class UnsetCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_UNKNOWN_PLAYER.getValue().replace("{1}", args.get(0)));
 
             }
 
@@ -62,12 +63,13 @@ public class UnsetCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_OFFLINE_PLAYER.getValue().replace("{1}", player.getName()));
 
             }
 
@@ -91,12 +93,13 @@ public class UnsetCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_UNSET_NOT_WEARING.getValue().replace("{1}", player.getName()));
 
             }
 
@@ -110,12 +113,13 @@ public class UnsetCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                CosmeticsOG.chatMessage((Player) sender,
                         Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_UNSET_LABEL_ERROR.getValue().replace("{1}", hatLabel));
 
             }
 
@@ -126,7 +130,8 @@ public class UnsetCommand extends Command {
         core.getPlayerState(player).removeHat(hat);
         if (tellPlayer) {
 
-            player.sendMessage(Message.COMMAND_UNSET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
+            CosmeticsOG.chatMessage(player,
+                    Message.COMMAND_UNSET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
 
         }
 

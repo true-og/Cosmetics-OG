@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.database.Database;
 import cosmeticsOG.database.Database.DataType;
@@ -29,7 +29,7 @@ public class EditorMetaMenu extends AbstractStaticMenu {
         this.editorManager = menuManager;
         this.targetHat = menuManager.getBaseHat();
         this.inventory = Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_META_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_META_MENU_TITLE.getValue()));
 
         build();
 

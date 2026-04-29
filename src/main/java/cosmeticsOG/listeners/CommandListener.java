@@ -43,7 +43,7 @@ public class CommandListener implements Listener {
             MetaState metaState = playerState.getMetaState();
             if (metaState != MetaState.NONE) {
 
-                player.sendMessage(Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
+                CosmeticsOG.chatMessage(player, Message.COMMAND_ERROR_ALREADY_EDITING.getValue());
                 event.setCancelled(true);
 
             }

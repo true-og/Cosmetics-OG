@@ -1,7 +1,7 @@
 package cosmeticsOG.editor;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.database.Database;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.particles.Hat;
@@ -92,7 +92,7 @@ public enum MetaState {
         sb.deleteCharAt(0);
 
         String value = sb.toString();
-        String rawString = Utils.stripColors(value);
+        String rawString = UtilitiesOG.stripFormatting(value);
 
         Hat targetHat = editorManager.getBaseHat();
 
@@ -123,7 +123,7 @@ public enum MetaState {
 
             case MENU_ALIAS: {
 
-                editorManager.getEditingMenu().setAlias(Utils.stripColors(args.get(0)));
+                editorManager.getEditingMenu().setAlias(UtilitiesOG.stripFormatting(args.get(0)));
                 editorManager.reopen();
 
             }
@@ -137,7 +137,8 @@ public enum MetaState {
 
                 if (database.menuExists(menuName)) {
 
-                    player.sendMessage(Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
+                    CosmeticsOG.chatMessage(player,
+                            Message.COMMAND_ERROR_MENU_EXISTS.getValue().replace("{1}", menuName));
                     return;
 
                 }

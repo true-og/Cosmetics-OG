@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.locale.Message;
@@ -127,7 +127,7 @@ public class EditorSearchMenu extends AbstractListMenu {
 
         for (int i = 0; i < totalPages; i++) {
 
-            Inventory inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(menuTitle));
+            Inventory inventory = Bukkit.createInventory(null, 54, UtilitiesOG.trueogColorize(menuTitle));
 
             inventory.setItem(49, backButtonItem);
 

@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.properties.Group;
@@ -22,11 +22,11 @@ public class GroupInfoCommand extends Command {
 
         if (sender.isPlayer()) {
 
-            Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_GROUP_INFO_TIP.getValue());
+            CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_GROUP_INFO_TIP.getValue());
 
         } else {
 
-            Utils.logToConsole(Message.COMMAND_GROUP_INFO_TIP.getValue());
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_GROUP_INFO_TIP.getValue());
 
         }
 
@@ -37,11 +37,11 @@ public class GroupInfoCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, ("&f> " + info));
+                CosmeticsOG.chatMessage((Player) sender, ("&f> " + info));
 
             } else {
 
-                Utils.logToConsole("> " + info);
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "> " + info);
 
             }
 

@@ -3,7 +3,8 @@ main: cosmeticsOG.CosmeticsOG
 version: '${version}'
 api-version: '${apiVersion}'
 authors: [MediusEcho, NotAlexNoyle]
-softdepend: [Vault, SuperVanish, PremiumVanish, VanishNoPacket, PlayerPoints, Citizens, TokenManager]
+depend: [DiamondBank-OG]
+softdepend: [Vanish-OG, SuperVanish, PremiumVanish, VanishNoPacket, Citizens]
 commands:
   cosmetics:
     description: Main command for Cosmetics-OG

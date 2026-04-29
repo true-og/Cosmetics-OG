@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -373,7 +373,7 @@ public class EditorTypeMenu extends AbstractStaticMenu {
 
             String menuTitle = title.replace("{1}", Integer.toString(i + 1)).replace("{2}", Integer.toString(pages));
 
-            Inventory menu = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(menuTitle));
+            Inventory menu = Bukkit.createInventory(null, 54, UtilitiesOG.trueogColorize(menuTitle));
             menu.setItem(49, backButtonItem);
 
             // Next page.

@@ -1,9 +1,21 @@
 package cosmeticsOG.particles.properties;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.events.HatEquipEvent;
-import cosmeticsOG.hooks.CurrencyHook;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.particles.Hat;
@@ -16,15 +28,10 @@ import cosmeticsOG.ui.StaticMenu;
 import cosmeticsOG.ui.StaticMenuManager;
 import cosmeticsOG.util.ItemUtil;
 import cosmeticsOG.util.PlayerUtil;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import net.trueog.diamondbankog.DiamondBankException;
+import net.trueog.diamondbankog.balance.shard.PlayerShards;
+import net.trueog.utilitiesog.UtilitiesOG;
 
 public enum ParticleAction {
 
@@ -38,7 +45,7 @@ public enum ParticleAction {
     private final boolean hasData;
     private final boolean isHidden;
 
-    private static final Map<Integer, ParticleAction> actionID = new HashMap<Integer, ParticleAction>();
+    private static final Map<Integer, ParticleAction> actionID = new HashMap<>();
 
     static {
 
@@ -83,7 +90,7 @@ public enum ParticleAction {
 
     public String getName() {
 
-        return this.toString().toLowerCase();
+        return StringUtils.lowerCase(this.toString());
 
     }
 
@@ -136,7 +143,7 @@ public enum ParticleAction {
      */
     public String getStrippedName() {
 
-        return Utils.stripColors(getDisplayName());
+        return UtilitiesOG.stripFormatting(getDisplayName());
 
     }
 
@@ -167,26 +174,25 @@ public enum ParticleAction {
     @SuppressWarnings("incomplete-switch")
     public void onClick(Player player, Hat hat, int slot, Inventory inventory, String argument) {
 
-        PlayerState playerState = core.getPlayerState(player);
-        boolean canClose = SettingsManager.CLOSE_MENU_ON_EQUIP.getBoolean();
+        final PlayerState playerState = core.getPlayerState(player);
+        final boolean canClose = SettingsManager.CLOSE_MENU_ON_EQUIP.getBoolean();
 
         switch (this) {
 
-            case EQUIP: {
+            case EQUIP -> {
 
-                HatEquipEvent event = new HatEquipEvent(player, hat);
+                final HatEquipEvent event = new HatEquipEvent(player, hat);
                 Bukkit.getPluginManager().callEvent(event);
-
                 if (!event.isCancelled()) {
 
-                    // Remove an already equipped hat
+                    // Remove an already equipped hat.
                     if (checkAgainstEquippedHats(hat, slot, playerState, inventory)) {
 
                         return;
 
                     }
 
-                    // Check to see if we have already purchased this hat
+                    // Check to see if we have already purchased this hat.
                     if (playerState.hasPurchased(hat)) {
 
                         core.getParticleManager().equipHat(player, hat);
@@ -201,26 +207,27 @@ public enum ParticleAction {
 
                     }
 
-                    boolean canUsePermission = SettingsManager.FLAG_PERMISSION.getBoolean();
-                    boolean canUseCurrency = SettingsManager.isEconomyEnabled();
-                    boolean canUseExp = SettingsManager.FLAG_EXPERIENCE.getBoolean();
+                    final boolean canUsePermission = SettingsManager.FLAG_PERMISSION.getBoolean();
+                    final boolean canUseCurrency = SettingsManager.isEconomyEnabled();
+                    final boolean canUseExp = SettingsManager.FLAG_EXPERIENCE.getBoolean();
 
                     if (canUsePermission) {
 
                         if (hat.isLocked()) {
 
-                            // Only show the permission denied message if vault and exp are also disabled.
+                            // Only show the permission denied message if currency and exp are also
+                            // disabled.
                             if (!canUseCurrency && !canUseExp) {
 
-                                String deniedMessage = hat.getPermissionDeniedDisplayMessage();
+                                final String deniedMessage = hat.getPermissionDeniedDisplayMessage();
 
-                                if (!deniedMessage.equals("")) {
+                                if (!"".equals(deniedMessage)) {
 
-                                    Utils.cosmeticsOGPlaceholderMessage(player, deniedMessage);
+                                    CosmeticsOG.chatMessage(player, deniedMessage);
 
                                 } else {
 
-                                    Utils.cosmeticsOGPlaceholderMessage(player, Message.HAT_NO_PERMISSION.getValue());
+                                    CosmeticsOG.chatMessage(player, Message.HAT_NO_PERMISSION.getValue());
 
                                 }
 
@@ -253,18 +260,15 @@ public enum ParticleAction {
 
                     }
 
-                    double playerBalance = -1;
-
                     if (canUseCurrency) {
 
-                        CurrencyHook currencyHook = core.getHookManager().getCurrencyHook();
-                        if (currencyHook != null && currencyHook.isEnabled()) {
+                        openPurchaseMenuIfAffordable(player, playerState, hat, canClose);
+                        return;
 
-                            playerBalance = currencyHook.getBalance(player);
+                    }
 
-                        }
-
-                    } else if (canUseExp) {
+                    long playerBalance = -1;
+                    if (canUseExp) {
 
                         playerBalance = player.getLevel();
 
@@ -274,9 +278,7 @@ public enum ParticleAction {
 
                         if (playerBalance < hat.getPrice()) {
 
-                            String currency = SettingsManager.CURRENCY.getString();
-                            Utils.cosmeticsOGPlaceholderMessage(player,
-                                    Message.INSUFFICIENT_FUNDS.getValue().replace("{1}", currency));
+                            sendInsufficientFunds(player);
 
                             if (canClose) {
 
@@ -288,26 +290,7 @@ public enum ParticleAction {
 
                         } else {
 
-                            StaticMenuManager staticManager = core.getMenuManagerFactory()
-                                    .getStaticMenuManager(playerState);
-                            playerState.setPendingPurchase(hat);
-
-                            MenuInventory purchaseInventory = core.getDatabase().getPurchaseMenu(playerState);
-                            AbstractMenu pendingPurchaseMenu;
-
-                            if (purchaseInventory != null) {
-
-                                pendingPurchaseMenu = new StaticMenu(core, staticManager, player, purchaseInventory);
-
-                            } else {
-
-                                pendingPurchaseMenu = new StaticMenu(core, staticManager, player,
-                                        PendingPurchaseMenu.defaultPendingPurchaseInventory.clone());
-
-                            }
-
-                            staticManager.addMenu(pendingPurchaseMenu);
-                            pendingPurchaseMenu.open();
+                            openPendingPurchaseMenu(player, playerState, hat);
 
                         }
 
@@ -329,42 +312,22 @@ public enum ParticleAction {
 
                 }
 
-                break;
-
             }
+            case TOGGLE -> {
 
-            case TOGGLE: {
-
-                List<Hat> hats = playerState.getActiveHats();
-
-                // Toggles all active hats based on the first hats toggle state
-                // Players can toggle individual hats through the hat manager
-
+                final List<Hat> hats = playerState.getActiveHats();
                 if (hats.size() > 0) {
 
-                    boolean initialToggle = hats.get(0).isHidden();
-                    for (Hat h : hats) {
-
-                        h.setHidden(!initialToggle);
-
-                    }
+                    final boolean initialToggle = hats.get(0).isHidden();
+                    hats.forEach(h -> h.setHidden(!initialToggle));
 
                 }
 
-                break;
-
             }
+            case CLOSE -> PlayerUtil.closeInventory(player);
+            case OVERRIDE -> {
 
-            case CLOSE: {
-
-                PlayerUtil.closeInventory(player);
-                break;
-
-            }
-
-            case OVERRIDE: {
-
-                // Remove an already equipped hat
+                // Remove an already equipped hat.
                 if (checkAgainstEquippedHats(hat, slot, playerState, inventory)) {
 
                     return;
@@ -378,21 +341,16 @@ public enum ParticleAction {
 
                 }
 
-                break;
-
             }
-
-            case CLEAR: {
+            case CLEAR -> {
 
                 core.getPlayerState(player).clearActiveHats();
-                Utils.cosmeticsOGPlaceholderMessage(player, Message.COMMAND_CLEAR_SUCCESS.getValue());
-                break;
+                CosmeticsOG.chatMessage(player, Message.COMMAND_CLEAR_SUCCESS.getValue());
 
             }
+            case COMMAND -> {
 
-            case COMMAND: {
-
-                if (!argument.equals("")) {
+                if (!"".equals(argument)) {
 
                     PlayerUtil.runNextTick(() -> {
 
@@ -403,12 +361,8 @@ public enum ParticleAction {
 
                 }
 
-                break;
-
             }
-
-            case OPEN_MENU_PERMISSION:
-            case OPEN_MENU: {
+            case OPEN_MENU_PERMISSION, OPEN_MENU -> {
 
                 if (this == OPEN_MENU_PERMISSION && !player.hasPermission(hat.getFullPermission())) {
 
@@ -416,71 +370,60 @@ public enum ParticleAction {
 
                 }
 
-                StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
+                final StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
                 if (staticManager == null) {
 
                     return;
 
                 }
 
-                AbstractMenu menu = staticManager.getMenuFromCache(argument);
+                final AbstractMenu menu = staticManager.getMenuFromCache(argument);
                 if (menu != null) {
 
                     menu.open();
 
                 } else {
 
-                    MenuInventory menuInventory = core.getDatabase().loadInventory(argument, playerState);
+                    final MenuInventory menuInventory = core.getDatabase().loadInventory(argument, playerState);
                     if (menuInventory == null) {
 
-                        Utils.cosmeticsOGPlaceholderMessage(player,
+                        CosmeticsOG.chatMessage(player,
                                 Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", argument));
                         break;
 
                     }
 
-                    StaticMenu staticMenu = new StaticMenu(core, staticManager, player, menuInventory);
+                    final StaticMenu staticMenu = new StaticMenu(core, staticManager, player, menuInventory);
                     staticManager.addMenu(staticMenu);
 
                     staticMenu.open();
 
                 }
 
-                break;
-
             }
+            case PURCHASE_CONFIRM -> {
 
-            case PURCHASE_CONFIRM: {
-
-                Hat pendingHat = playerState.getPendingPurchase();
-
+                final Hat pendingHat = playerState.getPendingPurchase();
                 // Go back to the previous menu if the pending hat is null
                 if (pendingHat == null) {
 
                     gotoPreviousMenu(playerState);
+                    return;
 
                 }
 
-                int price = pendingHat.getPrice();
+                final int price = pendingHat.getPrice();
                 boolean purchased = false;
-
                 if (SettingsManager.isEconomyEnabled()) {
 
-                    CurrencyHook currencyHook = core.getHookManager().getCurrencyHook();
-                    if (currencyHook != null && currencyHook.isEnabled()) {
-
-                        if (currencyHook.withdraw(player, price)) {
-
-                            purchased = true;
-
-                        }
-
-                    }
+                    playerState.setPendingPurchase(null);
+                    purchaseWithDiamondBank(player, playerState, pendingHat, price);
+                    return;
 
                 } else if (SettingsManager.FLAG_EXPERIENCE.getBoolean()) {
 
-                    double currentBalance = player.getLevel();
-                    double newBalance = currentBalance - price;
+                    final double currentBalance = player.getLevel();
+                    final double newBalance = currentBalance - price;
                     player.setLevel((int) newBalance);
 
                     purchased = true;
@@ -489,39 +432,21 @@ public enum ParticleAction {
 
                 if (purchased) {
 
-                    playerState.addPurchasedHat(pendingHat);
-
-                    core.getDatabase().savePlayerPurchase(player.getUniqueId(), pendingHat);
-                    core.getParticleManager().equipHat(player, pendingHat);
-
-                    if (SettingsManager.CLOSE_MENU_ON_EQUIP.getBoolean()) {
-
-                        PlayerUtil.closeInventory(player);
-
-                    } else {
-
-                        gotoPreviousMenu(playerState);
-
-                    }
+                    finishPurchase(player, playerState, pendingHat);
 
                 }
 
-                break;
-
             }
+            case PURCHASE_DENY -> {
 
-            case PURCHASE_DENY: {
-
+                playerState.setPendingPurchase(null);
                 gotoPreviousMenu(playerState);
-                break;
 
             }
+            case DEMO -> {
 
-            case DEMO: {
-
-                HatEquipEvent event = new HatEquipEvent(player, hat);
+                final HatEquipEvent event = new HatEquipEvent(player, hat);
                 Bukkit.getPluginManager().callEvent(event);
-
                 if (!event.isCancelled()) {
 
                     hat.setPermanent(false);
@@ -529,18 +454,14 @@ public enum ParticleAction {
 
                 }
 
-                break;
-
             }
+            case ACTIVE_PARTICLES -> {
 
-            case ACTIVE_PARTICLES: {
-
-                StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
-                EquippedParticlesMenu particlesMenu = new EquippedParticlesMenu(core, staticManager, player, true);
-
+                final StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
+                final EquippedParticlesMenu particlesMenu = new EquippedParticlesMenu(core, staticManager, player,
+                        true);
                 staticManager.addMenu(particlesMenu);
                 particlesMenu.open();
-                break;
 
             }
 
@@ -582,7 +503,7 @@ public enum ParticleAction {
 
         try {
 
-            return ParticleAction.valueOf(name.toUpperCase());
+            return ParticleAction.valueOf(StringUtils.upperCase(name));
 
         } catch (IllegalArgumentException e) {
 
@@ -594,9 +515,8 @@ public enum ParticleAction {
 
     private void gotoPreviousMenu(PlayerState playerState) {
 
-        StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
-        AbstractMenu menu = staticManager.getPreviousOpenMenu();
-
+        final StaticMenuManager staticManager = (StaticMenuManager) playerState.getMenuManager();
+        final AbstractMenu menu = staticManager.getPreviousOpenMenu();
         if (menu == null) {
 
             return;
@@ -609,23 +529,276 @@ public enum ParticleAction {
 
     private boolean checkAgainstEquippedHats(Hat hat, int slot, PlayerState playerState, Inventory inventory) {
 
-        if (playerState.isEquipped(hat)) {
+        if (!playerState.isEquipped(hat)) {
 
-            playerState.removeHat(hat);
-            ItemStack item = inventory.getItem(slot);
+            return false;
 
-            ItemUtil.stripHighlight(item);
+        }
 
-            // Convert List<String> to List<Component>.
-            List<Component> components = hat.getCachedDescription().stream().map(Component::text)
-                    .collect(Collectors.toList());
+        playerState.removeHat(hat);
 
-            ItemUtil.setItemDescription(item, components);
+        final ItemStack item = inventory.getItem(slot);
+        ItemUtil.stripHighlight(item);
+
+        // Convert List<String> to List<Component>.
+        final List<Component> components = hat.getCachedDescription().stream().map(Component::text)
+                .collect(Collectors.toList());
+        ItemUtil.setItemDescription(item, components);
+
+        return true;
+
+    }
+
+    private void openPurchaseMenuIfAffordable(Player player, PlayerState playerState, Hat hat, boolean canClose) {
+
+        if (!isDiamondBankAvailable()) {
+
+            return;
+
+        }
+
+        final UUID uuid = player.getUniqueId();
+        final long priceShards = hat.getPrice();
+        getSpendableShardBalance(uuid).whenComplete((playerBalance, throwable) -> {
+
+            if (throwable != null) {
+
+                handleDiamondBankFailure(player, throwable);
+                return;
+
+            }
+
+            runOnMainThread(() -> {
+
+                if (!player.isOnline()) {
+
+                    return;
+
+                }
+
+                if (playerBalance < priceShards) {
+
+                    sendInsufficientFunds(player);
+                    if (canClose) {
+
+                        PlayerUtil.closeInventory(player);
+
+                    }
+
+                    return;
+
+                }
+
+                openPendingPurchaseMenu(player, playerState, hat);
+
+            });
+
+        });
+
+    }
+
+    private void openPendingPurchaseMenu(Player player, PlayerState playerState, Hat hat) {
+
+        final StaticMenuManager staticManager = core.getMenuManagerFactory().getStaticMenuManager(playerState);
+        playerState.setPendingPurchase(hat);
+
+        final MenuInventory purchaseInventory = core.getDatabase().getPurchaseMenu(playerState);
+        final AbstractMenu pendingPurchaseMenu;
+        if (purchaseInventory != null) {
+
+            pendingPurchaseMenu = new StaticMenu(core, staticManager, player, purchaseInventory);
+
+        } else {
+
+            pendingPurchaseMenu = new StaticMenu(core, staticManager, player,
+                    PendingPurchaseMenu.defaultPendingPurchaseInventory.clone());
+
+        }
+
+        staticManager.addMenu(pendingPurchaseMenu);
+        pendingPurchaseMenu.open();
+
+    }
+
+    private void purchaseWithDiamondBank(Player player, PlayerState playerState, Hat pendingHat, long priceShards) {
+
+        if (!isDiamondBankAvailable()) {
+
+            return;
+
+        }
+
+        final UUID uuid = player.getUniqueId();
+        final String notes = "Purchased " + UtilitiesOG.stripFormatting(pendingHat.getDisplayName());
+        consumePlayerShards(uuid, priceShards, notes).whenComplete((ignored, throwable) -> {
+
+            if (throwable != null) {
+
+                handleDiamondBankFailure(player, throwable);
+                return;
+
+            }
+
+            runOnMainThread(() -> finishPurchase(player, playerState, pendingHat));
+
+        });
+
+    }
+
+    private void finishPurchase(Player player, PlayerState playerState, Hat pendingHat) {
+
+        if (!player.isOnline()) {
+
+            return;
+
+        }
+
+        playerState.setPendingPurchase(null);
+        playerState.addPurchasedHat(pendingHat);
+
+        core.getDatabase().savePlayerPurchase(player.getUniqueId(), pendingHat);
+        core.getParticleManager().equipHat(player, pendingHat);
+
+        if (SettingsManager.CLOSE_MENU_ON_EQUIP.getBoolean()) {
+
+            PlayerUtil.closeInventory(player);
+
+        } else {
+
+            gotoPreviousMenu(playerState);
+
+        }
+
+    }
+
+    private CompletableFuture<Long> getSpendableShardBalance(UUID uuid) {
+
+        return callDiamondBankAsync(() -> {
+
+            final PlayerShards shards = CosmeticsOG.getDiamondBankAPI().getAllShards(uuid);
+            return shards.getBank() + shards.getInventory();
+
+        });
+
+    }
+
+    private CompletableFuture<Void> consumePlayerShards(UUID uuid, long priceShards, String notes) {
+
+        return callDiamondBankAsync(() -> {
+
+            CosmeticsOG.getDiamondBankAPI().consumeFromPlayer(uuid, priceShards, "Cosmetics-OG purchase", notes);
+            return null;
+
+        });
+
+    }
+
+    private <T> CompletableFuture<T> callDiamondBankAsync(DiamondBankCall<T> call) {
+
+        final CompletableFuture<T> future = new CompletableFuture<>();
+        Bukkit.getScheduler().runTaskAsynchronously(CosmeticsOG.getInstance(), () -> {
+
+            try {
+
+                future.complete(call.execute());
+
+            } catch (Throwable t) {
+
+                future.completeExceptionally(t);
+
+            }
+
+        });
+
+        return future;
+
+    }
+
+    private boolean isDiamondBankAvailable() {
+
+        if (CosmeticsOG.getDiamondBankAPI() != null) {
+
             return true;
 
         }
 
+        CosmeticsOG.disableSelf("Could not find DiamondBank-OG! Disabling Cosmetics-OG...");
         return false;
+
+    }
+
+    private void handleDiamondBankFailure(Player player, Throwable throwable) {
+
+        final Throwable cause = unwrapCompletionException(throwable);
+        if (cause instanceof DiamondBankException.EconomyDisabledException) {
+
+            CosmeticsOG.disableSelf("The DiamondBank-OG economy is disabled - disabling Cosmetics-OG!");
+            return;
+
+        }
+
+        if (cause instanceof DiamondBankException.InsufficientFundsException
+                || cause instanceof DiamondBankException.InsufficientBalanceException)
+        {
+
+            runOnMainThread(() -> {
+
+                if (player.isOnline()) {
+
+                    sendInsufficientFunds(player);
+
+                }
+
+            });
+            return;
+
+        }
+
+        if (cause instanceof DiamondBankException.PlayerNotOnlineException) {
+
+            return;
+
+        }
+
+        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                "DiamondBank-OG transaction failed: " + cause.getClass().getSimpleName());
+        if (CosmeticsOG.debugging) {
+
+            cause.printStackTrace();
+
+        }
+
+    }
+
+    private Throwable unwrapCompletionException(Throwable throwable) {
+
+        if (throwable instanceof CompletionException && throwable.getCause() != null) {
+
+            return throwable.getCause();
+
+        }
+
+        return throwable;
+
+    }
+
+    private void sendInsufficientFunds(Player player) {
+
+        final String currency = SettingsManager.CURRENCY.getString();
+        CosmeticsOG.chatMessage(player, Message.INSUFFICIENT_FUNDS.getValue().replace("{1}", currency));
+
+    }
+
+    private void runOnMainThread(Runnable runnable) {
+
+        Bukkit.getScheduler().runTask(CosmeticsOG.getInstance(), runnable);
+
+    }
+
+    @FunctionalInterface
+    private interface DiamondBankCall<T> {
+
+        T execute() throws Exception;
 
     }
 

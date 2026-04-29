@@ -89,7 +89,8 @@ public class InteractListener implements Listener {
 
                 if (inventory == null) {
 
-                    player.sendMessage(Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
+                    CosmeticsOG.chatMessage(player,
+                            Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
                     return;
 
                 }

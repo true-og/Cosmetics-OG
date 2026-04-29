@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
@@ -59,7 +59,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
         this.colorFilterMenus = new HashMap<Integer, Inventory>();
         this.dataFilterMenus = new HashMap<Integer, Inventory>();
         this.recentFilterMenu = Bukkit.createInventory(null, 54,
-                Utils.legacySerializerAnyCase(Message.EDITOR_PARTICLE_MENU_RECENT_FILTER_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_PARTICLE_MENU_RECENT_FILTER_TITLE.getValue()));
 
         this.particles = new HashMap<Integer, ParticleEffect>();
         this.colorParticles = new HashMap<Integer, ParticleEffect>();
@@ -395,7 +395,7 @@ public class EditorParticleSelectionMenu extends AbstractStaticMenu {
 
             String menuTitle = title.replace("{1}", Integer.toString(i + 1)).replace("{2}",
                     Integer.toString(totalPages));
-            Inventory inventory = Bukkit.createInventory(null, 54, Utils.legacySerializerAnyCase(menuTitle));
+            Inventory inventory = Bukkit.createInventory(null, 54, UtilitiesOG.trueogColorize(menuTitle));
 
             inventory.setItem(49, backButtonItem);
             inventory.setItem(45,

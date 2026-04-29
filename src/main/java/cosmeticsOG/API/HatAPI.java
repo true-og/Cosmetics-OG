@@ -55,7 +55,8 @@ public class HatAPI extends ParticleHatsAPI {
 
         if (tellPlayer) {
 
-            player.sendMessage(Message.COMMAND_SET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
+            CosmeticsOG.chatMessage(player,
+                    Message.COMMAND_SET_SUCCESS.getValue().replace("{1}", hat.getDisplayName()));
 
         }
 

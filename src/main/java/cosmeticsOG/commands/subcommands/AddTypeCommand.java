@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.database.type.DatabaseType;
@@ -26,13 +26,13 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, getUsage().getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, getUsage().getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.logToConsole(getUsage().getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), getUsage().getValue());
 
             }
 
@@ -44,11 +44,11 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ADD_TYPE_ERROR.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ADD_TYPE_ERROR.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ADD_TYPE_ERROR.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ADD_TYPE_ERROR.getValue());
 
             }
 
@@ -61,12 +61,12 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ERROR_TYPE_EXISTS.replace("{1}", imageName));
 
             }
 
@@ -80,12 +80,12 @@ public class AddTypeCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender,
-                        Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                        Message.COMMAND_ADD_TYPE_SUCCESS.replace("{1}", imageName));
 
             }
 

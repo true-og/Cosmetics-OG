@@ -1,7 +1,7 @@
 package cosmeticsOG.commands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.database.Database;
 import cosmeticsOG.database.properties.Group;
 import cosmeticsOG.locale.Message;
@@ -26,7 +26,7 @@ public class MainCommand extends Command {
 
             if (!sender.isPlayer()) {
 
-                Utils.logToConsole(Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_PLAYER_ONLY.getValue());
                 return false;
 
             }
@@ -63,16 +63,16 @@ public class MainCommand extends Command {
 
                 if (usingGroupMenu) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(),
+                    CosmeticsOG.chatMessage(sender.getPlayer(),
                             Message.COMMAND_ERROR_UNKNOWN_GROUP_MENU.getValue().replace("{1}", menuName));
 
                 } else {
 
                     // TODO: Figure out why the menu isn't in the database.
                     Player player = sender.getPlayer();
-                    Utils.cosmeticsOGPlaceholderMessage(player,
+                    CosmeticsOG.chatMessage(player,
                             "Does the menu exist in the database?: " + String.valueOf(database.menuExists(menuName)));
-                    Utils.cosmeticsOGPlaceholderMessage(player,
+                    CosmeticsOG.chatMessage(player,
                             Message.COMMAND_ERROR_UNKNOWN_MENU.getValue().replace("{1}", menuName));
 
                 }
@@ -98,11 +98,11 @@ public class MainCommand extends Command {
 
                 if (sender.isPlayer()) {
 
-                    Utils.cosmeticsOGPlaceholderMessage(sender.getPlayer(), Message.COMMAND_ERROR_UNKNOWN.getValue());
+                    CosmeticsOG.chatMessage(sender.getPlayer(), Message.COMMAND_ERROR_UNKNOWN.getValue());
 
                 } else {
 
-                    Utils.logToConsole(Message.COMMAND_ERROR_UNKNOWN.getValue());
+                    UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_ERROR_UNKNOWN.getValue());
 
                 }
 

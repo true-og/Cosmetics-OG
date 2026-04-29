@@ -1,7 +1,7 @@
 package cosmeticsOG.editor.menus;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.editor.EditorLore;
 import cosmeticsOG.editor.EditorMenuManager;
 import cosmeticsOG.locale.Message;
@@ -25,7 +25,7 @@ public class EditorDurationMenu extends AbstractStaticMenu {
         this.targetHat = menuManager.getBaseHat();
         this.callback = callback;
         this.inventory = Bukkit.createInventory(null, 27,
-                Utils.legacySerializerAnyCase(Message.EDITOR_DURATION_MENU_TITLE.getValue()));
+                UtilitiesOG.trueogColorize(Message.EDITOR_DURATION_MENU_TITLE.getValue()));
 
         build();
 

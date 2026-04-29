@@ -1,7 +1,7 @@
 package cosmeticsOG.ui;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.locale.Message;
 import cosmeticsOG.managers.SettingsManager;
 import cosmeticsOG.particles.Hat;
@@ -100,7 +100,7 @@ public class StaticMenu extends AbstractStaticMenu {
 
         Material lockedMaterial = SettingsManager.MENU_LOCKED_ITEM.getMaterial();
         int lockedMaterialDurability = SettingsManager.MENU_LOCKED_ITEM_DAMAGE.getInt();
-        TextComponent lockedTitle = Utils.legacySerializerAnyCase(SettingsManager.MENU_LOCKED_ITEM_TITLE.getString());
+        TextComponent lockedTitle = UtilitiesOG.trueogColorize(SettingsManager.MENU_LOCKED_ITEM_TITLE.getString());
 
         List<Hat> equippedHats = core.getPlayerState(owner).getActiveHats();
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -248,7 +248,7 @@ public class StaticMenu extends AbstractStaticMenu {
 
         }
 
-        TextComponent equippedLore = Utils.legacySerializerAnyCase(Message.HAT_EQUIPPED_DESCRIPTION.getValue());
+        TextComponent equippedLore = UtilitiesOG.trueogColorize(Message.HAT_EQUIPPED_DESCRIPTION.getValue());
 
         String[] lineInfo = StringUtil.parseValue(equippedLore.content(), "1");
 

@@ -1,7 +1,7 @@
 package cosmeticsOG.commands.subcommands;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Command;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.locale.Message;
@@ -33,8 +33,8 @@ public class ClearCommand extends Command {
 
             if (!sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_USAGE.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_ERROR_ARGUMENTS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_CLEAR_PLAYER_USAGE.getValue());
 
                 return false;
 
@@ -44,11 +44,11 @@ public class ClearCommand extends Command {
 
             if (sender.isPlayer()) {
 
-                Utils.cosmeticsOGPlaceholderMessage((Player) sender, Message.COMMAND_CLEAR_SUCCESS.getValue());
+                CosmeticsOG.chatMessage((Player) sender, Message.COMMAND_CLEAR_SUCCESS.getValue());
 
             } else {
 
-                Utils.logToConsole(Message.COMMAND_CLEAR_SUCCESS.getValue());
+                UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), Message.COMMAND_CLEAR_SUCCESS.getValue());
 
             }
 

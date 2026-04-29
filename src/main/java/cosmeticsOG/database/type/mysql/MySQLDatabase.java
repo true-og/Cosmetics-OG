@@ -1,9 +1,9 @@
 package cosmeticsOG.database.type.mysql;
 
+import net.trueog.utilitiesog.UtilitiesOG;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import cosmeticsOG.CosmeticsOG;
-import cosmeticsOG.Utils;
 import cosmeticsOG.commands.Sender;
 import cosmeticsOG.compatibility.CompatibleMaterial;
 import cosmeticsOG.configuration.CustomConfig;
@@ -115,7 +115,7 @@ public class MySQLDatabase implements Database {
             helper.initDatabase(core);
             connected = true;
 
-            Utils.logToConsole("Successfully connected to MySQL database");
+            UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(), "Successfully connected to MySQL database");
 
         } catch (Exception e) {
 
@@ -1246,12 +1246,13 @@ public class MySQLDatabase implements Database {
 
                     if (sender.isPlayer()) {
 
-                        Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        CosmeticsOG.chatMessage((Player) sender,
                                 Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuConfig.getName()));
 
                     } else {
 
-                        Utils.logToConsole(Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuConfig.getName()));
+                        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
+                                Message.COMMAND_IMPORT_SUCCESS.replace("{1}", menuConfig.getName()));
 
                     }
 
@@ -1263,12 +1264,12 @@ public class MySQLDatabase implements Database {
 
                     if (sender.isPlayer()) {
 
-                        Utils.cosmeticsOGPlaceholderMessage((Player) sender,
+                        CosmeticsOG.chatMessage((Player) sender,
                                 Message.COMMAND_IMPORT_ERROR.replace("{1}", error.getClass().getSimpleName()));
 
                     } else {
 
-                        Utils.logToConsole(
+                        UtilitiesOG.logToConsole(CosmeticsOG.getPrefix(),
                                 Message.COMMAND_IMPORT_ERROR.replace("{1}", error.getClass().getSimpleName()));
 
                     }
@@ -1285,7 +1286,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Adds an exiting .yml menu into the database
-     * 
+     *
      * @param menuConfig
      * @return
      * @throws SQLException
@@ -1692,7 +1693,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Inserts an image into the database
-     * 
+     *
      * @param imageName
      * @param image
      * @return
@@ -1736,7 +1737,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Creates an empty menu in the database
-     * 
+     *
      * @param menuName
      * @param title
      * @param rows
@@ -1815,7 +1816,7 @@ public class MySQLDatabase implements Database {
 
             while (menuResult.next()) {
 
-                final TextComponent menuTitle = Utils.legacySerializerAnyCase(menuResult.getString("title"));
+                final TextComponent menuTitle = UtilitiesOG.trueogColorize(menuResult.getString("title"));
                 final int menuSize = menuResult.getInt("size");
                 final String alias = menuResult.getString("alias");
 
@@ -1971,7 +1972,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Updates the database with any changes
-     * 
+     *
      * @param menuName
      * @param slot
      * @param sqlQuery
@@ -2013,8 +2014,8 @@ public class MySQLDatabase implements Database {
 
             // Using legacySerializerAnyCase to handle any-case color codes
             ItemMeta meta = item.getItemMeta();
-            meta.displayName(Utils.legacySerializerAnyCase(hat.getDisplayName())); // Convert color-coded string to
-                                                                                   // Component
+            meta.displayName(UtilitiesOG.trueogColorize(hat.getDisplayName())); // Convert color-coded string to
+                                                                                // Component
 
             while (set.next()) {
 
@@ -2022,16 +2023,16 @@ public class MySQLDatabase implements Database {
                 switch (type) {
 
                     case DESCRIPTION:
-                        descriptionComponents.add(Utils.legacySerializerAnyCase(set.getString("value"))); // Handle
-                                                                                                          // any-case
-                                                                                                          // color codes
+                        descriptionComponents.add(UtilitiesOG.trueogColorize(set.getString("value"))); // Handle
+                                                                                                       // any-case
+                                                                                                       // color codes
                         break;
 
                     case PERMISSION_DESCRIPTION:
-                        permissionDescriptionComponents.add(Utils.legacySerializerAnyCase(set.getString("value"))); // Handle
-                                                                                                                    // any-case
-                                                                                                                    // color
-                                                                                                                    // codes
+                        permissionDescriptionComponents.add(UtilitiesOG.trueogColorize(set.getString("value"))); // Handle
+                                                                                                                 // any-case
+                                                                                                                 // color
+                                                                                                                 // codes
                         break;
 
                     case ICON:
@@ -2320,7 +2321,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Moves data from one table to another table
-     * 
+     *
      * @param fromMenu
      * @param toMenu
      * @param fromSlot
@@ -2380,7 +2381,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Moves hat data to a new slot
-     * 
+     *
      * @param menuName
      * @param previousSlot
      * @param newSlot
@@ -2408,7 +2409,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Swaps hat data with an existing slot
-     * 
+     *
      * @param menuName
      * @param previousSlot
      * @param newSlot
@@ -2502,7 +2503,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Returns the value stored at the column label, or the default value if null
-     * 
+     *
      * @param set
      * @param columnLabel
      * @param defaultValue
@@ -2524,7 +2525,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Returns the value stored at the column index, or the default value if 0
-     * 
+     *
      * @param set
      * @param columnLabel
      * @param defaultValue
@@ -2546,7 +2547,7 @@ public class MySQLDatabase implements Database {
 
     /**
      * Returns the value stored at the column index, or the default value if 0
-     * 
+     *
      * @param set
      * @param columnLabel
      * @param defaultValue
