@@ -198,3 +198,16 @@ items:
     particles:
       '1':
         particle: NOTE
+  '34':
+    name: '&dRainbow Halo'
+    id: NETHER_STAR
+    action:
+      left-click:
+        id: override
+    type: rainbow_halo
+    location: head
+    update-frequency: 1
+    particles:
+      '1':
+        particle: REDSTONE
+        color: random

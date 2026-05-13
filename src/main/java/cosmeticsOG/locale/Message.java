@@ -348,9 +348,10 @@ public enum Message {
      * Types
      */
     TYPE_NONE_NAME("&cNone"), TYPE_NONE_DESCRIPTION("&8Does absolutely nothing"), TYPE_HALO_NAME("&bHalo"),
-    TYPE_HALO_DESCRIPTION("&8A ring of particles for the/n&8players head"), TYPE_TRAIL_NAME("&bTrail"),
-    TYPE_TRAIL_DESCRIPTION("&8Displays a small cloud of particles/n&8with random offsets"), TYPE_CAPE_NAME("&bCape"),
-    TYPE_CAPE_DESCRIPTION("&8A Cape worn on the players back"), TYPE_WINGS_NAME("&bWings"),
+    TYPE_HALO_DESCRIPTION("&8A ring of particles for the/n&8players head"), TYPE_RAINBOW_HALO_NAME("&dRainbow Halo"),
+    TYPE_RAINBOW_HALO_DESCRIPTION("&8A spinning rainbow ring of/n&8particles above the players head"),
+    TYPE_TRAIL_NAME("&bTrail"), TYPE_TRAIL_DESCRIPTION("&8Displays a small cloud of particles/n&8with random offsets"),
+    TYPE_CAPE_NAME("&bCape"), TYPE_CAPE_DESCRIPTION("&8A Cape worn on the players back"), TYPE_WINGS_NAME("&bWings"),
     TYPE_WINGS_DESCRIPTION("&8Default Wings"), TYPE_VORTEX_NAME("&bVortex"),
     TYPE_VORTEX_DESCRIPTION("&8A Swirling cone that gets/n&8larger at the bottom"), TYPE_ARCH_NAME("&bArch"),
     TYPE_ARCH_DESCRIPTION("&8A half circle that sits/n&8above the players head"), TYPE_ATOM_NAME("&bAtom"),

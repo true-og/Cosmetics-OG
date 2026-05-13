@@ -13,6 +13,7 @@ import cosmeticsOG.particles.effects.CrystalEffect;
 import cosmeticsOG.particles.effects.Debug5x5Effect;
 import cosmeticsOG.particles.effects.Debug6x6Effect;
 import cosmeticsOG.particles.effects.HaloEffect;
+import cosmeticsOG.particles.effects.RainbowHaloEffect;
 import cosmeticsOG.particles.effects.HelixEffect;
 import cosmeticsOG.particles.effects.HoopEffect;
 import cosmeticsOG.particles.effects.InverseVortexEffect;
@@ -40,7 +41,8 @@ public enum ParticleType {
     ANGEL_WINGS(14, new AngelWingsEffect()), CREEPER_HAT(15, new CreeperEffect()),
     CLEAN_TRAIL(16, new CleanTrailEffect()), TORNADO(17, new TornadoEffect()), CUSTOM(18, new PixelEffect()),
     PARTICLEHATS(19, new ParticleHatsEffect()), ANIMATED(20, new AnimatedEffect(), true),
-    DEBUG_5X5(-1, new Debug5x5Effect(), true), DEBUG_6X6(-2, new Debug6x6Effect(), true);
+    RAINBOW_HALO(21, new RainbowHaloEffect()), DEBUG_5X5(-1, new Debug5x5Effect(), true),
+    DEBUG_6X6(-2, new Debug6x6Effect(), true);
 
     private final int id;
     private final Effect effect;
